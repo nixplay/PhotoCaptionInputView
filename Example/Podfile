@@ -1,0 +1,12 @@
+use_frameworks!
+
+target 'PhotoCaptionInputView_Example' do
+  pod 'PhotoCaptionInputView', :path => '../'
+
+  target 'PhotoCaptionInputView_Tests' do
+    inherit! :search_paths
+
+    pod 'Kiwi'
+  pod 'FBSnapshotTestCase'
+  end
+end
