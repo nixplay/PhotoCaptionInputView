@@ -19,9 +19,17 @@
     "ios": "8.0"
   },
   "source_files": "PhotoCaptionInputView/Classes/**/*",
+  "requires_arc": true,
+  "frameworks": [
+    "ImageIO",
+    "QuartzCore",
+    "AssetsLibrary",
+    "MediaPlayer"
+  ],
+  "weak_frameworks": "Photos",
   "resource_bundles": {
     "PhotoCaptionInputView": [
-      "Pod/Assets/*.png"
+      "PhotoCaptionInputView/Assets/*.png"
     ]
   },
   "requires_arc": true,
