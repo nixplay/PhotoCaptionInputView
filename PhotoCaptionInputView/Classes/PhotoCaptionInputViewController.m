@@ -15,6 +15,7 @@
 @end
 
 @implementation PhotoCaptionInputViewController
+@synthesize browser = _browser;
 @synthesize collectionView = _collectionView;
 @synthesize addButton = _addButton;
 #pragma mark - Init
@@ -33,15 +34,28 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-}
--(void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+    
     BOOL displayActionButton = NO;
     BOOL displaySelectionButtons = NO;
     BOOL displayNavArrows = NO;
     BOOL enableGrid = NO;
     BOOL startOnGrid = NO;
     BOOL autoPlayOnAppear = NO;
+    self.browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+    self.browser.displayActionButton = displayActionButton;
+    self.browser.displayNavArrows = displayNavArrows;
+    self.browser.displaySelectionButtons = displaySelectionButtons;
+    self.browser.alwaysShowControls = displaySelectionButtons;
+    self.browser.zoomPhotosToFill = YES;
+    self.browser.enableGrid = enableGrid;
+    self.browser.startOnGrid = startOnGrid;
+    self.browser.enableSwipeToDismiss = NO;
+    self.browser.autoPlayOnAppear = autoPlayOnAppear;
+    [self.browser setCurrentPhotoIndex:0];
+}
+-(void) viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     if(self.photos == nil || [self.photos count] == 0){
         NSMutableArray *photos = [[NSMutableArray alloc] init];
         
@@ -795,32 +809,30 @@
         photo.caption = @"Mannequin DoF";
         [photos addObject:photo];
         [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];
+        
         self.photos = photos;
         self.thumbs = thumbs;
     }
     
-    MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
-    browser.displayActionButton = displayActionButton;
-    browser.displayNavArrows = displayNavArrows;
-    browser.displaySelectionButtons = displaySelectionButtons;
-    browser.alwaysShowControls = displaySelectionButtons;
-    browser.zoomPhotosToFill = YES;
-    browser.enableGrid = enableGrid;
-    browser.startOnGrid = startOnGrid;
-    browser.enableSwipeToDismiss = NO;
-    browser.autoPlayOnAppear = autoPlayOnAppear;
-    [browser setCurrentPhotoIndex:0];
-    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:browser];
-    [self presentViewController:nc animated:NO completion:^{
-        
-    }];
+    
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:self.browser];
+   
     float initY = self.view.frame.size.height * (9.0/10.0);
     float initHeight = self.view.frame.size.height * (1.0/10.0);
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
+    flowLayout.sectionInset = UIEdgeInsetsMake(0, 25, 0, 25);
+    flowLayout.itemSize = CGSizeMake(50, 50);
+    flowLayout.minimumLineSpacing = 2;
+    flowLayout.minimumInteritemSpacing = 2;
+    flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
+    UIView * graoupView = [[UIView alloc]initWithFrame:CGRectMake(0,
+                                                                 initY,
+                                                                 self.view.frame.size.width,
+                                                                  initHeight)];
     
     self.collectionView = [[UICollectionView alloc]initWithFrame:
                            CGRectMake(0,
@@ -828,6 +840,7 @@
                                       self.view.frame.size.width-initHeight,
                                       initHeight) collectionViewLayout:flowLayout
                                   ];
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
     [self.collectionView registerClass:[MWGridCell class] forCellWithReuseIdentifier:@"GridCell"];
     
@@ -836,16 +849,24 @@
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
+    
+    
+//    [graoupView addSubview:self.collectionView];
+    
+    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.collectionView.frame.origin.x + self.collectionView.frame.size.width,
+                                                               initY,
+                                                               initHeight,
+                                                               initHeight
+                                                               ) ];
+    self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    [nc.view addSubview:self.addButton];
+//    [self.addButton setImage:[UIImage imageForResourcePath:@"PhotoCaptionInputViewController.bundle/add_button" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] forState:UIControlStateNormal];
+//    [graoupView addSubview:self.addButton];
     [nc.view addSubview:self.collectionView];
     
-    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width-initHeight,
-                                                              initY,
-                                                              initHeight,
-                                                               initHeight) ];
-    
-    
-    [self.addButton setImage:[UIImage imageForResourcePath:@"PhotoCaptionInputViewController.bundle/add_button" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] forState:UIControlStateNormal];
-    [nc.view addSubview:self.addButton];
+    [self presentViewController:nc animated:NO completion:^{
+        
+    }];
 }
 - (void)_initialisation {
     
@@ -865,7 +886,6 @@
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
     MWGridCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"GridCell" forIndexPath:indexPath];
     if (!cell) {
         cell = [[MWGridCell alloc] init];
@@ -885,6 +905,16 @@
     return cell;
     
 }
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    dispatch_async (dispatch_get_main_queue (), ^{
+        [self.browser setCurrentPhotoIndex:indexPath.item];
+        
+        [self.collectionView layoutIfNeeded];
+        
+        [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+    });
+}
 
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
     if (photo) {
@@ -901,6 +931,29 @@
 
 
 #pragma mark MWPhotoBrowserDelegate
+
+- (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index{
+    if(self.collectionView != NULL){
+        if(self.prevSelectItem != NULL){
+            
+            [self.prevSelectItem setHighlighted: NO];
+        }
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
+        NSLog(@"index path  %@",indexPath);
+        MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+        if(cell != NULL){
+            [cell setHighlighted:YES];
+            self.prevSelectItem = cell;
+             dispatch_async (dispatch_get_main_queue (), ^{
+                 [self.collectionView layoutIfNeeded];
+//                 [self.collectionView reloadData];
+                  
+                 [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+             });
+        }
+        
+    }
+}
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
     return [self.photos count];
 }

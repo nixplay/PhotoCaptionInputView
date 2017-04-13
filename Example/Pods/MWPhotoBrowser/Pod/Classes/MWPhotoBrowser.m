@@ -216,18 +216,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [_doneButton setBackgroundImage:nil forState:UIControlStateHighlighted barMetrics:UIBarMetricsLandscapePhone];
         [_doneButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateNormal];
         [_doneButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateHighlighted];
-        self.navigationItem.leftBarButtonItem = _doneButton;
-        
-        _selectButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectButtonPressed:)];
-        // Set appearance
-        [_selectButton setBackgroundImage:nil forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-        [_selectButton setBackgroundImage:nil forState:UIControlStateNormal barMetrics:UIBarMetricsLandscapePhone];
-        [_selectButton setBackgroundImage:nil forState:UIControlStateHighlighted barMetrics:UIBarMetricsDefault];
-        [_selectButton setBackgroundImage:nil forState:UIControlStateHighlighted barMetrics:UIBarMetricsLandscapePhone];
-        [_selectButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateNormal];
-        [_selectButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateHighlighted];
-        self.navigationItem.rightBarButtonItem = _selectButton;
-        
+        self.navigationItem.rightBarButtonItem = _doneButton;
     } else {
         // We're not first so show back button
         UIViewController *previousViewController = [self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count-2];
@@ -1586,23 +1575,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         }
     }
 }
-
-- (void)selectButtonPressed:(id)sender {
-    if (self.enableGrid && _gridController) {
-        _gridController.selectionMode = !_gridController.selectionMode;
-        if(_gridController.selectionMode){
-            
-            [_selectButton setTitle:NSLocalizedString(@"Cancel", nil)];
-            [_gridController.collectionView reloadData];
-        }else{
-            [_selectButton setTitle:NSLocalizedString(@"Select", nil)];
-            [_gridController.collectionView reloadData];
-        }
-        return;
-    }
-
-}
-
 
 #pragma mark - Actions
 

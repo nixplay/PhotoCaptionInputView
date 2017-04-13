@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "summary": "A short description of PhotoCaptionInputView.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/James Kong/PhotoCaptionInputView",
+  "homepage": "https://github.com/nixplay/PhotoCaptionInputView",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -16,7 +16,7 @@
     "tag": "0.1.0"
   },
   "platforms": {
-    "ios": "9.0"
+    "ios": "8.0"
   },
   "source_files": "PhotoCaptionInputView/Classes/**/*",
   "resource_bundles": {
@@ -24,8 +24,19 @@
       "Pod/Assets/*.png"
     ]
   },
+  "requires_arc": true,
+  "frameworks": [
+    "ImageIO",
+    "QuartzCore",
+    "AssetsLibrary",
+    "MediaPlayer"
+  ],
+  "weak_frameworks": "Photos",
   "dependencies": {
     "MWPhotoBrowser": [
+
+    ],
+    "MHVideoPhotoGallery": [
 
     ]
   }

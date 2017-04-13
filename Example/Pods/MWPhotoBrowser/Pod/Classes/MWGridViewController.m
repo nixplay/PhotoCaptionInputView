@@ -172,13 +172,8 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    if(!_selectionMode){
-        [_browser setCurrentPhotoIndex:indexPath.row];
-        [_browser hideGrid];
-    }else{
-        MWGridCell * cell = (MWGridCell*)[collectionView cellForItemAtIndexPath:indexPath];
-        [cell setIsSelected:!cell.selected];
-    }
+    [_browser setCurrentPhotoIndex:indexPath.row];
+    [_browser hideGrid];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
