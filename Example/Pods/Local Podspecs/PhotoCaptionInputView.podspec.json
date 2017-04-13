@@ -1,0 +1,32 @@
+{
+  "name": "PhotoCaptionInputView",
+  "version": "0.1.0",
+  "summary": "A short description of PhotoCaptionInputView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/James Kong/PhotoCaptionInputView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "James Kong": "james.kong@nixplay.com"
+  },
+  "source": {
+    "git": "https://github.com/James Kong/PhotoCaptionInputView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "PhotoCaptionInputView/Classes/**/*",
+  "resource_bundles": {
+    "PhotoCaptionInputView": [
+      "Pod/Assets/*.png"
+    ]
+  },
+  "dependencies": {
+    "MWPhotoBrowser": [
+
+    ]
+  }
+}

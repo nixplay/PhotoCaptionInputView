@@ -1,0 +1,49 @@
+PODS:
+  - DACircularProgress (2.3.1)
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - Kiwi (2.4.0)
+  - MBProgressHUD (1.0.0)
+  - MWPhotoBrowser (2.1.2):
+    - DACircularProgress
+    - MBProgressHUD
+    - SDWebImage
+  - PhotoCaptionInputView (0.1.0):
+    - MWPhotoBrowser
+  - SDWebImage (4.0.0):
+    - SDWebImage/Core (= 4.0.0)
+  - SDWebImage/Core (4.0.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase
+  - Kiwi
+  - MWPhotoBrowser (from `https://github.com/nixplay/MWPhotoBrowser.git`, branch `develop`)
+  - PhotoCaptionInputView (from `../`)
+
+EXTERNAL SOURCES:
+  MWPhotoBrowser:
+    :branch: develop
+    :git: https://github.com/nixplay/MWPhotoBrowser.git
+  PhotoCaptionInputView:
+    :path: "../"
+
+CHECKOUT OPTIONS:
+  MWPhotoBrowser:
+    :commit: f4c4e949caae474ebc2f68d0f69b9aac85c79b0e
+    :git: https://github.com/nixplay/MWPhotoBrowser.git
+
+SPEC CHECKSUMS:
+  DACircularProgress: 4dd437c0fc3da5161cb289e07ac449493d41db71
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
+  MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
+  MWPhotoBrowser: e119eed9786d088e65b32d9a56f15c4708868eaf
+  PhotoCaptionInputView: 778f2a8c7e0406b18b2f774df5dcad6f69b4f6cd
+  SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
+
+PODFILE CHECKSUM: 698d8d6c22fd222c3bf3c268b9c1ca3aea353f85
+
+COCOAPODS: 1.2.0

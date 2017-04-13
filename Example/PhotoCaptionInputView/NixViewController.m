@@ -7,7 +7,7 @@
 //
 
 #import "NixViewController.h"
-
+#import "PhotoCaptionInputViewController.h"
 @interface NixViewController ()
 
 @end
@@ -17,9 +17,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+//    [self presentViewController:vc animated:NO completion:^{
+//        
+//    }];
 	// Do any additional setup after loading the view, typically from a nib.
 }
 
+-(void) viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] init];
+    [self presentViewController:vc animated:NO completion:^{
+        
+    }];
+    
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

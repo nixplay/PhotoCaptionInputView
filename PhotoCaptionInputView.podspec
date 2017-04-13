@@ -21,17 +21,23 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/James Kong/PhotoCaptionInputView'
+  s.homepage         = 'https://github.com/nixplay/PhotoCaptionInputView'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'James Kong' => 'james.kong@nixplay.com' }
   s.source           = { :git => 'https://github.com/James Kong/PhotoCaptionInputView.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   s.source_files = 'PhotoCaptionInputView/Classes/**/*'
-  
+  s.resource_bundles = {
+    'PhotoCaptionInputView' => ['Pod/Assets/*.png']
+  }
+  s.requires_arc = true
+  s.frameworks = 'ImageIO', 'QuartzCore', 'AssetsLibrary', 'MediaPlayer'
+  s.weak_frameworks = 'Photos'
+
   # s.resource_bundles = {
   #   'PhotoCaptionInputView' => ['PhotoCaptionInputView/Assets/*.png']
   # }
@@ -39,4 +45,5 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'MWPhotoBrowser'
 end
