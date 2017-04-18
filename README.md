@@ -1,6 +1,6 @@
 # PhotoCaptionInputView
 
-[![CI Status](http://img.shields.io/travis/James Kong/PhotoCaptionInputView.svg?style=flat)](https://travis-ci.org/James Kong/PhotoCaptionInputView)
+[![CI Status](http://img.shields.io/travis/nixplay/PhotoCaptionInputView.svg?style=flat)](https://travis-ci.org/nixplay/PhotoCaptionInputView)
 [![Version](https://img.shields.io/cocoapods/v/PhotoCaptionInputView.svg?style=flat)](http://cocoapods.org/pods/PhotoCaptionInputView)
 [![License](https://img.shields.io/cocoapods/l/PhotoCaptionInputView.svg?style=flat)](http://cocoapods.org/pods/PhotoCaptionInputView)
 [![Platform](https://img.shields.io/cocoapods/p/PhotoCaptionInputView.svg?style=flat)](http://cocoapods.org/pods/PhotoCaptionInputView)
