@@ -16,26 +16,20 @@
 @end
 
 @implementation PhotoCaptionInputViewController
-@synthesize browser = _browser;
+
 @synthesize collectionView = _collectionView;
 @synthesize addButton = _addButton;
 @synthesize textfield = _textfield;
-@synthesize navigationController = _navigationController;
-
+@synthesize selfDelegate = _selfDelegate;
 #pragma mark - Init
 
-- (id)init {
-    if ((self = [super init])) {
-        [self _initialisation];
-    }
-    return self;
-}
-
--(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails{
+-(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self _initialisation];
         self.photos = [NSMutableArray arrayWithArray:photos];
         self.thumbs = thumbnails;
+        _selfDelegate = delegate;
+        self.delegate = self;
     }
     return self;
     
@@ -48,35 +42,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onKeyboardDidShow:)
-                                                 name:UIKeyboardWillShowNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onKeyboardWillHide:)
-                                                 name:UIKeyboardWillHideNotification
-                                               object:nil];
-    BOOL displayActionButton = NO;
-    BOOL displaySelectionButtons = NO;
-    BOOL displayNavArrows = NO;
-    BOOL enableGrid = NO;
-    BOOL startOnGrid = NO;
-    BOOL autoPlayOnAppear = NO;
-    self.browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
-    self.browser.displayActionButton = displayActionButton;
-    self.browser.displayNavArrows = displayNavArrows;
-    self.browser.displaySelectionButtons = displaySelectionButtons;
-    self.browser.alwaysShowControls = displaySelectionButtons;
-    self.browser.zoomPhotosToFill = YES;
-    self.browser.enableGrid = enableGrid;
-    self.browser.startOnGrid = startOnGrid;
-    self.browser.enableSwipeToDismiss = NO;
-    self.browser.autoPlayOnAppear = autoPlayOnAppear;
-    [self.browser setCurrentPhotoIndex:0];
-}
--(void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
+
     if(self.photos == nil || [self.photos count] == 0){
         NSMutableArray *photos = [[NSMutableArray alloc] init];
         
@@ -104,8 +70,7 @@
     }
     
     
-    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:self.browser];
-   
+    
     float initY = self.view.frame.size.height * (11.0/12.0)-10;
     float initHeight = self.view.frame.size.height * (1.0/12.0);
     
@@ -119,8 +84,8 @@
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
     UIView * graoupView = [[UIView alloc]initWithFrame:CGRectMake(0,
-                                                                 initY,
-                                                                 self.view.frame.size.width,
+                                                                  initY,
+                                                                  self.view.frame.size.width,
                                                                   initHeight)];
     
     self.collectionView = [[UICollectionView alloc]initWithFrame:
@@ -128,7 +93,7 @@
                                       initY,
                                       self.view.frame.size.width-initHeight,
                                       initHeight) collectionViewLayout:flowLayout
-                                  ];
+                           ];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
     [self.collectionView registerClass:[MWGridCell class] forCellWithReuseIdentifier:@"GridCell"];
@@ -148,9 +113,9 @@
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
     self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-    [nc.view addSubview:self.addButton];
-
-    [nc.view addSubview:self.collectionView];
+    [self.view addSubview:self.addButton];
+    
+    [self.view addSubview:self.collectionView];
     
     
     CGRect rect = CGRectMake(0, initY-32, self.view.frame.size.width, 31);
@@ -172,16 +137,36 @@
     
     textfield.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     _textfield = textfield;
-    [nc.view addSubview:_textfield];
-    
-    
-    [self presentViewController:nc animated:NO completion:^{
-        
-    }];
-    _navigationController = nc;
+    [self.view addSubview:_textfield];
 }
+
 - (void)_initialisation {
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onKeyboardDidShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onKeyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+    BOOL displayActionButton = NO;
+    BOOL displaySelectionButtons = NO;
+    BOOL displayNavArrows = NO;
+    BOOL enableGrid = NO;
+    BOOL startOnGrid = NO;
+    BOOL autoPlayOnAppear = NO;
+    
+    self.displayActionButton = displayActionButton;
+    self.displayNavArrows = displayNavArrows;
+    self.displaySelectionButtons = displaySelectionButtons;
+    self.alwaysShowControls = displaySelectionButtons;
+    self.zoomPhotosToFill = YES;
+    self.enableGrid = enableGrid;
+    self.startOnGrid = startOnGrid;
+    self.enableSwipeToDismiss = NO;
+    self.autoPlayOnAppear = autoPlayOnAppear;
+    [self setCurrentPhotoIndex:0];
 
     
     // Do any additional setup after loading the view.
@@ -247,7 +232,7 @@
     [UIView beginAnimations: @"animateTextField" context: nil];
     [UIView setAnimationBeginsFromCurrentState: YES];
     [UIView setAnimationDuration: movementDuration];
-    _navigationController.view.frame = CGRectOffset(_navigationController.view.frame, 0, movement);
+    self.view.frame = CGRectOffset(self.view.frame, 0, movement);
     [UIView commitAnimations];
 }
 
@@ -286,7 +271,7 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     dispatch_async (dispatch_get_main_queue (), ^{
-        [self.browser setCurrentPhotoIndex:indexPath.item];
+        [self setCurrentPhotoIndex:indexPath.item];
         
         [self.collectionView layoutIfNeeded];
         
@@ -348,6 +333,15 @@
 //    return captionView;
     return nil;
 }
+
+- (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
+
+//    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
+    if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
+        [_selfDelegate onDismiss];
+    }
+}
+
 
 - (void)didReceiveMemoryWarning {
     self.collectionView = nil;

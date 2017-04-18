@@ -781,7 +781,7 @@
         [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];
     }
     
-    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs];
+    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs delegate:self];
     [self presentViewController:vc animated:NO completion:^{
         
     }];
@@ -792,4 +792,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - PhotoCaptionInputViewDelegate
+
+-(void) onDismiss{
+    
+}
 @end

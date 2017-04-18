@@ -7,7 +7,7 @@
 //
 
 @import UIKit;
-
-@interface NixViewController : UIViewController
+#import "PhotoCaptionInputViewController.h"
+@interface NixViewController : UIViewController<PhotoCaptionInputViewDelegate>
 
 @end
