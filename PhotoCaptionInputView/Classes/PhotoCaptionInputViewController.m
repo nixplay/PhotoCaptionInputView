@@ -10,6 +10,7 @@
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
+
 @interface PhotoCaptionInputViewController ()
 
 @end
@@ -33,7 +34,7 @@
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails{
     if ((self = [super init])) {
         [self _initialisation];
-        self.photos = photos;
+        self.photos = [NSMutableArray arrayWithArray:photos];
         self.thumbs = thumbnails;
     }
     return self;
@@ -47,7 +48,14 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onKeyboardDidShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onKeyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
     BOOL displayActionButton = NO;
     BOOL displaySelectionButtons = NO;
     BOOL displayNavArrows = NO;
@@ -98,8 +106,8 @@
     
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:self.browser];
    
-    float initY = self.view.frame.size.height * (9.0/10.0);
-    float initHeight = self.view.frame.size.height * (1.0/10.0);
+    float initY = self.view.frame.size.height * (11.0/12.0)-10;
+    float initHeight = self.view.frame.size.height * (1.0/12.0);
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
@@ -179,31 +187,59 @@
     // Do any additional setup after loading the view.
 }
 
+-(void) viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidShowNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
+}
+
 #pragma mark UITextFieldDelegate
+
+-(void) onKeyboardDidShow :(NSNotification*)notification
+{
+    NSDictionary* keyboardInfo = [notification userInfo];
+    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+    _keyboardRect = [keyboardFrameBegin CGRectValue];
+    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect];
+}
+
+-(void) onKeyboardWillHide :(NSNotification*)notification
+{
+//    NSDictionary* keyboardInfo = [notification userInfo];
+//    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+//    CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+    [self animateTextField:_textfield up:NO keyboardFrameBeginRect:_keyboardRect];
+}
+
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    [self animateTextField:textField up:YES];
+//    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:keyboardRect];
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    [self animateTextField:textField up:NO];
+//    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect];
+//    [self animateTextField:textField up:NO :];
 }
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     NSLog(@"textFieldShouldReturn:");
     if (textField.tag == 1) {
-        UITextField *passwordTextField = (UITextField *)[self.view viewWithTag:2];
-        [passwordTextField becomeFirstResponder];
+        UITextField *textField = (UITextField *)[self.view viewWithTag:2];
+        [textField becomeFirstResponder];
     }
     else {
+        
         [textField resignFirstResponder];
+        MWPhoto *photo = self.prevSelectItem.photo;
+        
+        [photo setCaption:textField.text];
     }
     return YES;
 }
 
--(void)animateTextField:(UITextField*)textField up:(BOOL)up
+-(void)animateTextField:(UITextField*)textField up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect
 {
-    const int movementDistance = -130; // tweak as needed
+    const int movementDistance = -keyboardFrameBeginRect.size.height+(self.view.frame.size.height-textField.frame.origin.y-textField.frame.size.height); // tweak as needed
     const float movementDuration = 0.3f; // tweak as needed
     
     int movement = (up ? movementDistance : -movementDistance);
