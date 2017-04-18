@@ -782,7 +782,9 @@
     }
     
     PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs delegate:self];
-    [self presentViewController:vc animated:NO completion:^{
+    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
+    
+    [self presentViewController:nc animated:NO completion:^{
         
     }];
 }
