@@ -9,14 +9,17 @@
 #import <UIKit/UIKit.h>
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
-@interface PhotoCaptionInputViewController : UIViewController <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
+@interface PhotoCaptionInputViewController : UIViewController <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
 
-
-@property (nonatomic, strong) NSMutableArray *photos;
-@property (nonatomic, strong) NSMutableArray *thumbs;
+-(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails;
+@property (nonatomic, strong) NSArray *photos;
+@property (nonatomic, strong) NSArray *thumbs;
 @property (nonatomic, strong) MWPhotoBrowser *browser;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
 @property (nonatomic, weak) MWGridCell *prevSelectItem;
+@property (nonatomic, strong) UITextField *textfield;
+@property (nonatomic, strong) UINavigationController *navigationController;
+
 
 @end

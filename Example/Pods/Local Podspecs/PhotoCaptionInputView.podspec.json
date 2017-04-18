@@ -12,7 +12,7 @@
     "James Kong": "james.kong@nixplay.com"
   },
   "source": {
-    "git": "https://github.com/James Kong/PhotoCaptionInputView.git",
+    "git": "https://github.com/nixplay/PhotoCaptionInputView.git",
     "tag": "0.1.0"
   },
   "platforms": {
@@ -32,14 +32,6 @@
       "PhotoCaptionInputView/Assets/*.png"
     ]
   },
-  "requires_arc": true,
-  "frameworks": [
-    "ImageIO",
-    "QuartzCore",
-    "AssetsLibrary",
-    "MediaPlayer"
-  ],
-  "weak_frameworks": "Photos",
   "dependencies": {
     "MWPhotoBrowser": [
 
