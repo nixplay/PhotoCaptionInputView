@@ -16,8 +16,8 @@
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate;
 @property (nonatomic) id <PhotoCaptionInputViewDelegate> selfDelegate;
-@property (nonatomic, strong) NSMutableArray *photos;
-@property (nonatomic, strong) NSArray *thumbs;
+@property (nonatomic, strong) NSMutableArray *selfPhotos;
+@property (nonatomic, strong) NSArray *selfThumbs;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
 @property (nonatomic, strong) MWGridCell *prevSelectItem;

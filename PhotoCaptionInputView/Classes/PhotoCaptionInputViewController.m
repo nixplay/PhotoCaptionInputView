@@ -25,9 +25,9 @@
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
-        [self _initialisation];
-        self.photos = [NSMutableArray arrayWithArray:photos];
-        self.thumbs = thumbnails;
+        [self initialisation];
+        self.selfPhotos = [NSMutableArray arrayWithArray:photos];
+        self.selfThumbs = thumbnails;
         _selfDelegate = delegate;
         self.delegate = self;
     }
@@ -36,14 +36,14 @@
 }
 - (id)initWithCoder:(NSCoder *)decoder {
     if ((self = [super initWithCoder:decoder])) {
-        [self _initialisation];
+        [self initialisation];
     }
     return self;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if(self.photos == nil || [self.photos count] == 0){
+    if(self.selfPhotos == nil || [self.selfThumbs count] == 0){
         NSMutableArray *photos = [[NSMutableArray alloc] init];
         
         NSMutableArray *thumbs = [[NSMutableArray alloc] init];
@@ -65,14 +65,14 @@
         [photos addObject:photo];
         [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
         
-        self.photos = photos;
-        self.thumbs = thumbs;
+        self.selfPhotos = photos;
+        self.selfThumbs = thumbs;
     }
     
     
     
-    float initY = self.view.frame.size.height * (11.0/12.0)-10;
-    float initHeight = self.view.frame.size.height * (1.0/12.0);
+    float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-10;
+    float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
@@ -83,16 +83,18 @@
     flowLayout.minimumInteritemSpacing = 2;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
-    UIView * graoupView = [[UIView alloc]initWithFrame:CGRectMake(0,
-                                                                  initY,
-                                                                  self.view.frame.size.width,
-                                                                  initHeight)];
+//    UIView * graoupView = [[UIView alloc]initWithFrame:CGRectMake(0,
+//                                                                  initY,
+//                                                                  self.navigationController.view.frame.size.width,
+//                                                                  initHeight)];
     
-    self.collectionView = [[UICollectionView alloc]initWithFrame:
-                           CGRectMake(0,
-                                      initY,
-                                      self.view.frame.size.width-initHeight,
-                                      initHeight) collectionViewLayout:flowLayout
+    CGRect rect = CGRectMake(0,
+                             initY-5,
+                             self.navigationController.view.frame.size.width-initHeight,
+                             initHeight);
+    
+    self.collectionView = [[UICollectionView alloc]initWithFrame:rect
+                            collectionViewLayout:flowLayout
                            ];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
@@ -105,7 +107,7 @@
     self.collectionView.dataSource = self;
     
     self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.collectionView.frame.origin.x + self.collectionView.frame.size.width,
-                                                               initY,
+                                                               rect.origin.y,
                                                                initHeight,
                                                                initHeight
                                                                ) ];
@@ -113,13 +115,13 @@
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
     self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-    [self.view addSubview:self.addButton];
+    [self.navigationController.view addSubview:self.addButton];
     
-    [self.view addSubview:self.collectionView];
+    [self.navigationController.view addSubview:self.collectionView];
     
     
-    CGRect rect = CGRectMake(0, initY-32, self.view.frame.size.width, 31);
-    UITextField *textfield = [[UITextField alloc] initWithFrame:rect];
+    CGRect tfrect = CGRectMake(0, initY-32, self.navigationController.view.frame.size.width, 31);
+    UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
     
     textfield.backgroundColor = [UIColor whiteColor];
     textfield.textColor = [UIColor blackColor];
@@ -137,10 +139,10 @@
     
     textfield.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     _textfield = textfield;
-    [self.view addSubview:_textfield];
+    [self.navigationController.view addSubview:_textfield];
 }
 
-- (void)_initialisation {
+- (void)initialisation {
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onKeyboardDidShow:)
@@ -209,7 +211,7 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     NSLog(@"textFieldShouldReturn:");
     if (textField.tag == 1) {
-        UITextField *textField = (UITextField *)[self.view viewWithTag:2];
+        UITextField *textField = (UITextField *)[self.navigationController.view viewWithTag:2];
         [textField becomeFirstResponder];
     }
     else {
@@ -224,7 +226,7 @@
 
 -(void)animateTextField:(UITextField*)textField up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect
 {
-    const int movementDistance = -keyboardFrameBeginRect.size.height+(self.view.frame.size.height-textField.frame.origin.y-textField.frame.size.height); // tweak as needed
+    const int movementDistance = -keyboardFrameBeginRect.size.height*0.5; // tweak as needed
     const float movementDuration = 0.3f; // tweak as needed
     
     int movement = (up ? movementDistance : -movementDistance);
@@ -232,7 +234,7 @@
     [UIView beginAnimations: @"animateTextField" context: nil];
     [UIView setAnimationBeginsFromCurrentState: YES];
     [UIView setAnimationDuration: movementDuration];
-    self.view.frame = CGRectOffset(self.view.frame, 0, movement);
+    self.navigationController.view.frame = CGRectOffset(self.navigationController.view.frame, 0, movement);
     [UIView commitAnimations];
 }
 
@@ -244,7 +246,7 @@
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     
-    return [self.thumbs count];
+    return [self.selfThumbs count];
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -252,7 +254,7 @@
     if (!cell) {
         cell = [[MWGridCell alloc] init];
     }
-    id <MWPhoto> photo = [self.thumbs objectAtIndex:indexPath.row];
+    id <MWPhoto> photo = [self.selfThumbs objectAtIndex:indexPath.row];
     cell.photo = photo;
     
     cell.selectionMode = NO;
@@ -277,7 +279,7 @@
         
         [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
         
-        [_textfield setText:[ [self.photos objectAtIndex:indexPath.item] caption]];
+        [_textfield setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
     });
 }
 
@@ -310,7 +312,7 @@
             [cell setHighlighted:YES];
             self.prevSelectItem = cell;
             
-            [_textfield setText:[[self.photos objectAtIndex:index] caption]];
+            [_textfield setText:[[self.selfPhotos objectAtIndex:index] caption]];
              dispatch_async (dispatch_get_main_queue (), ^{
                  [self.collectionView layoutIfNeeded];
                  [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
@@ -320,11 +322,11 @@
     }
 }
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
-    return [self.photos count];
+    return [self.selfPhotos count];
 }
 
 - (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index {
-    return [self.photos objectAtIndex:index];
+    return [self.selfPhotos objectAtIndex:index];
 }
 
 - (MWCaptionView *)photoBrowser:(MWPhotoBrowser *)photoBrowser captionViewForPhotoAtIndex:(NSUInteger)index{
