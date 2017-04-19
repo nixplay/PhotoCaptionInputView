@@ -258,7 +258,7 @@
         NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            [captions addObject:(![[obj caption] isEqual:NULL]) ? [obj caption] : @" "];
+            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
         }];
         [_selfDelegate photoCaptionInputViewCaptions:captions];
     }
@@ -527,7 +527,7 @@
         NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            [captions addObject:(![[obj caption] isEqual:NULL]) ? [obj caption] : @" "];
+            [captions addObject: obj.caption != nil ? [obj caption] : @" "];
             
         }];
         [_selfDelegate photoCaptionInputViewCaptions:captions];
