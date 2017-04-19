@@ -253,7 +253,7 @@
         [_selfDelegate onDismiss];
     }
     if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
-        NSMutableArray *captions = [NSMutableArray arrayWithCapacity:[self.selfPhotos count]];
+        NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
             [captions addObject:[obj caption]];
@@ -513,7 +513,7 @@
         [_selfDelegate onDismiss];
     }
     if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
-        NSMutableArray *captions = [NSMutableArray arrayWithCapacity:[self.selfPhotos count]];
+        NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
             [captions addObject:[obj caption]];
