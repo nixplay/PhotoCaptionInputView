@@ -78,7 +78,7 @@
     
     
     
-    float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-10;
+    float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -127,7 +127,7 @@
     [self.navigationController.view addSubview:self.collectionView];
     
     
-    CGRect tfrect = CGRectMake(0, initY-32, self.navigationController.view.frame.size.width, 31);
+    CGRect tfrect = CGRectMake(0, initY-35, self.navigationController.view.frame.size.width, 31);
     UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
     
     textfield.backgroundColor = [UIColor whiteColor];
@@ -194,15 +194,21 @@
     NSDictionary* keyboardInfo = [notification userInfo];
     NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
     _keyboardRect = [keyboardFrameBegin CGRectValue];
-    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect];
+    BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
+    
+    [self.navigationController.view setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width , self.navigationController.view.frame.size.height)];
+    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
+    
+    
 }
 
 -(void) onKeyboardWillHide :(NSNotification*)notification
 {
-//    NSDictionary* keyboardInfo = [notification userInfo];
-//    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-//    CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
-    [self animateTextField:_textfield up:NO keyboardFrameBeginRect:_keyboardRect];
+    NSDictionary* keyboardInfo = [notification userInfo];
+    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+    CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+    [self animateTextField:_textfield up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+    
 }
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField
@@ -231,10 +237,11 @@
     return YES;
 }
 
--(void)animateTextField:(UITextField*)textField up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect
+-(void)animateTextField:(UITextField*)textField up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
 {
-    const int movementDistance = -keyboardFrameBeginRect.size.height*0.5; // tweak as needed
-    const float movementDuration = 0.3f; // tweak as needed
+    
+    const int movementDistance = -(keyboardFrameBeginRect.size.height ); // tweak as needed
+    const float movementDuration = animation ? 0.3f : 0; // tweak as needed
     
     int movement = (up ? movementDistance : -movementDistance);
     
