@@ -130,11 +130,13 @@
     [self.navigationController.view addSubview:self.collectionView];
     
     
-    CGRect tfrect = CGRectMake(0, initY-35, self.navigationController.view.frame.size.width, 31);
+    CGRect tfrect = CGRectMake(0, initY-40, self.navigationController.view.frame.size.width, 31);
     UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
     
     textfield.backgroundColor = [UIColor blackColor];
     textfield.textColor = [UIColor whiteColor];
+    textfield.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil)];
+    textfield.placeholder = NSLocalizedString(@"Add a caption", nil);
     textfield.font = [UIFont systemFontOfSize:14.0f];
     textfield.borderStyle = UITextBorderStyleRoundedRect;
     textfield.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -255,8 +257,8 @@
     picker.delegate = self;
     picker.title = @"Custom title";
     
-    picker.customDoneButtonTitle = @"Finished";
-    picker.customCancelButtonTitle = @"Nope";
+    picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
+    picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
     picker.customNavigationBarPrompt = @"Take a new photo or select an existing one!";
     
     picker.colsInPortrait = 3;
@@ -311,6 +313,13 @@
     
 }
 
+-(void)reloadPhoto{
+    NSLog(@"removePhoto");
+    [self.collectionView reloadData];
+    [self reloadData];
+    self.navigationItem.rightBarButtonItem = _trashButton;
+}
+
 
 -(void) viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
@@ -345,12 +354,16 @@
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
 //    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:keyboardRect];
+    textField.backgroundColor = [UIColor whiteColor];
+    textField.textColor = [UIColor blackColor];
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
 //    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect];
 //    [self animateTextField:textField up:NO :];
+    textField.backgroundColor = [UIColor blackColor];
+    textField.textColor = [UIColor whiteColor];
 }
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     NSLog(@"textFieldShouldReturn:");
@@ -516,6 +529,24 @@
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     
     NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
+    
+    UIScreen *screen = [UIScreen mainScreen];
+    CGFloat scale = screen.scale;
+    // Sizing is very rough... more thought required in a real implementation
+    CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
+    CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
+    CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+    
+    [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
+        NSLog(@"idx : %lu obj :%@",(unsigned long)idx,asset);
+        [self.selfPhotos addObject:[MWPhoto photoWithAsset:asset targetSize:imageTargetSize]];
+        [self.selfThumbs addObject:[MWPhoto photoWithAsset:asset targetSize:thumbTargetSize]];
+    }];
+    [self setCurrentPhotoIndex:self.selfPhotos.count-1];
+    [self reloadPhoto];
+    
 }
 
 //Optional implementation:
