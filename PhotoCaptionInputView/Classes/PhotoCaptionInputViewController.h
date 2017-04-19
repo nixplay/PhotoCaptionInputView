@@ -17,11 +17,12 @@
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate;
 @property (nonatomic) id <PhotoCaptionInputViewDelegate> selfDelegate;
 @property (nonatomic, strong) NSMutableArray *selfPhotos;
-@property (nonatomic, strong) NSArray *selfThumbs;
+@property (nonatomic, strong) NSMutableArray *selfThumbs;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
 @property (nonatomic, strong) MWGridCell *prevSelectItem;
 @property (nonatomic, strong) UITextField *textfield;
 @property (nonatomic) CGRect keyboardRect;
-
+@property (nonatomic, strong) UIBarButtonItem *backButton;
+@property (nonatomic, strong) UIBarButtonItem *trashButton;
 @end

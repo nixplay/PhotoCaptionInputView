@@ -12,7 +12,6 @@
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 
 @interface PhotoCaptionInputViewController ()
-
 @end
 
 @implementation PhotoCaptionInputViewController
@@ -21,13 +20,15 @@
 @synthesize addButton = _addButton;
 @synthesize textfield = _textfield;
 @synthesize selfDelegate = _selfDelegate;
+@synthesize backButton = _backButton;
+@synthesize trashButton = _trashButton;
 #pragma mark - Init
 
 -(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
-        self.selfThumbs = thumbnails;
+        self.selfThumbs = [NSMutableArray arrayWithArray:thumbnails];
         
         if(_selfPhotos == nil){
             [NSException raise:@"PhotoCaptionInputViewController photos is nil" format:@"PhotoCaptionInputViewController photos can not be nil."];
@@ -121,7 +122,7 @@
     
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
-    self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.navigationController.view addSubview:self.addButton];
     
     [self.navigationController.view addSubview:self.collectionView];
@@ -130,8 +131,8 @@
     CGRect tfrect = CGRectMake(0, initY-35, self.navigationController.view.frame.size.width, 31);
     UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
     
-    textfield.backgroundColor = [UIColor whiteColor];
-    textfield.textColor = [UIColor blackColor];
+    textfield.backgroundColor = [UIColor blackColor];
+    textfield.textColor = [UIColor whiteColor];
     textfield.font = [UIFont systemFontOfSize:14.0f];
     textfield.borderStyle = UITextBorderStyleRoundedRect;
     textfield.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -147,6 +148,61 @@
     textfield.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     _textfield = textfield;
     [self.navigationController.view addSubview:_textfield];
+    
+    NSString *backArrowString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
+
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"UINavigationBarBackIndicatorDefault"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(backAction)];
+    backButton.title = backArrowString;
+    
+    self.navigationItem.leftBarButtonItem = backButton;
+    
+    _backButton = backButton;
+    
+    
+    UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[ self imageFromSystemBarButton:UIBarButtonSystemItemTrash]
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(removePhoto)];
+    trashButton.title = backArrowString;
+    
+    self.navigationItem.rightBarButtonItem = trashButton;
+    
+    _trashButton = trashButton;
+}
+
+
+- (UIImage *)imageFromSystemBarButton:(UIBarButtonSystemItem)systemItem {
+    // Holding onto the oldItem (if any) to set it back later
+    // could use left or right, doesn't matter
+    UIBarButtonItem *oldItem = self.navigationItem.rightBarButtonItem;
+    
+    UIBarButtonItem *tempItem = [[UIBarButtonItem alloc]
+                                 initWithBarButtonSystemItem:systemItem
+                                 target:nil
+                                 action:nil];
+    
+    // Setting as our right bar button item so we can traverse its subviews
+    self.navigationItem.rightBarButtonItem = tempItem;
+    
+    // Don't know whether this is considered as PRIVATE API or not
+    UIView *itemView = (UIView *)[self.navigationItem.rightBarButtonItem performSelector:@selector(view)];
+    
+    UIImage *image = nil;
+    // Traversing the subviews to find the ImageView and getting its image
+    for (UIView *subView in itemView.subviews) {
+        if ([subView isKindOfClass:[UIImageView class]]) {
+            image = ((UIImageView *)subView).image;
+            break;
+        }
+    }
+    
+    // Setting our oldItem back since we have the image now
+    self.navigationItem.rightBarButtonItem = oldItem;
+    
+    return image;
 }
 
 - (void)initialisation {
@@ -176,10 +232,27 @@
     self.enableSwipeToDismiss = NO;
     self.autoPlayOnAppear = autoPlayOnAppear;
     [self setCurrentPhotoIndex:0];
-
     
     // Do any additional setup after loading the view.
 }
+
+
+-(void)backAction{
+    NSLog(@"backAction");
+}
+
+-(void)removePhoto{
+    NSLog(@"removePhoto");
+    [self.selfPhotos removeObjectAtIndex:self.currentIndex];
+    [self.selfThumbs removeObjectAtIndex:self.currentIndex];
+    [self.collectionView reloadData];
+    [self reloadData];
+    
+    self.navigationItem.rightBarButtonItem = _trashButton;
+    
+    
+}
+
 
 -(void) viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
@@ -196,7 +269,7 @@
     _keyboardRect = [keyboardFrameBegin CGRectValue];
     BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
     
-    [self.navigationController.view setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width , self.navigationController.view.frame.size.height)];
+    [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
     [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
     
     
@@ -230,7 +303,7 @@
     else {
         
         [textField resignFirstResponder];
-        MWPhoto *photo = self.prevSelectItem.photo;
+        MWPhoto *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
         [photo setCaption:textField.text];
     }
