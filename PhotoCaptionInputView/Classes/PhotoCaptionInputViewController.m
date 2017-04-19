@@ -135,8 +135,14 @@
     
     textfield.backgroundColor = [UIColor blackColor];
     textfield.textColor = [UIColor whiteColor];
-    textfield.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil)];
-    textfield.placeholder = NSLocalizedString(@"Add a caption", nil);
+    
+    textfield.layer.cornerRadius=8.0f;
+    textfield.layer.masksToBounds=YES;
+    
+    
+    textfield.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil) attributes:@{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
+
+
     textfield.font = [UIFont systemFontOfSize:14.0f];
     textfield.borderStyle = UITextBorderStyleRoundedRect;
     textfield.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -246,6 +252,14 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
+        NSMutableArray *captions = [NSMutableArray arrayWithCapacity:[self.selfPhotos count]];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            [captions addObject:[obj caption]];
+        }];
+        [_selfDelegate photoCaptionInputViewCaptions:captions];
+    }
 }
 
 -(void)addPhotoFromLibrary{
@@ -255,12 +269,10 @@
 {
     GMImagePickerController *picker = [[GMImagePickerController alloc] init];
     picker.delegate = self;
-    picker.title = @"Custom title";
-    
+    picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
-    picker.customNavigationBarPrompt = @"Take a new photo or select an existing one!";
-    
+ 
     picker.colsInPortrait = 3;
     picker.colsInLandscape = 5;
     picker.minimumInteritemSpacing = 2.0;
@@ -500,6 +512,15 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
+        NSMutableArray *captions = [NSMutableArray arrayWithCapacity:[self.selfPhotos count]];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            [captions addObject:[obj caption]];
+        }];
+        [_selfDelegate photoCaptionInputViewCaptions:captions];
+    }
+    
 }
 
 
@@ -553,5 +574,15 @@
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
     NSLog(@"GMImagePicker: User pressed cancel button");
+}
+
+-(NSString*) controllerTitle{
+    return NSLocalizedString(@"Select an Album",nil);
+}
+-(NSString*) controllerCustomDoneButtonTitle{
+    return NSLocalizedString(@"Done",nil);
+}
+-(NSString*) controllerCustomCancelButtonTitle{
+    return NSLocalizedString(@"Cancel",nil);
 }
 @end

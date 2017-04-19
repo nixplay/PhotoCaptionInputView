@@ -11,10 +11,12 @@
 #import <MWPhotoBrowser/MWGridCell.h>
 @protocol PhotoCaptionInputViewDelegate <NSObject>
 -(void) onDismiss;
+-(void) photoCaptionInputViewCaptions:(NSArray*) captions;
 @end
 @interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate;
+
 @property (nonatomic) id <PhotoCaptionInputViewDelegate> selfDelegate;
 @property (nonatomic, strong) NSMutableArray *selfPhotos;
 @property (nonatomic, strong) NSMutableArray *selfThumbs;
@@ -25,4 +27,5 @@
 @property (nonatomic) CGRect keyboardRect;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
+
 @end
