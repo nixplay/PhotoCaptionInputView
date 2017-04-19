@@ -132,7 +132,9 @@
     
     CGRect tfrect = CGRectMake(0, initY-40, self.navigationController.view.frame.size.width, 31);
     UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
-    
+    [textfield addTarget:self
+                  action:@selector(textFieldDidChange:)
+        forControlEvents:UIControlEventEditingChanged];
     textfield.backgroundColor = [UIColor blackColor];
     textfield.textColor = [UIColor whiteColor];
     
@@ -256,7 +258,7 @@
         NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            [captions addObject:[obj caption]];
+            [captions addObject:(![[obj caption] isEqual:NULL]) ? [obj caption] : @" "];
         }];
         [_selfDelegate photoCaptionInputViewCaptions:captions];
     }
@@ -363,6 +365,14 @@
     
 }
 
+-(void)textFieldDidChange:(UITextField *)textField{
+    MWPhoto *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+    
+    [photo setCaption:textField.text];
+    [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
+    
+}
+
 -(void)textFieldDidBeginEditing:(UITextField *)textField
 {
 //    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:keyboardRect];
@@ -389,6 +399,7 @@
         MWPhoto *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
         [photo setCaption:textField.text];
+        [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
     }
     return YES;
 }
@@ -516,7 +527,8 @@
         NSMutableArray *captions = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            [captions addObject:[obj caption]];
+            [captions addObject:(![[obj caption] isEqual:NULL]) ? [obj caption] : @" "];
+            
         }];
         [_selfDelegate photoCaptionInputViewCaptions:captions];
     }
