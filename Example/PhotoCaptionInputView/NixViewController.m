@@ -790,6 +790,7 @@
 }
 - (void)didReceiveMemoryWarning
 {
+    NSLog(@"didReceiveMemoryWarning");
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
@@ -797,6 +798,6 @@
 #pragma mark - PhotoCaptionInputViewDelegate
 
 -(void) onDismiss{
-    
+    [self dismissViewControllerAnimated:NO completion:nil];
 }
 @end

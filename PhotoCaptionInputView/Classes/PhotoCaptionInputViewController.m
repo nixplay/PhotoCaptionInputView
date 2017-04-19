@@ -10,8 +10,8 @@
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
-
-@interface PhotoCaptionInputViewController ()
+#import <GMImagePicker/GMImagePickerController.h>
+@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>
 @end
 
 @implementation PhotoCaptionInputViewController
@@ -123,6 +123,8 @@
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
     self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [self.addButton addTarget:self action:@selector(addPhotoFromLibrary) forControlEvents:UIControlEventTouchUpInside];
+
     [self.navigationController.view addSubview:self.addButton];
     
     [self.navigationController.view addSubview:self.collectionView];
@@ -239,6 +241,62 @@
 
 -(void)backAction{
     NSLog(@"backAction");
+    if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
+        [_selfDelegate onDismiss];
+    }
+}
+
+-(void)addPhotoFromLibrary{
+    [self launchGMImagePicker];
+}
+- (void)launchGMImagePicker
+{
+    GMImagePickerController *picker = [[GMImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.title = @"Custom title";
+    
+    picker.customDoneButtonTitle = @"Finished";
+    picker.customCancelButtonTitle = @"Nope";
+    picker.customNavigationBarPrompt = @"Take a new photo or select an existing one!";
+    
+    picker.colsInPortrait = 3;
+    picker.colsInLandscape = 5;
+    picker.minimumInteritemSpacing = 2.0;
+    
+    //    picker.allowsMultipleSelection = NO;
+    //    picker.confirmSingleSelection = YES;
+    //    picker.confirmSingleSelectionPrompt = @"Do you want to select the image you have chosen?";
+    
+    //    picker.showCameraButton = YES;
+    //    picker.autoSelectCameraImages = YES;
+    
+    picker.modalPresentationStyle = UIModalPresentationPopover;
+    
+    //    picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
+    
+    //    picker.pickerBackgroundColor = [UIColor blackColor];
+    //    picker.pickerTextColor = [UIColor whiteColor];
+    //    picker.toolbarBarTintColor = [UIColor darkGrayColor];
+    //    picker.toolbarTextColor = [UIColor whiteColor];
+    //    picker.toolbarTintColor = [UIColor redColor];
+    //    picker.navigationBarBackgroundColor = [UIColor blackColor];
+    //    picker.navigationBarTextColor = [UIColor whiteColor];
+    //    picker.navigationBarTintColor = [UIColor redColor];
+    //    picker.pickerFontName = @"Verdana";
+    //    picker.pickerBoldFontName = @"Verdana-Bold";
+    //    picker.pickerFontNormalSize = 14.f;
+    //    picker.pickerFontHeaderSize = 17.0f;
+    //    picker.pickerStatusBarStyle = UIStatusBarStyleLightContent;
+    //    picker.useCustomFontForNavigationBar = YES;
+    
+    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
+    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
+//    popPC.sourceView = _gmImagePickerButton;
+//    popPC.sourceRect = _gmImagePickerButton.bounds;
+    //    popPC.backgroundColor = [UIColor blackColor];
+    
+//    [self showViewController:picker sender:nil];
+    [self.navigationController presentViewController:picker animated:YES completion:nil];
 }
 
 -(void)removePhoto{
@@ -447,5 +505,22 @@
     // Pass the selected object to the new view controller.
 }
 */
+    
+    
+    
+    
+#pragma mark - GMImagePickerControllerDelegate
 
+- (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
+{
+    [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    
+    NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
+}
+
+//Optional implementation:
+-(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
+{
+    NSLog(@"GMImagePicker: User pressed cancel button");
+}
 @end
