@@ -23,11 +23,18 @@
 @synthesize selfDelegate = _selfDelegate;
 #pragma mark - Init
 
--(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
+-(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
         self.selfThumbs = thumbnails;
+        
+        if(_selfPhotos == nil){
+            [NSException raise:@"PhotoCaptionInputViewController photos is nil" format:@"PhotoCaptionInputViewController photos can not be nil."];
+        }
+        if(_selfThumbs == nil){
+            [NSException raise:@"PhotoCaptionInputViewController thumbnail is nil" format:@"PhotoCaptionInputViewController thumbnail can not be nil."];
+        }
         _selfDelegate = delegate;
         self.delegate = self;
     }
