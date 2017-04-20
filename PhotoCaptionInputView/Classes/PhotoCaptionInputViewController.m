@@ -12,7 +12,9 @@
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 #import <GMImagePicker/GMImagePickerController.h>
 #import "MWPhotoExt.h"
-@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>
+@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
+    NSMutableArray* preSelectedAssets;
+}
 @end
 
 @implementation PhotoCaptionInputViewController
@@ -25,11 +27,16 @@
 @synthesize trashButton = _trashButton;
 #pragma mark - Init
 
--(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
+-(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails  preselectedAssets:(NSArray*  _Nullable) preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
         self.selfThumbs = [NSMutableArray arrayWithArray:thumbnails];
+        if(preselectedAssets == nil){
+            preSelectedAssets = [NSMutableArray array];
+        }else{
+            preSelectedAssets = [NSMutableArray arrayWithArray:preSelectedAssets];
+        }
         
         if(_selfPhotos == nil){
             [NSException raise:@"PhotoCaptionInputViewController photos is nil" format:@"PhotoCaptionInputViewController photos can not be nil."];
@@ -87,7 +94,7 @@
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
     flowLayout.sectionInset = UIEdgeInsetsMake(0, 25, 0, 25);
-    flowLayout.itemSize = CGSizeMake(50, 50);
+    flowLayout.itemSize = CGSizeMake(initHeight, initHeight);
     flowLayout.minimumLineSpacing = 2;
     flowLayout.minimumInteritemSpacing = 2;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
@@ -272,8 +279,8 @@
 }
 - (void)launchGMImagePicker
 {
-    GMImagePickerController *picker = [[GMImagePickerController alloc] init];
-    picker.delegate = self;
+    GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:preSelectedAssets delegate:self];
+    
     picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
@@ -289,7 +296,7 @@
     //    picker.showCameraButton = YES;
     //    picker.autoSelectCameraImages = YES;
     
-    picker.modalPresentationStyle = UIModalPresentationPopover;
+//    picker.modalPresentationStyle = UIModalPresentationPopover;
     
     //    picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
     
@@ -308,8 +315,8 @@
     //    picker.pickerStatusBarStyle = UIStatusBarStyleLightContent;
     //    picker.useCustomFontForNavigationBar = YES;
     
-    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
-    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
+//    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
+//    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
 //    popPC.sourceView = _gmImagePickerButton;
 //    popPC.sourceRect = _gmImagePickerButton.bounds;
     //    popPC.backgroundColor = [UIColor blackColor];
@@ -324,9 +331,10 @@
     [self.selfThumbs removeObjectAtIndex:self.currentIndex];
     [self.collectionView reloadData];
     [self reloadData];
-    
-    self.navigationItem.rightBarButtonItem = _trashButton;
-    
+    [_textfield setText:@""];
+    if([self.selfPhotos count]>1){
+        self.navigationItem.rightBarButtonItem = _trashButton;
+    }
     
 }
 
@@ -444,7 +452,14 @@
     cell.selectionMode = NO;
     cell.isSelected = NO;
     cell.index = indexPath.row;
-
+    
+    if(self.currentIndex == indexPath.item){
+        cell.layer.borderWidth = 2.0;
+        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
+    }else{
+        cell.layer.borderWidth = 0;
+        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
+    }
     UIImage *img = [self imageForPhoto:photo];
     if (img) {
         [cell displayImage];
@@ -563,6 +578,7 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
+    
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     
     NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
@@ -577,9 +593,20 @@
     [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         
         NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
-        NSLog(@"idx : %lu obj :%@",(unsigned long)idx,asset);
-        [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
-        [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
+        
+        
+        BOOL preselected = NO;
+        for (NSString * localidentifier in preSelectedAssets){
+            if([localidentifier isEqualToString:asset.localIdentifier]){
+                preselected = YES;
+                break;
+            }
+        }
+        if(!preselected){
+            [preSelectedAssets addObject:asset.localIdentifier];
+            [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
+            [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
+        }
     }];
     [self setCurrentPhotoIndex:self.selfPhotos.count-1];
     [self reloadPhoto];

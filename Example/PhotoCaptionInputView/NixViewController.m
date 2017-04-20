@@ -782,7 +782,7 @@
 //        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];
     }
     
-    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs delegate:self];
+    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs preselectedAssets:nil delegate:self];
     UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
     
     [self presentViewController:nc animated:NO completion:^{
