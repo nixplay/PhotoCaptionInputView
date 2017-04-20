@@ -457,6 +457,7 @@
         
         cell.layer.borderWidth = 2.0;
         cell.layer.borderColor = [[UIColor blueColor] CGColor];
+        self.prevSelectItem = cell;
         
     }else{
         
