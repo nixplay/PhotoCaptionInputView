@@ -12,7 +12,7 @@ PODS:
     - DACircularProgress (~> 2.3)
     - MBProgressHUD (~> 0.9)
     - SDWebImage (!= 3.7.2, ~> 3.7)
-  - PhotoCaptionInputView (0.2.0):
+  - PhotoCaptionInputView (0.3.2):
     - GMImagePicker
     - MWPhotoBrowser
   - SDWebImage (3.8.2):
@@ -35,7 +35,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   GMImagePicker:
-    :commit: 7e25ed2ff51ccfde925e4177113929d4170939b6
+    :commit: 2e5914de94a2cb860f9f278ffcb5b9b66046f257
     :git: https://github.com/nixplay/GMImagePicker.git
 
 SPEC CHECKSUMS:
@@ -45,7 +45,7 @@ SPEC CHECKSUMS:
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
   MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
   MWPhotoBrowser: 5836d7aa041dc05a13de380c246826578adc5ea5
-  PhotoCaptionInputView: 35cff96bde25f39efc2afcb7fcee2b7d7e6b38bc
+  PhotoCaptionInputView: 2dab6ea9868d4c681aa28eef35dab29c6b36d542
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
 
 PODFILE CHECKSUM: dc83b8c5abd46bd1ed44b40b3e4ad1bc064e9079

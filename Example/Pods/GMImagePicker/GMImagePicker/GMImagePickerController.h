@@ -24,7 +24,7 @@ static CGSize const kPopoverContentSize = {480, 720};
  */
 @interface GMImagePickerController : UIViewController
 
-- (id)init:(bool)allow_v withAssets: (NSArray*)preSelectedAssets;
+- (id)init:(bool)allow_v withAssets: (NSArray*)preSelectedAssets delegate: (id <GMImagePickerControllerDelegate>) delegate;
 
 @property (nonatomic, assign) BOOL allow_video;
 
@@ -323,5 +323,14 @@ static CGSize const kPopoverContentSize = {480, 720};
 
 
 
+- (BOOL)shouldSelectAllAlbumCell;
 
+
+- (NSString*) controllerTitle;
+
+- (NSString*) controllerCustomDoneButtonTitle;
+
+- (NSString*) controllerCustomCancelButtonTitle;
+
+- (NSString*) controllerCustomNavigationBarPrompt;
 @end

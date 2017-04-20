@@ -11,7 +11,7 @@
 #import <MWPhotoBrowser/MWGridCell.h>
 @protocol PhotoCaptionInputViewDelegate <NSObject>
 -(void) onDismiss;
--(void) photoCaptionInputViewCaptions:(NSArray*) captions;
+-(void) photoCaptionInputViewCaptions:(NSArray*) captions photos:(NSArray*)photos;
 @end
 @interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
 

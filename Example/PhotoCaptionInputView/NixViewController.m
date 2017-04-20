@@ -800,4 +800,12 @@
 -(void) onDismiss{
     [self dismissViewControllerAnimated:NO completion:nil];
 }
+
+-(void) photoCaptionInputViewCaptions:(NSArray *)captions{
+    [captions enumerateObjectsUsingBlock:^(NSArray* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"%@",obj);
+    
+    }];
+    
+}
 @end

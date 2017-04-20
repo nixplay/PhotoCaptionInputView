@@ -98,9 +98,7 @@
     }
     return self;
 }
-- (NSString*) url{
-    return [self.photoURL absoluteString];
-}
+
 - (void)setup {
     _assetRequestID = PHInvalidImageRequestID;
     _assetVideoRequestID = PHInvalidImageRequestID;

@@ -11,6 +11,7 @@
 #import <MWPhotoBrowser/MWGridCell.h>
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 #import <GMImagePicker/GMImagePickerController.h>
+#import "MWPhotoExt.h"
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>
 @end
 
@@ -56,22 +57,22 @@
         
         NSMutableArray *thumbs = [[NSMutableArray alloc] init];
         
-        MWPhoto * photo = [MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
+        MWPhotoExt * photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
         photo.caption = @"Tube";
         [photos addObject:photo];
-        [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_q.jpg"]]];
-        photo = [MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_b.jpg"]];
+        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_q.jpg"]]];
+        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_b.jpg"]];
         photo.caption = @"Flat White at Elliot's";
         [photos addObject:photo];
-        [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_q.jpg"]]];
-        photo = [MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_b.jpg"]];
+        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_q.jpg"]]];
+        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_b.jpg"]];
         photo.caption = @"Woburn Abbey";
         [photos addObject:photo];
-        [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_q.jpg"]]];
-        photo = [MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_b.jpg"]];
+        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_q.jpg"]]];
+        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_b.jpg"]];
         photo.caption = @"Frosty walk";
         [photos addObject:photo];
-        [thumbs addObject:[MWPhoto photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
+        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
         
         self.selfPhotos = photos;
         self.selfThumbs = thumbs;
@@ -254,13 +255,15 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
-        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSMutableArray *photos = [NSMutableArray array];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+            [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputViewCaptions:captions];
+        [_selfDelegate photoCaptionInputViewCaptions:captions photos:photos];
     }
 }
 
@@ -366,7 +369,7 @@
 }
 
 -(void)textFieldDidChange:(UITextField *)textField{
-    MWPhoto *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+    MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
     
     [photo setCaption:textField.text];
     [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
@@ -396,7 +399,7 @@
     else {
         
         [textField resignFirstResponder];
-        MWPhoto *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
         [photo setCaption:textField.text];
         [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
@@ -523,14 +526,15 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
-        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhoto* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSMutableArray *photos = [NSMutableArray array];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
             
-            [captions addObject: obj.caption != nil ? [obj caption] : @" "];
-            
+            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+            [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputViewCaptions:captions];
+        [_selfDelegate photoCaptionInputViewCaptions:captions photos:photos];
     }
     
 }
@@ -574,8 +578,8 @@
         
         NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
         NSLog(@"idx : %lu obj :%@",(unsigned long)idx,asset);
-        [self.selfPhotos addObject:[MWPhoto photoWithAsset:asset targetSize:imageTargetSize]];
-        [self.selfThumbs addObject:[MWPhoto photoWithAsset:asset targetSize:thumbTargetSize]];
+        [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
+        [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
     }];
     [self setCurrentPhotoIndex:self.selfPhotos.count-1];
     [self reloadPhoto];

@@ -16,10 +16,11 @@
 @end
 
 @implementation GMImagePickerController
-- (id)init:(bool)allow_v withAssets: (NSArray*)preSelectedAssets
+- (id)init:(bool)allow_v withAssets: (NSArray*)preSelectedAssets delegate: (id<GMImagePickerControllerDelegate>) delegate
 {
     if (self = [super init])
     {
+        self.delegate = delegate;
         _selectedAssets = [[NSMutableArray alloc] init];
         
         PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:preSelectedAssets options:nil];
@@ -156,7 +157,7 @@
     _navigationController.toolbar.translucent = YES;
     _navigationController.toolbar.barTintColor = _toolbarBarTintColor;
     _navigationController.toolbar.tintColor = _toolbarTintColor;
-//    [(UIView*)[_navigationController.toolbar.subviews objectAtIndex:0] setAlpha:0.75f];  // URGH - I know!
+    [(UIView*)[_navigationController.toolbar.subviews firstObject] setAlpha:0.75f];  // URGH - I know!
     
     _navigationController.navigationBar.backgroundColor = _navigationBarBackgroundColor;
     _navigationController.navigationBar.tintColor = _navigationBarTintColor;
@@ -194,6 +195,25 @@
     [self.view addSubview:_navigationController.view];
     [self addChildViewController:_navigationController];
     [_navigationController didMoveToParentViewController:self];
+    
+    if([self.delegate respondsToSelector:@selector(shouldSelectAllAlbumCell)]){
+        if([self.delegate respondsToSelector:@selector(controllerTitle)])
+            self.title = [self.delegate controllerTitle];
+        
+        if([self.delegate respondsToSelector:@selector(controllerCustomDoneButtonTitle)])
+            self.customDoneButtonTitle = [self.delegate controllerCustomDoneButtonTitle];
+        
+        if([self.delegate respondsToSelector:@selector(controllerCustomCancelButtonTitle)])
+            self.customCancelButtonTitle = [self.delegate controllerCustomCancelButtonTitle];
+        
+        if([self.delegate respondsToSelector:@selector(controllerCustomNavigationBarPrompt)])
+            self.customNavigationBarPrompt = [self.delegate controllerCustomNavigationBarPrompt];
+        
+        
+        if([self.delegate shouldSelectAllAlbumCell]){
+            [albumsViewController selectAllAlbumsCell];
+        }
+    }
 }
 
 
