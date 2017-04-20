@@ -532,20 +532,10 @@
         if(cell != NULL){
             [cell setHighlighted:YES];
             
-            if(self.currentIndex == indexPath.item){
-
-                cell.layer.borderWidth = 2.0;
-                cell.layer.borderColor = [[UIColor blueColor] CGColor];
-                
-            }else{
-                
-//                        cell.layer.borderWidth = 0;
-//                        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
-            }
-
-            
+            cell.layer.borderWidth = 2.0;
+            cell.layer.borderColor = [[UIColor blueColor] CGColor];
             self.prevSelectItem = cell;
-            
+            [self.collectionView reloadData];
             [_textfield setText:[[self.selfPhotos objectAtIndex:index] caption]];
              dispatch_async (dispatch_get_main_queue (), ^{
                  [self.collectionView layoutIfNeeded];
