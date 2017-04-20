@@ -78,7 +78,7 @@ SOFTWARE.
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>Copyright (c) 2009-2015 Matej Bukovinski
+			<string>Copyright © 2009-2016 Matej Bukovinski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -165,7 +165,7 @@ SOFTWARE.
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>Copyright (c) 2016 Olivier Poitrey rs@dailymotion.com
+			<string>Copyright (c) 2009 Olivier Poitrey &lt;rs@dailymotion.com&gt;
  
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

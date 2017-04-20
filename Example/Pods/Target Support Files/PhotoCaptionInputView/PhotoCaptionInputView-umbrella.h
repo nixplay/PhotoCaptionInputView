@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "MWPhotoExt.h"
 #import "PhotoCaptionInputViewController.h"
 
 FOUNDATION_EXPORT double PhotoCaptionInputViewVersionNumber;
