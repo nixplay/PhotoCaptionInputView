@@ -9,10 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
-@protocol PhotoCaptionInputViewDelegate <NSObject>
--(void) onDismiss;
--(void) photoCaptionInputViewCaptions:(NSArray*) captions photos:(NSArray*)photos;
-@end
+@protocol PhotoCaptionInputViewDelegate;
+
 @interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails preselectedAssets:(NSArray*) preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate;
@@ -28,4 +26,10 @@
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
 
+@end
+
+
+@protocol PhotoCaptionInputViewDelegate <NSObject>
+-(void) onDismiss;
+-(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos;
 @end

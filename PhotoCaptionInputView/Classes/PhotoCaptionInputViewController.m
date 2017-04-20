@@ -263,7 +263,7 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:photos:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
         NSMutableArray *photos = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -271,7 +271,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputViewCaptions:captions photos:photos];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos];
     }
 }
 
@@ -576,7 +576,7 @@
     if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
         [_selfDelegate onDismiss];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputViewCaptions:photos:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
         NSMutableArray *photos = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -584,7 +584,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputViewCaptions:captions photos:photos];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos];
     }
     
 }
