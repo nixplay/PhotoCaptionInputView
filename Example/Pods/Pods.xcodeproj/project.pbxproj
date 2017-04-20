@@ -332,11 +332,12 @@
 		E1DE22CA21F615E0C469B07D7BD03DC6 /* KWBeKindOfClassMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 9594B0C5F355092BC96CC82AAEC7A32C /* KWBeKindOfClassMatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E1E3A28CBE42D9E9D4D72E79B6B6A1B3 /* SDWebImageDownloaderOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 521DAA4C4956CDB7ECB8A1A8B1ED87F9 /* SDWebImageDownloaderOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E31D351F1623FEA6E313D26EBFF7B53D /* SDWebImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 16570136E79D5649F9C454D08AE682E9 /* SDWebImageManager.m */; };
-		E347DB4F1EA83DB0000B8A77 /* MWPhotoExt.h in Headers */ = {isa = PBXBuildFile; fileRef = E347DB4D1EA83DB0000B8A77 /* MWPhotoExt.h */; };
+		E347DB4F1EA83DB0000B8A77 /* MWPhotoExt.h in Headers */ = {isa = PBXBuildFile; fileRef = E347DB4D1EA83DB0000B8A77 /* MWPhotoExt.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E347DB501EA83DB0000B8A77 /* MWPhotoExt.m in Sources */ = {isa = PBXBuildFile; fileRef = E347DB4E1EA83DB0000B8A77 /* MWPhotoExt.m */; };
 		E3A990E5163D7DE66E1930A54A23212C /* KWExpectationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A3D3268764F7BABDC2255E64702C0AB /* KWExpectationType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E3ABA567FA3A5E1D92D86C5DE85E9E63 /* KWStringPrefixMatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 998AC4622C6C6D2D24552F6FCAA35D82 /* KWStringPrefixMatcher.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
 		E3ADFD68A6A2756F44F838DD12C95BD1 /* KWContextNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD365B4C7E4467A30CB68ACA200C429 /* KWContextNode.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
+		E3F10DDD1EA8430A00E22AD9 /* MWPhotoExt.m in Headers */ = {isa = PBXBuildFile; fileRef = E347DB4E1EA83DB0000B8A77 /* MWPhotoExt.m */; settings = {ATTRIBUTES = (Public, ); }; };
 		E442DDCAFB691D88116A3FFE9E331A0E /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080E18D4D6198D25D42C50996C832A48 /* ImageIO.framework */; };
 		E576E560C42CB7420F8B050A78E2111A /* KWNotificationMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 92C68BE3FDC808C24A7F31E7C64C0682 /* KWNotificationMatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E6B838C42E52C673B4D10B77414900F7 /* MWTapDetectingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F95032616925111075DDC1DA0A09CB5 /* MWTapDetectingView.m */; };
@@ -1922,6 +1923,7 @@
 			files = (
 				BB5812BAE5610AFD058DE6AE7D854D92 /* PhotoCaptionInputView-umbrella.h in Headers */,
 				99A001BFF9A31D9B3B79B0E099FF91CD /* PhotoCaptionInputViewController.h in Headers */,
+				E3F10DDD1EA8430A00E22AD9 /* MWPhotoExt.m in Headers */,
 				E347DB4F1EA83DB0000B8A77 /* MWPhotoExt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,6 +8,7 @@
 
 #import "NixViewController.h"
 #import "PhotoCaptionInputViewController.h"
+#import "MWPhotoExt.h"
 @interface NixViewController ()
 
 @end
