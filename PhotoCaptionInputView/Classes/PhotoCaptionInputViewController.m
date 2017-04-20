@@ -615,7 +615,7 @@
     CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
     CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
     CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
-    
+    //TODO not yet handle deselect action
     [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         
         NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
