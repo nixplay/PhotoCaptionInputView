@@ -14,6 +14,7 @@
 #import "MWPhotoExt.h"
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
+    UIView* hightlightView;
 }
 @end
 
@@ -452,13 +453,15 @@
     cell.selectionMode = NO;
     cell.isSelected = NO;
     cell.index = indexPath.row;
-    
     if(self.currentIndex == indexPath.item){
+        
         cell.layer.borderWidth = 2.0;
-        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
+        cell.layer.borderColor = [[UIColor blueColor] CGColor];
+        
     }else{
+        
         cell.layer.borderWidth = 0;
-        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
+        cell.layer.borderColor = [[UIColor clearColor] CGColor];
     }
     UIImage *img = [self imageForPhoto:photo];
     if (img) {
@@ -477,6 +480,23 @@
         [self.collectionView layoutIfNeeded];
         
         [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+        
+        if(self.prevSelectItem != NULL){
+            
+            [self.prevSelectItem setHighlighted: NO];
+            self.prevSelectItem.layer.borderWidth = 0.0;
+            self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
+        }
+        
+        MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+        if(cell != NULL){
+            
+            cell.layer.borderWidth = 2.0;
+            cell.layer.borderColor = [[UIColor blueColor] CGColor];
+            self.prevSelectItem = cell;
+            
+        }
+
         
         [_textfield setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
     });
@@ -503,12 +523,27 @@
         if(self.prevSelectItem != NULL){
             
             [self.prevSelectItem setHighlighted: NO];
+            self.prevSelectItem.layer.borderWidth = 0.0;
+            self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
         NSLog(@"index path  %@",indexPath);
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             [cell setHighlighted:YES];
+            
+            if(self.currentIndex == indexPath.item){
+
+                cell.layer.borderWidth = 2.0;
+                cell.layer.borderColor = [[UIColor blueColor] CGColor];
+                
+            }else{
+                
+//                        cell.layer.borderWidth = 0;
+//                        cell.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blueColor]);
+            }
+
+            
             self.prevSelectItem = cell;
             
             [_textfield setText:[[self.selfPhotos objectAtIndex:index] caption]];
