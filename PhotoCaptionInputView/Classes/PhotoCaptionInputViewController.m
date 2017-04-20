@@ -59,7 +59,11 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    for(int i = 0 ;i < [self.selfPhotos count] ; i++){
+        printf("{\n\"previewUrl\":\"%s\",\n", [[[self.selfPhotos objectAtIndex:i] photoData] cStringUsingEncoding:NSUTF8StringEncoding]);
+    
+        printf("\"thumbnailUrl\":\"%s\"\n},\n", [[[self.selfThumbs objectAtIndex:i] photoData] cStringUsingEncoding:NSUTF8StringEncoding]);
+    }
     if(self.selfPhotos == nil || [self.selfThumbs count] == 0){
         NSMutableArray *photos = [[NSMutableArray alloc] init];
         
@@ -176,6 +180,12 @@
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(backAction)];
+    
+//    [backButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+//                                        [UIFont fontWithName:@"Helvetica-Bold" size:32], NSFontAttributeName,
+//                                        [UIColor whiteColor], NSForegroundColorAttributeName,
+//                                        nil] 
+//                              forState:UIControlStateNormal];
     backButton.title = backArrowString;
     
     self.navigationItem.leftBarButtonItem = backButton;
@@ -294,8 +304,8 @@
     //    picker.confirmSingleSelection = YES;
     //    picker.confirmSingleSelectionPrompt = @"Do you want to select the image you have chosen?";
     
-    //    picker.showCameraButton = YES;
-    //    picker.autoSelectCameraImages = YES;
+        picker.showCameraButton = YES;
+        picker.autoSelectCameraImages = YES;
     
 //    picker.modalPresentationStyle = UIModalPresentationPopover;
     
@@ -645,6 +655,9 @@
     NSLog(@"GMImagePicker: User pressed cancel button");
 }
 
+- (BOOL)shouldSelectAllAlbumCell{
+    return YES;
+}
 -(NSString*) controllerTitle{
     return NSLocalizedString(@"Select an Album",nil);
 }
