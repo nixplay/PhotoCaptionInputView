@@ -174,19 +174,12 @@
     _textfield = textfield;
     [self.navigationController.view addSubview:_textfield];
     
-    NSString *backArrowString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
+    
 
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageNamed:@"UINavigationBarBackIndicatorDefault"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(backAction)];
-    
-//    [backButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
-//                                        [UIFont fontWithName:@"Helvetica-Bold" size:32], NSFontAttributeName,
-//                                        [UIColor whiteColor], NSForegroundColorAttributeName,
-//                                        nil] 
-//                              forState:UIControlStateNormal];
-    backButton.title = backArrowString;
     
     self.navigationItem.leftBarButtonItem = backButton;
     
@@ -197,7 +190,8 @@
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(removePhoto)];
-    trashButton.title = backArrowString;
+    NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
+    trashButton.title = trashString;
     
     self.navigationItem.rightBarButtonItem = trashButton;
     
