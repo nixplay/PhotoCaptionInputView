@@ -13,7 +13,7 @@
 
 @interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
 
--(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails preselectedAssets:(NSArray*) preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate;
+-(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails  preselectedAssets:(NSArray*) _preselectedAssets delegate:(id <PhotoCaptionInputViewDelegate>)delegate;
 
 @property (nonatomic) id <PhotoCaptionInputViewDelegate> selfDelegate;
 @property (nonatomic, strong) NSMutableArray *selfPhotos;

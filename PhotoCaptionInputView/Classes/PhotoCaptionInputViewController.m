@@ -28,15 +28,15 @@
 @synthesize trashButton = _trashButton;
 #pragma mark - Init
 
--(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails  preselectedAssets:(NSArray*  _Nullable) preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
+-(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails  preselectedAssets:(NSArray*  _Nullable) _preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
         self.selfThumbs = [NSMutableArray arrayWithArray:thumbnails];
-        if(preselectedAssets == nil){
+        if(_preselectedAssets == nil){
             preSelectedAssets = [NSMutableArray array];
         }else{
-            preSelectedAssets = [NSMutableArray arrayWithArray:preSelectedAssets];
+            preSelectedAssets = [NSMutableArray arrayWithArray:_preselectedAssets];
         }
         
         if(_selfPhotos == nil){
