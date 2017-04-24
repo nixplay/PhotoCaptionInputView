@@ -64,32 +64,32 @@
     
         printf("\"thumbnailUrl\":\"%s\"\n},\n", [[[self.selfThumbs objectAtIndex:i] photoData] cStringUsingEncoding:NSUTF8StringEncoding]);
     }
-    if(self.selfPhotos == nil || [self.selfThumbs count] == 0){
-        NSMutableArray *photos = [[NSMutableArray alloc] init];
-        
-        NSMutableArray *thumbs = [[NSMutableArray alloc] init];
-        
-        MWPhotoExt * photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
-        photo.caption = @"Tube";
-        [photos addObject:photo];
-        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_q.jpg"]]];
-        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_b.jpg"]];
-        photo.caption = @"Flat White at Elliot's";
-        [photos addObject:photo];
-        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_q.jpg"]]];
-        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_b.jpg"]];
-        photo.caption = @"Woburn Abbey";
-        [photos addObject:photo];
-        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_q.jpg"]]];
-        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_b.jpg"]];
-        photo.caption = @"Frosty walk";
-        [photos addObject:photo];
-        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
-        
-        self.selfPhotos = photos;
-        self.selfThumbs = thumbs;
-    }
-    
+//    if(self.selfPhotos == nil || [self.selfThumbs count] == 0){
+//        NSMutableArray *photos = [[NSMutableArray alloc] init];
+//        
+//        NSMutableArray *thumbs = [[NSMutableArray alloc] init];
+//        
+//        MWPhotoExt * photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
+//        photo.caption = @"Tube";
+//        [photos addObject:photo];
+//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_q.jpg"]]];
+//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_b.jpg"]];
+//        photo.caption = @"Flat White at Elliot's";
+//        [photos addObject:photo];
+//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_q.jpg"]]];
+//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_b.jpg"]];
+//        photo.caption = @"Woburn Abbey";
+//        [photos addObject:photo];
+//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_q.jpg"]]];
+//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_b.jpg"]];
+//        photo.caption = @"Frosty walk";
+//        [photos addObject:photo];
+//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
+//        
+//        self.selfPhotos = photos;
+//        self.selfThumbs = thumbs;
+//    }
+//    
     
     
     float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
@@ -614,6 +614,23 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
+    [preSelectedAssets removeAllObjects];
+    
+    NSIndexSet *toBeRemoved = [self.selfPhotos indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
+        // The block is called for each object in the array.
+        NSURL* url = [NSURL URLWithString:[ obj photoData]];
+        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
+        return removeIt;
+    }];
+    [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
+    
+    toBeRemoved = [self.selfThumbs indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
+        // The block is called for each object in the array.
+        NSURL* url = [NSURL URLWithString:[ obj photoData]];
+        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
+        return removeIt;
+    }];
+    [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
     
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     

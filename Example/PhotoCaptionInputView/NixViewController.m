@@ -64,7 +64,7 @@
         photo.caption = @"Grotto of the Madonna";
         [photos addObject:photo];
         [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm3.static.flickr.com/2667/4072710001_f36316ddc7_q.jpg"]]];
-        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm3.static.flickr.com/2449/4052876281_6e068ac860_b.jpg"]];
+        /*photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm3.static.flickr.com/2449/4052876281_6e068ac860_b.jpg"]];
         photo.caption = @"Beautiful Eyes";
         [photos addObject:photo];
         [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm3.static.flickr.com/2449/4052876281_6e068ac860_q.jpg"]]];
@@ -779,7 +779,7 @@
         photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_b.jpg"]];
         photo.caption = @"Mannequin DoF";
         [photos addObject:photo];
-        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];
+        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];*/
     }
     
     PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs preselectedAssets:nil delegate:self];
