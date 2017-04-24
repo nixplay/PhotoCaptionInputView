@@ -338,10 +338,16 @@
 
 -(void)removePhoto{
     NSLog(@"removePhoto");
+    //may have problem
+    MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+    if([preSelectedAssets containsObject:photo.photoData]){
+        [preSelectedAssets removeObject:photo.photoData];
+    }
     [self.selfPhotos removeObjectAtIndex:self.currentIndex];
     [self.selfThumbs removeObjectAtIndex:self.currentIndex];
     [self.collectionView reloadData];
     [self reloadData];
+    
     [_textfield setText:@""];
     if([self.selfPhotos count]>1){
         self.navigationItem.rightBarButtonItem = _trashButton;
