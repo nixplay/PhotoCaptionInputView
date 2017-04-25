@@ -30,6 +30,6 @@
 
 
 @protocol PhotoCaptionInputViewDelegate <NSObject>
--(void) onDismiss;
+-(void) dismissPhotoCaptionInputView:(PhotoCaptionInputViewController*)controller;
 -(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos;
 @end

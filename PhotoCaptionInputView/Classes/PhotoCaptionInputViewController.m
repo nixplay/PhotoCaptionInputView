@@ -264,8 +264,8 @@
 
 -(void)backAction{
     NSLog(@"backAction");
-    if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
-        [_selfDelegate onDismiss];
+    if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
+        [_selfDelegate dismissPhotoCaptionInputView:self];
     }
     if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
@@ -574,8 +574,8 @@
 - (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
 
 //    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
-    if ([_selfDelegate respondsToSelector:@selector(onDismiss)]) {
-        [_selfDelegate onDismiss];
+    if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
+        [_selfDelegate dismissPhotoCaptionInputView:self];
     }
     if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
         NSMutableArray *captions = [NSMutableArray array];
