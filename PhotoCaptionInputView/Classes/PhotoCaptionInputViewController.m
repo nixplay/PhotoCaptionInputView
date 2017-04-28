@@ -12,6 +12,7 @@
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 #import <GMImagePicker/GMImagePickerController.h>
 #import "MWPhotoExt.h"
+#define LIGHT_BLUE_CGCOLOR [[UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0] CGColor]
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
@@ -466,7 +467,7 @@
     if(self.currentIndex == indexPath.item){
         
         cell.layer.borderWidth = 2.0;
-        cell.layer.borderColor = [[UIColor blueColor] CGColor];
+        cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
         self.prevSelectItem = cell;
         
     }else{
@@ -503,7 +504,7 @@
         if(cell != NULL){
             
             cell.layer.borderWidth = 2.0;
-            cell.layer.borderColor = [[UIColor blueColor] CGColor];
+            cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
             self.prevSelectItem = cell;
             
         }
@@ -544,7 +545,7 @@
             [cell setHighlighted:YES];
             
             cell.layer.borderWidth = 2.0;
-            cell.layer.borderColor = [[UIColor blueColor] CGColor];
+            cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
             [_textfield setText:[[self.selfPhotos objectAtIndex:index] caption]];
