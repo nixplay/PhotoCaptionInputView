@@ -268,7 +268,7 @@
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
         NSMutableArray *captions = [NSMutableArray array];
         NSMutableArray *photos = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -276,7 +276,20 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+    }
+}
+
+-(void) getPhotosCaptions{
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
+        NSMutableArray *captions = [NSMutableArray array];
+        NSMutableArray *photos = [NSMutableArray array];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+            [photos addObject:obj.photoData];
+        }];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
     }
 }
 
@@ -332,20 +345,25 @@
 }
 
 -(void)removePhoto{
-    NSLog(@"removePhoto");
-    //may have problem
-    MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
-    if([preSelectedAssets containsObject:photo.photoData]){
-        [preSelectedAssets removeObject:photo.photoData];
-    }
-    [self.selfPhotos removeObjectAtIndex:self.currentIndex];
-    [self.selfThumbs removeObjectAtIndex:self.currentIndex];
-    [self.collectionView reloadData];
-    [self reloadData];
-    
-    [_textfield setText:@""];
-    if([self.selfPhotos count]>1){
-        self.navigationItem.rightBarButtonItem = _trashButton;
+    if([self.selfPhotos count] > 0){
+        NSLog(@"removePhoto");
+        //may have problem
+        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+        if([preSelectedAssets containsObject:photo.photoData]){
+            [preSelectedAssets removeObject:photo.photoData];
+        }
+        [self.selfPhotos removeObjectAtIndex:self.currentIndex];
+        [self.selfThumbs removeObjectAtIndex:self.currentIndex];
+        [self.collectionView reloadData];
+        [self reloadData];
+        
+        [_textfield setText:@""];
+        if([self.selfPhotos count]>1){
+            self.navigationItem.rightBarButtonItem = _trashButton;
+        }
+        if([self.selfPhotos count]==0){
+            self.navigationItem.rightBarButtonItem = nil;
+        }
     }
     
 }
@@ -588,7 +606,7 @@
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:)]) {
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
         NSMutableArray *captions = [NSMutableArray array];
         NSMutableArray *photos = [NSMutableArray array];
         [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -596,7 +614,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
     }
     
 }

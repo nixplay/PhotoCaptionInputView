@@ -25,12 +25,15 @@
 @property (nonatomic) CGRect keyboardRect;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
-
+-(void) getPhotosCaptions;
 @end
 
 
 @protocol PhotoCaptionInputViewDelegate <NSObject>
+
+@optional
 -(void) dismissPhotoCaptionInputView:(PhotoCaptionInputViewController*)controller;
--(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos;
+-(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos preSelectedAssets:(NSArray*)preSelectedAssets;
+@optional
 - (NSString *)photoCaptionInputView:(PhotoCaptionInputViewController *)controller titleForPhotoAtIndex:(NSUInteger)index;
 @end
