@@ -32,4 +32,5 @@
 @protocol PhotoCaptionInputViewDelegate <NSObject>
 -(void) dismissPhotoCaptionInputView:(PhotoCaptionInputViewController*)controller;
 -(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos;
+- (NSString *)photoCaptionInputView:(PhotoCaptionInputViewController *)controller titleForPhotoAtIndex:(NSUInteger)index;
 @end

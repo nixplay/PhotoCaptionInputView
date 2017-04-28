@@ -572,6 +572,16 @@
     return nil;
 }
 
+-(NSString*) photoBrowser:(MWPhotoBrowser *)photoBrowser titleForPhotoAtIndex:(NSUInteger)index{
+    NSString* title = @"";
+    if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
+        title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
+    }else{
+     title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
+    }
+    return title;
+}
+
 - (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
 
 //    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
