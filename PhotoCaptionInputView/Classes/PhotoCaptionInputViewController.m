@@ -268,16 +268,16 @@
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
-        NSMutableArray *captions = [NSMutableArray array];
-        NSMutableArray *photos = [NSMutableArray array];
-        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            
-            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
-            [photos addObject:obj.photoData];
-        }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
-    }
+//    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
+//        NSMutableArray *captions = [NSMutableArray array];
+//        NSMutableArray *photos = [NSMutableArray array];
+//        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//            
+//            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+//            [photos addObject:obj.photoData];
+//        }];
+//        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+//    }
 }
 
 -(void) getPhotosCaptions{
