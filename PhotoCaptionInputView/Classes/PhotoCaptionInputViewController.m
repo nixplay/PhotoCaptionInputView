@@ -17,6 +17,7 @@
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
+    BOOL keyboardIsShown;
 }
 @end
 
@@ -24,7 +25,7 @@
 
 @synthesize collectionView = _collectionView;
 @synthesize addButton = _addButton;
-@synthesize textfield = _textfield;
+@synthesize textView = _textView;
 @synthesize selfDelegate = _selfDelegate;
 @synthesize backButton = _backButton;
 @synthesize trashButton = _trashButton;
@@ -146,35 +147,40 @@
     
     
     CGRect tfrect = CGRectMake(0, initY-40, self.navigationController.view.frame.size.width, 31);
-    UITextField *textfield = [[UITextField alloc] initWithFrame:tfrect];
-    [textfield addTarget:self
-                  action:@selector(textFieldDidChange:)
-        forControlEvents:UIControlEventEditingChanged];
-    textfield.backgroundColor = [UIColor blackColor];
-    textfield.textColor = [UIColor whiteColor];
+    UITextView * textView = [[UITextView alloc] initWithFrame:tfrect textContainer:nil];
+//    UITextView *textView = [[UITextView alloc] initWithFrame:tfrect];
+//    [textView addTarget:self
+//                  action:@selector(textViewDidChange:)
+//        forControlEvents:UIControlEventEditingChanged];
+    textView.backgroundColor = [UIColor blackColor];
+    textView.textColor = [UIColor whiteColor];
     
-    textfield.layer.cornerRadius=8.0f;
-    textfield.layer.masksToBounds=YES;
+    textView.layer.cornerRadius=8.0f;
+    textView.layer.masksToBounds=YES;
+//    textView.borderStyle = UITextBorderStyleNone;
     
-    
-    textfield.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil) attributes:@{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
+//    textView.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil) attributes:@{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
 
 
-    textfield.font = [UIFont systemFontOfSize:14.0f];
-    textfield.borderStyle = UITextBorderStyleRoundedRect;
-    textfield.clearButtonMode = UITextFieldViewModeWhileEditing;
-    textfield.returnKeyType = UIReturnKeyDone;
-    textfield.textAlignment = NSTextAlignmentLeft;
-    textfield.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    textfield.tag = 2;
-    textfield.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textfield.autocorrectionType = UITextAutocorrectionTypeNo;
+    textView.font = [UIFont systemFontOfSize:14.0f];
+//    textView.borderStyle = UITextBorderStyleRoundedRect;
+//    textView.clearButtonMode = UITextViewViewModeWhileEditing;
+    textView.returnKeyType = UIReturnKeyDone;
+    textView.textAlignment = NSTextAlignmentLeft;
+//    textView.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    textView.tag = 2;
+    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textView.autocorrectionType = UITextAutocorrectionTypeNo;
     
-    textfield.delegate = self;
+    textView.delegate = self;
     
-    textfield.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-    _textfield = textfield;
-    [self.navigationController.view addSubview:_textfield];
+    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    _textView = textView;
+    
+    [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
+    
+    
+    [self.navigationController.view addSubview:_textView];
     
     
 
@@ -233,7 +239,7 @@
 }
 
 - (void)initialisation {
-    
+    keyboardIsShown = NO;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onKeyboardDidShow:)
                                                  name:UIKeyboardWillShowNotification
@@ -360,7 +366,7 @@
         [self.collectionView reloadData];
         [self reloadData];
         
-        [_textfield setText:@""];
+        [_textView setText:@""];
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
@@ -385,70 +391,92 @@
 //    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
 }
 
-#pragma mark UITextFieldDelegate
+#pragma mark UITextViewDelegate
 
 -(void) onKeyboardDidShow :(NSNotification*)notification
 {
-    NSDictionary* keyboardInfo = [notification userInfo];
-    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-    _keyboardRect = [keyboardFrameBegin CGRectValue];
-    BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
-    
-    [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
-    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
-    
+    if(!keyboardIsShown){
+        NSDictionary* keyboardInfo = [notification userInfo];
+        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        _keyboardRect= [keyboardFrameBegin CGRectValue];
+        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
+        
+        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
+        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
+        keyboardIsShown = YES;
+    }
     
 }
 
 -(void) onKeyboardWillHide :(NSNotification*)notification
 {
-    NSDictionary* keyboardInfo = [notification userInfo];
-    NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-    CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
-    [self animateTextField:_textfield up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+    if(keyboardIsShown){
+        NSDictionary* keyboardInfo = [notification userInfo];
+        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+        keyboardIsShown = NO;
+    }
     
 }
 
--(void)textFieldDidChange:(UITextField *)textField{
+-(void)textViewDidChange:(UITextView *)textView{
     MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
     
-    [photo setCaption:textField.text];
+    [photo setCaption:textView.text];
     [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
     
 }
-
--(void)textFieldDidBeginEditing:(UITextField *)textField
+- (BOOL)textViewShouldEndEditing:(UITextView *)textView{
+    return YES;
+}
+-(void)textViewDidBeginEditing:(UITextView *)textView
 {
-//    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:keyboardRect];
-    textField.backgroundColor = [UIColor whiteColor];
-    textField.textColor = [UIColor blackColor];
+//    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
+    textView.backgroundColor = [UIColor whiteColor];
+    textView.textColor = [UIColor blackColor];
 }
 
-- (void)textFieldDidEndEditing:(UITextField *)textField
+- (void)textViewDidEndEditing:(UITextView *)textView
 {
-//    [self animateTextField:_textfield up:YES keyboardFrameBeginRect:_keyboardRect];
-//    [self animateTextField:textField up:NO :];
-    textField.backgroundColor = [UIColor blackColor];
-    textField.textColor = [UIColor whiteColor];
+//    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
+//    [self animatetextView:textView up:NO :];
+    textView.backgroundColor = [UIColor blackColor];
+    textView.textColor = [UIColor whiteColor];
 }
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    NSLog(@"textFieldShouldReturn:");
-    if (textField.tag == 1) {
-        UITextField *textField = (UITextField *)[self.navigationController.view viewWithTag:2];
-        [textField becomeFirstResponder];
+- (BOOL)textViewShouldReturn:(UITextView *)textView{
+    NSLog(@"textViewShouldReturn:");
+    if (textView.tag == 1) {
+        UITextView *textView = (UITextView *)[self.navigationController.view viewWithTag:2];
+        [textView becomeFirstResponder];
     }
     else {
         
-        [textField resignFirstResponder];
+        [textView resignFirstResponder];
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
-        [photo setCaption:textField.text];
+        [photo setCaption:textView.text];
         [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
     }
     return YES;
 }
 
--(void)animateTextField:(UITextField*)textField up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    // Prevent crashing undo bug – see note below.
+    if(range.length + range.location > textView.text.length)
+    {
+        return NO;
+    }
+    if ([text isEqualToString:@"\n"]) {
+        [textView resignFirstResponder];
+        return NO;
+    }
+    NSUInteger newLength = [textView.text length] + [text length] - range.length;
+    return newLength <= 160;
+}
+
+-(void)animatetextView:(UITextView*)textView up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
 {
     
     const int movementDistance = -(keyboardFrameBeginRect.size.height ); // tweak as needed
@@ -456,7 +484,7 @@
     
     int movement = (up ? movementDistance : -movementDistance);
     
-    [UIView beginAnimations: @"animateTextField" context: nil];
+    [UIView beginAnimations: @"animatetextView" context: nil];
     [UIView setAnimationBeginsFromCurrentState: YES];
     [UIView setAnimationDuration: movementDuration];
     self.navigationController.view.frame = CGRectOffset(self.navigationController.view.frame, 0, movement);
@@ -531,7 +559,11 @@
         }
 
         
-        [_textfield setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
+        [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
+        CGRect originFrame = _textView.frame;
+        float rows = (_textView.contentSize.height - _textView.textContainerInset.top - _textView.textContainerInset.bottom) / _textView.font.lineHeight;
+        CGRect newFrame = CGRectMake( originFrame.origin.x, originFrame.origin.y, originFrame.size.width, MAX(MIN(4.0,rows), 1)*_textView.font.lineHeight );
+        [_textView setFrame:newFrame];
     });
 }
 
@@ -569,7 +601,7 @@
             cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
-            [_textfield setText:[[self.selfPhotos objectAtIndex:index] caption]];
+            [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
              dispatch_async (dispatch_get_main_queue (), ^{
                  [self.collectionView layoutIfNeeded];
                  [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];

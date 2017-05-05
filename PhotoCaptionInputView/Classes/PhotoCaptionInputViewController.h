@@ -11,7 +11,7 @@
 #import <MWPhotoBrowser/MWGridCell.h>
 @protocol PhotoCaptionInputViewDelegate;
 
-@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextFieldDelegate>
+@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate>
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails  preselectedAssets:(NSArray*) _preselectedAssets delegate:(id <PhotoCaptionInputViewDelegate>)delegate;
 
@@ -21,7 +21,7 @@
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
 @property (nonatomic, strong) MWGridCell *prevSelectItem;
-@property (nonatomic, strong) UITextField *textfield;
+@property (nonatomic, strong) UITextView *textView;
 @property (nonatomic) CGRect keyboardRect;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
