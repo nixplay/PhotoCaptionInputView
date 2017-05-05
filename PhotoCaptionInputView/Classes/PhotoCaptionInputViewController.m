@@ -12,7 +12,8 @@
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 #import <GMImagePicker/GMImagePickerController.h>
 #import "MWPhotoExt.h"
-#define LIGHT_BLUE_CGCOLOR [[UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0] CGColor]
+#define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
+#define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
@@ -307,7 +308,9 @@
     picker.colsInPortrait = 3;
     picker.colsInLandscape = 5;
     picker.minimumInteritemSpacing = 2.0;
-    
+    picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
+    picker.toolbarTextColor = LIGHT_BLUE_COLOR;
+    picker.toolbarTintColor = LIGHT_BLUE_COLOR;
     //    picker.allowsMultipleSelection = NO;
     //    picker.confirmSingleSelection = YES;
     //    picker.confirmSingleSelectionPrompt = @"Do you want to select the image you have chosen?";
