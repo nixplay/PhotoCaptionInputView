@@ -118,20 +118,31 @@
     
     CGRect tfrect = CGRectMake(0, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
+
+    [[IQKeyboardManager sharedManager]setEnable:YES];
+    [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
+//    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
+    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
+    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
+    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
+
+    
+//    textView.autocorrectionType = UITextAutocorrectionTypeYes;
+    textView.spellCheckingType = UITextSpellCheckingTypeYes;
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
     
     textView.layer.cornerRadius=0.0f;
     textView.layer.masksToBounds=YES;
-    textView.placeholder = PLACEHOLDER_TEXT;
+    textView.placeholderText = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor]; // optional
 
     textView.font = [UIFont systemFontOfSize:14.0f];
     textView.returnKeyType = UIReturnKeyDone;
     textView.textAlignment = NSTextAlignmentLeft;
     textView.tag = 2;
-    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textView.autocorrectionType = UITextAutocorrectionTypeNo;
+//    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textView.autocorrectionType = UITextAutocorrectionTypeYes;
     
     textView.delegate = self;
     
@@ -139,7 +150,7 @@
     _textView = textView;
     
     [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
-    [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length]];
+    ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length];
     
     
     
@@ -295,7 +306,7 @@
         
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:self.currentIndex] caption]];
-        [_textView setPlaceholder: PLACEHOLDER_TEXT];
+        _textView.placeholderText = PLACEHOLDER_TEXT;
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
@@ -396,8 +407,8 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // Prevent crashing undo bug – see note below.
     IQTextView* iqTextView = (IQTextView*)textView;
-    iqTextView.shouldHidePlaceholderText = YES;
-    [iqTextView setPlaceholder: [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER]];
+    iqTextView.shouldHidePlaceholderText = NO;
+    iqTextView.placeholderText = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
     
     if(range.length + range.location > textView.text.length)
     {
@@ -497,7 +508,7 @@
 
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
-        [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER]];
+        ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
         [_textView setFrame:[self newFrameFromTextView:_textView]];
     });
 }
@@ -559,7 +570,7 @@
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
             [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
-            [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER]];
+            ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
             [_textView setFrame:[self newFrameFromTextView:_textView]];
 //            [_textView scrollsToTop];
              dispatch_async (dispatch_get_main_queue (), ^{
