@@ -6,14 +6,16 @@ PODS:
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
   - GMImagePicker (0.0.6)
+  - IQKeyboardManager (4.0.9)
   - Kiwi (2.4.0)
   - MBProgressHUD (1.0.0)
   - MWPhotoBrowser (2.1.12):
     - DACircularProgress
     - MBProgressHUD
     - SDWebImage
-  - PhotoCaptionInputView (0.3.21):
+  - PhotoCaptionInputView (0.3.22):
     - GMImagePicker
+    - IQKeyboardManager
     - MWPhotoBrowser
     - UITextView+Placeholder (~> 1.2)
   - SDWebImage (3.7.5):
@@ -51,10 +53,11 @@ SPEC CHECKSUMS:
   DACircularProgress: 4dd437c0fc3da5161cb289e07ac449493d41db71
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   GMImagePicker: e7c922bebc3a1d1fa300f2ab6baff648a2f288d5
+  IQKeyboardManager: 322c7405df3eb5f7e50dede32ea937bf3d4364e0
   Kiwi: f49c9d54b28917df5928fe44968a39ed198cb8a8
   MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
   MWPhotoBrowser: 3283082029745ab2f4266a74c7554f6e12bea1f4
-  PhotoCaptionInputView: 10f3cd84ac606ae0ee3fed4129ad4ab6f007b944
+  PhotoCaptionInputView: d04d5ecae510fca51b212128234a7af60fa8f574
   SDWebImage: 69c6303e3348fba97e03f65d65d4fbc26740f461
   UITextView+Placeholder: 77680995fcdd07c3f52ec92fe1150874a2ac89ff
 

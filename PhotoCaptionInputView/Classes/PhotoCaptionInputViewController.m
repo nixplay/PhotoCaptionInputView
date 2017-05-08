@@ -13,13 +13,18 @@
 #import <GMImagePicker/GMImagePickerController.h>
 #import "MWPhotoExt.h"
 #import "UITextView+Placeholder.h"
+#import "IQKeyboardManager.h"
+#import "IQUIView+IQKeyboardToolbar.h"
+#import "IQTextView.h"
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
+#define MAX_CHARACTER 160
+#define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"Add a caption…",nil) , MAX_CHARACTER]
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
-    float textViewOrigY;
+    float textViewOrigYRatio;
 }
 @end
 
@@ -64,42 +69,10 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    for(int i = 0 ;i < [self.selfPhotos count] ; i++){
-        printf("{\n\"previewUrl\":\"%s\",\n", [[[self.selfPhotos objectAtIndex:i] photoData] cStringUsingEncoding:NSUTF8StringEncoding]);
-    
-        printf("\"thumbnailUrl\":\"%s\"\n},\n", [[[self.selfThumbs objectAtIndex:i] photoData] cStringUsingEncoding:NSUTF8StringEncoding]);
-    }
-//    if(self.selfPhotos == nil || [self.selfThumbs count] == 0){
-//        NSMutableArray *photos = [[NSMutableArray alloc] init];
-//        
-//        NSMutableArray *thumbs = [[NSMutableArray alloc] init];
-//        
-//        MWPhotoExt * photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
-//        photo.caption = @"Tube";
-//        [photos addObject:photo];
-//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_q.jpg"]]];
-//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_b.jpg"]];
-//        photo.caption = @"Flat White at Elliot's";
-//        [photos addObject:photo];
-//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3777/9522276829_fdea08ffe2_q.jpg"]]];
-//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_b.jpg"]];
-//        photo.caption = @"Woburn Abbey";
-//        [photos addObject:photo];
-//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8379/8530199945_47b386320f_q.jpg"]]];
-//        photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_b.jpg"]];
-//        photo.caption = @"Frosty walk";
-//        [photos addObject:photo];
-//        [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm9.static.flickr.com/8364/8268120482_332d61a89e_q.jpg"]]];
-//        
-//        self.selfPhotos = photos;
-//        self.selfThumbs = thumbs;
-//    }
-//    
-    
     
     float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
-    
+    textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
@@ -108,11 +81,6 @@
     flowLayout.minimumLineSpacing = 2;
     flowLayout.minimumInteritemSpacing = 2;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    
-//    UIView * graoupView = [[UIView alloc]initWithFrame:CGRectMake(0,
-//                                                                  initY,
-//                                                                  self.navigationController.view.frame.size.width,
-//                                                                  initHeight)];
     
     CGRect rect = CGRectMake(0,
                              initY-5,
@@ -147,23 +115,20 @@
     
     [self.navigationController.view addSubview:self.collectionView];
     
-    textViewOrigY = initY-40;
-    CGRect tfrect = CGRectMake(0, textViewOrigY, self.navigationController.view.frame.size.width, 31);
-    UITextView * textView = [[UITextView alloc] initWithFrame:tfrect textContainer:nil];
+    
+    CGRect tfrect = CGRectMake(0, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width, 31);
+    IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
     
     textView.layer.cornerRadius=0.0f;
     textView.layer.masksToBounds=YES;
-    textView.placeholder = NSLocalizedString(@"Add a caption…(0/160)", nil);
+    textView.placeholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor]; // optional
 
     textView.font = [UIFont systemFontOfSize:14.0f];
-//    textView.borderStyle = UITextBorderStyleRoundedRect;
-//    textView.clearButtonMode = UITextViewViewModeWhileEditing;
     textView.returnKeyType = UIReturnKeyDone;
     textView.textAlignment = NSTextAlignmentLeft;
-//    textView.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     textView.tag = 2;
     textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textView.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -174,6 +139,9 @@
     _textView = textView;
     
     [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
+    [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length]];
+    
+    
     
     
     [self.navigationController.view addSubview:_textView];
@@ -200,6 +168,8 @@
     self.navigationItem.rightBarButtonItem = trashButton;
     
     _trashButton = trashButton;
+    
+    [[IQKeyboardManager sharedManager] setEnable:YES];
     
 }
 
@@ -272,16 +242,6 @@
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
-//    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
-//        NSMutableArray *captions = [NSMutableArray array];
-//        NSMutableArray *photos = [NSMutableArray array];
-//        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//            
-//            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
-//            [photos addObject:obj.photoData];
-//        }];
-//        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
-//    }
 }
 
 -(void) getPhotosCaptions{
@@ -314,39 +274,9 @@
     picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
     picker.toolbarTextColor = LIGHT_BLUE_COLOR;
     picker.toolbarTintColor = LIGHT_BLUE_COLOR;
-    //    picker.allowsMultipleSelection = NO;
-    //    picker.confirmSingleSelection = YES;
-    //    picker.confirmSingleSelectionPrompt = @"Do you want to select the image you have chosen?";
-    
-        picker.showCameraButton = YES;
-        picker.autoSelectCameraImages = YES;
-    
-//    picker.modalPresentationStyle = UIModalPresentationPopover;
-    
-    //    picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
-    
-    //    picker.pickerBackgroundColor = [UIColor blackColor];
-    //    picker.pickerTextColor = [UIColor whiteColor];
-    //    picker.toolbarBarTintColor = [UIColor darkGrayColor];
-    //    picker.toolbarTextColor = [UIColor whiteColor];
-    //    picker.toolbarTintColor = [UIColor redColor];
-    //    picker.navigationBarBackgroundColor = [UIColor blackColor];
-    //    picker.navigationBarTextColor = [UIColor whiteColor];
-    //    picker.navigationBarTintColor = [UIColor redColor];
-    //    picker.pickerFontName = @"Verdana";
-    //    picker.pickerBoldFontName = @"Verdana-Bold";
-    //    picker.pickerFontNormalSize = 14.f;
-    //    picker.pickerFontHeaderSize = 17.0f;
-    //    picker.pickerStatusBarStyle = UIStatusBarStyleLightContent;
-    //    picker.useCustomFontForNavigationBar = YES;
-    
-//    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
-//    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
-//    popPC.sourceView = _gmImagePickerButton;
-//    popPC.sourceRect = _gmImagePickerButton.bounds;
-    //    popPC.backgroundColor = [UIColor blackColor];
-    
-//    [self showViewController:picker sender:nil];
+    picker.showCameraButton = YES;
+    picker.autoSelectCameraImages = YES;
+
     [self.navigationController presentViewController:picker animated:YES completion:nil];
 }
 
@@ -365,6 +295,7 @@
         
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:self.currentIndex] caption]];
+        [_textView setPlaceholder: PLACEHOLDER_TEXT];
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
@@ -385,8 +316,6 @@
 
 -(void) viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidShowNotification object:nil];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
 }
 
 #pragma mark UITextViewDelegate
@@ -394,13 +323,13 @@
 -(void) onKeyboardDidShow :(NSNotification*)notification
 {
     if(!keyboardIsShown){
-        NSDictionary* keyboardInfo = [notification userInfo];
-        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-        _keyboardRect= [keyboardFrameBegin CGRectValue];
-        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
-        
-        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
-        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
+//        NSDictionary* keyboardInfo = [notification userInfo];
+//        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+//        _keyboardRect= [keyboardFrameBegin CGRectValue];
+//        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
+//        
+//        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
+//        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
         keyboardIsShown = YES;
     }
     
@@ -409,10 +338,12 @@
 -(void) onKeyboardWillHide :(NSNotification*)notification
 {
     if(keyboardIsShown){
-        NSDictionary* keyboardInfo = [notification userInfo];
-        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
-        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+//        NSDictionary* keyboardInfo = [notification userInfo];
+//        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+//        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+//        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+        [_textView setFrame:[self newFrameFromTextView:_textView]];
+        
         keyboardIsShown = NO;
     }
     
@@ -441,6 +372,7 @@
 //    [self animatetextView:textView up:NO :];
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
+    [textView setFrame:[self newFrameFromTextView:textView]];
 }
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
     NSLog(@"textViewShouldReturn:");
@@ -451,7 +383,7 @@
     else {
         
         [textView resignFirstResponder];
-        [textView setFrame:[self newFarameFromTextView:textView]];
+        [textView setFrame:[self newFrameFromTextView:textView]];
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
         [photo setCaption:textView.text];
@@ -463,17 +395,21 @@
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // Prevent crashing undo bug – see note below.
+    IQTextView* iqTextView = (IQTextView*)textView;
+    iqTextView.shouldHidePlaceholderText = YES;
+    [iqTextView setPlaceholder: [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER]];
+    
     if(range.length + range.location > textView.text.length)
     {
         return NO;
     }
     if ([text isEqualToString:@"\n"]) {
         [textView resignFirstResponder];
-        [textView setFrame:[self newFarameFromTextView:textView]];
+        [textView setFrame:[self newFrameFromTextView:textView]];
         return NO;
     }
     NSUInteger newLength = [textView.text length] + [text length] - range.length;
-    return newLength <= 160;
+    return newLength <= MAX_CHARACTER;
 }
 
 -(void)animatetextView:(UITextView*)textView up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
@@ -561,21 +497,31 @@
 
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
-
-        [_textView setFrame:[self newFarameFromTextView:_textView]];
+        [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER]];
+        [_textView setFrame:[self newFrameFromTextView:_textView]];
     });
 }
 
--(CGRect) newFarameFromTextView:(UITextView*)textView{
-    CGRect originFrame = textView.frame;
-    float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
-    float newRow =  MAX(MIN(5.0,rows), 2);
-    float newHeight = newRow*textView.font.lineHeight ;
-    float yOffset = ((newRow-1)*textView.font.lineHeight);
-    CGRect newFrame = CGRectMake( originFrame.origin.x, textViewOrigY-yOffset, originFrame.size.width, newHeight);
-    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    return newFrame;
-//    return textView.frame;
+-(CGRect) newFrameFromTextView:(UITextView*)textView{
+//    if(!keyboardIsShown){
+        if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
+            float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
+            textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+        }else{
+            float initY = self.navigationController.view.frame.size.height * (10.0/12.0)-5;
+            textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+        }
+        CGRect originFrame = textView.frame;
+        float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
+        float newRow =  MAX(MIN(5.0,rows), 2);
+        float newHeight = newRow*textView.font.lineHeight ;
+        float yOffset = ((newRow-1)*textView.font.lineHeight);
+        CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
+        textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+        return newFrame;
+//    }else{
+//        return textView.frame;
+//    }
 }
 
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
@@ -613,8 +559,9 @@
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
             [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
-            [_textView setFrame:[self newFarameFromTextView:_textView]];
-            [_textView scrollsToTop];
+            [((IQTextView*)_textView) setPlaceholder: ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER]];
+            [_textView setFrame:[self newFrameFromTextView:_textView]];
+//            [_textView scrollsToTop];
              dispatch_async (dispatch_get_main_queue (), ^{
                  [self.collectionView layoutIfNeeded];
                  [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
+#import "IQTextView.h"
 @protocol PhotoCaptionInputViewDelegate;
 
 @interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate>
@@ -21,7 +22,7 @@
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
 @property (nonatomic, strong) MWGridCell *prevSelectItem;
-@property (nonatomic, strong) UITextView *textView;
+@property (nonatomic, strong) IQTextView *textView;
 @property (nonatomic) CGRect keyboardRect;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;

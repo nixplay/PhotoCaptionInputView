@@ -91,6 +91,7 @@ strip_invalid_archs() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "$BUILT_PRODUCTS_DIR/DACircularProgress/DACircularProgress.framework"
   install_framework "$BUILT_PRODUCTS_DIR/GMImagePicker/GMImagePicker.framework"
+  install_framework "$BUILT_PRODUCTS_DIR/IQKeyboardManager/IQKeyboardManager.framework"
   install_framework "$BUILT_PRODUCTS_DIR/MBProgressHUD/MBProgressHUD.framework"
   install_framework "$BUILT_PRODUCTS_DIR/MWPhotoBrowser/MWPhotoBrowser.framework"
   install_framework "$BUILT_PRODUCTS_DIR/PhotoCaptionInputView/PhotoCaptionInputView.framework"
@@ -100,6 +101,7 @@ fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "$BUILT_PRODUCTS_DIR/DACircularProgress/DACircularProgress.framework"
   install_framework "$BUILT_PRODUCTS_DIR/GMImagePicker/GMImagePicker.framework"
+  install_framework "$BUILT_PRODUCTS_DIR/IQKeyboardManager/IQKeyboardManager.framework"
   install_framework "$BUILT_PRODUCTS_DIR/MBProgressHUD/MBProgressHUD.framework"
   install_framework "$BUILT_PRODUCTS_DIR/MWPhotoBrowser/MWPhotoBrowser.framework"
   install_framework "$BUILT_PRODUCTS_DIR/PhotoCaptionInputView/PhotoCaptionInputView.framework"
