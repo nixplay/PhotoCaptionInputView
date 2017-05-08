@@ -208,7 +208,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     // Navigation buttons
     if ([self.navigationController.viewControllers objectAtIndex:0] == self) {
         // We're first on stack so show done button
-        _doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"╳", nil) style:UIBarButtonItemStylePlain target:self action:@selector(doneButtonPressed:)];
+        _doneButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:@"MWPhotoBrowser.bundle/IconBack" ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] style:UIBarButtonItemStylePlain target:self action:@selector(doneButtonPressed:)];
         // Set appearance
         [_doneButton setBackgroundImage:nil forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
         [_doneButton setBackgroundImage:nil forState:UIControlStateNormal barMetrics:UIBarMetricsCompact];
@@ -216,7 +216,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [_doneButton setBackgroundImage:nil forState:UIControlStateHighlighted barMetrics:UIBarMetricsCompactPrompt];
         [_doneButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateNormal];
         [_doneButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateHighlighted];
-        self.navigationItem.leftBarButtonItem = _doneButton;
+        if(self.navigationItem.leftBarButtonItem == NULL){
+            self.navigationItem.leftBarButtonItem = _doneButton;
+        }
         
         NSString* selectionString =  _displaySelectionButtons ?  NSLocalizedString(@"Cancel", nil) : NSLocalizedString(@"Select", nil);
         _selectButton = [[UIBarButtonItem alloc] initWithTitle:selectionString style:UIBarButtonItemStylePlain target:self action:@selector(selectButtonPressed:)];
@@ -227,7 +229,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [_selectButton setBackgroundImage:nil forState:UIControlStateHighlighted barMetrics:UIBarMetricsCompactPrompt];
         [_selectButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateNormal];
         [_selectButton setTitleTextAttributes:[NSDictionary dictionary] forState:UIControlStateHighlighted];
-        self.navigationItem.rightBarButtonItem = _selectButton;
+        if(self.navigationItem.rightBarButtonItem == NULL){
+            self.navigationItem.rightBarButtonItem = _selectButton;
+        }
         
     } else {
         // We're not first so show back button
@@ -293,6 +297,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
                 hideToolbar = NO;
                 break;
             }
+        }
+        if([self.delegate respondsToSelector:@selector(photoBrowser:hideToolbar:)]){
+            hideToolbar = [self.delegate photoBrowser:self hideToolbar:hideToolbar];
         }
         if (hideToolbar) {
             [_toolbar removeFromSuperview];
@@ -456,14 +463,19 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)setNavBarAppearance:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:animated];
-    UINavigationBar *navBar = self.navigationController.navigationBar;
-    navBar.tintColor = [UIColor whiteColor];
-    navBar.barTintColor = nil;
-    navBar.shadowImage = nil;
-    navBar.translucent = YES;
-    navBar.barStyle = UIBarStyleBlackTranslucent;
-    [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-    [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
+    
+    if([self.delegate respondsToSelector:@selector(photoBrowser:setNavBarAppearance:)]){
+        [self.delegate photoBrowser:self setNavBarAppearance:self.navigationController.navigationBar];
+    }else{
+        UINavigationBar *navBar = self.navigationController.navigationBar;
+        navBar.tintColor = [UIColor whiteColor];
+        navBar.barTintColor = nil;
+        navBar.shadowImage = nil;
+        navBar.translucent = YES;
+        navBar.barStyle = UIBarStyleBlackTranslucent;
+        [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+        [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
+    }
 }
 
 - (void)storePreviousNavBarAppearance {
@@ -1097,6 +1109,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 	// Title
     NSUInteger numberOfPhotos = [self numberOfPhotos];
     if (_gridController) {
+        if([self.delegate respondsToSelector:@selector(photoBrowserSelectionMode)]){
+            _gridController.selectionMode = [self.delegate photoBrowserSelectionMode];
+            [_gridController.collectionView reloadData];
+        }
         if (_gridController.selectionMode) {
             self.title = NSLocalizedString(@"Select Photos", nil);
         } else {
@@ -1324,6 +1340,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
     if (_gridController) return;
     
+    if([self.delegate respondsToSelector:@selector(photoBrowser:showGridController:)]){
+        if([self.delegate photoBrowser:self showGridController:_gridController]){
+            
+        }
+    }
     // Clear video
     [self clearCurrentVideo];
     
@@ -1374,7 +1395,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (void)hideGrid {
     
     if (!_gridController) return;
-    
+    if([self.delegate respondsToSelector:@selector(photoBrowser:hideGridController:)]){
+        if([self.delegate photoBrowser:self hideGridController:_gridController]){
+            
+        }
+    }
     // Remember previous content offset
     _currentGridContentOffset = _gridController.collectionView.contentOffset;
     
@@ -1596,7 +1621,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     if(!_displaySelectionButtons){
         _displaySelectionButtons = YES;
         [_selectButton setTitle:NSLocalizedString(@"Cancel", nil)];
-        _displaySelectionButtons = YES;
+    
         [self createSelectionModeBarButton];
     }else{
         [_selectButton setTitle:NSLocalizedString(@"Select", nil)];
@@ -1606,7 +1631,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         }
         
     }
-    if (self.enableGrid && _gridController) {
+    if (_gridController) {
         _gridController.selectionMode = _displaySelectionButtons;
         if(_gridController.selectionMode){
             
@@ -1635,37 +1660,42 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 }
 
 -(void) createSelectionModeBarButton{
-    UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
-    fixedSpace.width = 32; // To balance action button
-    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    
-    NSMutableArray *items = [[NSMutableArray alloc] init];
-    
-    UIBarButtonItem * deleteBarButton = [[UIBarButtonItem alloc] initWithImage:[ self imageFromSystemBarButton:UIBarButtonSystemItemTrash]
-                                                                         style:UIBarButtonItemStylePlain target:self action:@selector(deletePhoto:)];
-    
-    UIBarButtonItem * sendtoBarButton = [[UIBarButtonItem alloc] initWithTitle:@"Send To" style:UIBarButtonItemStylePlain target:self action:@selector(sendTo:)];
-    
-    
-    [items addObject:deleteBarButton];
-    [items addObject:flexSpace];
-    [items addObject:sendtoBarButton];
-    [items addObject:flexSpace];
-    // Right - Action
-    _actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
-    if (_actionButton ) {
-        [items addObject:_actionButton];
+    if([self.delegate respondsToSelector:@selector(photoBrowser:buildToolbarItems:)]){
+        NSMutableArray *items = [self.delegate photoBrowser:self buildToolbarItems:_toolbar];
+        [_toolbar setItems:items];
+    }else{
+        UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
+        fixedSpace.width = 32; // To balance action button
+        UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+        
+        NSMutableArray *items = [[NSMutableArray alloc] init];
+        
+        UIBarButtonItem * deleteBarButton = [[UIBarButtonItem alloc] initWithImage:[ self imageFromSystemBarButton:UIBarButtonSystemItemTrash]
+                                                                             style:UIBarButtonItemStylePlain target:self action:@selector(deletePhoto:)];
+        
+        UIBarButtonItem * sendtoBarButton = [[UIBarButtonItem alloc] initWithTitle:@"Add" style:UIBarButtonItemStylePlain target:self action:@selector(add:)];
+        
+        
+        [items addObject:deleteBarButton];
+        [items addObject:flexSpace];
+        [items addObject:sendtoBarButton];
+        [items addObject:flexSpace];
+        // Right - Action
+        UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
+        if (actionButton ) {
+            [items addObject:actionButton];
+        }
+        [_toolbar setItems:items];
     }
-    [_toolbar setItems:items];
-    
     [self.view addSubview:_toolbar];
+        
 }
 
 -(void) deletePhoto : (id)sender{
     
 }
 
--(void) sendTo : (id)sender{
+-(void) add : (id)sender{
     
 }
 

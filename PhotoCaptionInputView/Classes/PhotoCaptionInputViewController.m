@@ -12,6 +12,7 @@
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
 #import <GMImagePicker/GMImagePickerController.h>
 #import "MWPhotoExt.h"
+#import "UITextView+Placeholder.h"
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
@@ -149,19 +150,13 @@
     textViewOrigY = initY-40;
     CGRect tfrect = CGRectMake(0, textViewOrigY, self.navigationController.view.frame.size.width, 31);
     UITextView * textView = [[UITextView alloc] initWithFrame:tfrect textContainer:nil];
-//    UITextView *textView = [[UITextView alloc] initWithFrame:tfrect];
-//    [textView addTarget:self
-//                  action:@selector(textViewDidChange:)
-//        forControlEvents:UIControlEventEditingChanged];
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
     
     textView.layer.cornerRadius=0.0f;
     textView.layer.masksToBounds=YES;
-//    textView.borderStyle = UITextBorderStyleNone;
-    
-//    textView.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"Add a caption", nil) attributes:@{NSForegroundColorAttributeName: [UIColor lightGrayColor]}];
-
+    textView.placeholder = NSLocalizedString(@"Add a caption…(0/160)", nil);
+    textView.placeholderColor = [UIColor lightGrayColor]; // optional
 
     textView.font = [UIFont systemFontOfSize:14.0f];
 //    textView.borderStyle = UITextBorderStyleRoundedRect;
@@ -205,6 +200,7 @@
     self.navigationItem.rightBarButtonItem = trashButton;
     
     _trashButton = trashButton;
+    
 }
 
 

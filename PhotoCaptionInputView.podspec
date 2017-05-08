@@ -44,5 +44,6 @@ TODO: Add long description of the pod here.
   # s.dependency 'AFNetworking', '~> 2.3'
     s.dependency 'MWPhotoBrowser'
   s.dependency 'GMImagePicker'
+    s.dependency 'UITextView+Placeholder', '~> 1.2'
   
 end
