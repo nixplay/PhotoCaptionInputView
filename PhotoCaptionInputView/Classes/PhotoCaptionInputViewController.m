@@ -134,6 +134,8 @@
     
     textView.layer.cornerRadius=0.0f;
     textView.layer.masksToBounds=YES;
+    textView.placeholder = PLACEHOLDER_TEXT;
+    textView.placeholderColor = [UIColor lightGrayColor];
     textView.placeholderText = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor]; // optional
 
