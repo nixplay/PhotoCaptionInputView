@@ -18,6 +18,7 @@
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
+    float textViewOrigY;
 }
 @end
 
@@ -145,8 +146,8 @@
     
     [self.navigationController.view addSubview:self.collectionView];
     
-    
-    CGRect tfrect = CGRectMake(0, initY-40, self.navigationController.view.frame.size.width, 31);
+    textViewOrigY = initY-40;
+    CGRect tfrect = CGRectMake(0, textViewOrigY, self.navigationController.view.frame.size.width, 31);
     UITextView * textView = [[UITextView alloc] initWithFrame:tfrect textContainer:nil];
 //    UITextView *textView = [[UITextView alloc] initWithFrame:tfrect];
 //    [textView addTarget:self
@@ -155,7 +156,7 @@
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
     
-    textView.layer.cornerRadius=8.0f;
+    textView.layer.cornerRadius=0.0f;
     textView.layer.masksToBounds=YES;
 //    textView.borderStyle = UITextBorderStyleNone;
     
@@ -174,7 +175,7 @@
     
     textView.delegate = self;
     
-    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     _textView = textView;
     
     [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
@@ -366,7 +367,8 @@
         [self.collectionView reloadData];
         [self reloadData];
         
-        [_textView setText:@""];
+        
+        [_textView setText:[ [self.selfPhotos objectAtIndex:self.currentIndex] caption]];
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
@@ -453,6 +455,7 @@
     else {
         
         [textView resignFirstResponder];
+        [textView setFrame:[self newFarameFromTextView:textView]];
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         
         [photo setCaption:textView.text];
@@ -470,6 +473,7 @@
     }
     if ([text isEqualToString:@"\n"]) {
         [textView resignFirstResponder];
+        [textView setFrame:[self newFarameFromTextView:textView]];
         return NO;
     }
     NSUInteger newLength = [textView.text length] + [text length] - range.length;
@@ -549,6 +553,7 @@
             self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         
+//        [self.delegate photoBrowser:self didDisplayPhotoAtIndex:indexPath.item];
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             
@@ -560,11 +565,21 @@
 
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
-        CGRect originFrame = _textView.frame;
-        float rows = (_textView.contentSize.height - _textView.textContainerInset.top - _textView.textContainerInset.bottom) / _textView.font.lineHeight;
-        CGRect newFrame = CGRectMake( originFrame.origin.x, originFrame.origin.y, originFrame.size.width, MAX(MIN(4.0,rows), 1)*_textView.font.lineHeight );
-        [_textView setFrame:newFrame];
+
+        [_textView setFrame:[self newFarameFromTextView:_textView]];
     });
+}
+
+-(CGRect) newFarameFromTextView:(UITextView*)textView{
+    CGRect originFrame = textView.frame;
+    float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
+    float newRow =  MAX(MIN(5.0,rows), 2);
+    float newHeight = newRow*textView.font.lineHeight ;
+    float yOffset = ((newRow-1)*textView.font.lineHeight);
+    CGRect newFrame = CGRectMake( originFrame.origin.x, textViewOrigY-yOffset, originFrame.size.width, newHeight);
+    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    return newFrame;
+//    return textView.frame;
 }
 
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
@@ -602,6 +617,8 @@
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
             [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
+            [_textView setFrame:[self newFarameFromTextView:_textView]];
+            [_textView scrollsToTop];
              dispatch_async (dispatch_get_main_queue (), ^{
                  [self.collectionView layoutIfNeeded];
                  [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
@@ -748,4 +765,21 @@
 -(NSString*) controllerCustomCancelButtonTitle{
     return NSLocalizedString(@"Cancel",nil);
 }
+
+
+//lock orientation
+
+-(BOOL)shouldAutorotate {
+    return NO;
+}
+
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
+    return NO;
+}
+
+
 @end
