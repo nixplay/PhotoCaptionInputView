@@ -422,7 +422,7 @@
         return NO;
     }
     NSUInteger newLength = [textView.text length] + [text length] - range.length;
-    return newLength <= MAX_CHARACTER;
+    return newLength < MAX_CHARACTER;
 }
 
 -(void)animatetextView:(UITextView*)textView up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
