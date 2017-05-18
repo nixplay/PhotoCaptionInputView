@@ -223,8 +223,8 @@ There are three ways to use SDWebImage in your project:
 
 #### Podfile
 ```
-platform :ios, '6.1'
-pod 'SDWebImage', '~>3.7'
+platform :ios, '8.0'
+pod 'SDWebImage', '~>4.0.0'
 ```
 
 If you are using Swift, be sure to add `use_frameworks!` and set your target to iOS 8+:

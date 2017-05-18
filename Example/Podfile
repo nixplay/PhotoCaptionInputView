@@ -6,7 +6,7 @@ target 'PhotoCaptionInputView_Example' do
   pod 'PhotoCaptionInputView', :path => '../'
   pod 'MWPhotoBrowser' , :git => 'https://github.com/nixplay/MWPhotoBrowser.git', :branch => 'develop' 
   pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :branch => 'develop'
-  pod 'SDWebImage' , '3.7.5'
+  pod 'SDWebImage' , '4.0.0'
   target 'PhotoCaptionInputView_Tests' do
     inherit! :search_paths
 
