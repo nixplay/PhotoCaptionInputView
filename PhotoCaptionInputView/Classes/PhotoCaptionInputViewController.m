@@ -88,7 +88,7 @@
                              initHeight);
     
     self.collectionView = [[UICollectionView alloc]initWithFrame:rect
-                            collectionViewLayout:flowLayout
+                                            collectionViewLayout:flowLayout
                            ];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
@@ -110,7 +110,7 @@
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
     self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.addButton addTarget:self action:@selector(addPhotoFromLibrary) forControlEvents:UIControlEventTouchUpInside];
-
+    
     [self.navigationController.view addSubview:self.addButton];
     
     [self.navigationController.view addSubview:self.collectionView];
@@ -118,16 +118,16 @@
     
     CGRect tfrect = CGRectMake(0, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
-
+    
     [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
-//    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
+    //    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
     [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
     [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
     [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
-
     
-//    textView.autocorrectionType = UITextAutocorrectionTypeYes;
+    
+    //    textView.autocorrectionType = UITextAutocorrectionTypeYes;
     textView.spellCheckingType = UITextSpellCheckingTypeYes;
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
@@ -138,29 +138,31 @@
     textView.placeholderColor = [UIColor lightGrayColor];
     textView.placeholderText = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor]; // optional
-
+    
     textView.font = [UIFont systemFontOfSize:14.0f];
     textView.returnKeyType = UIReturnKeyDone;
     textView.textAlignment = NSTextAlignmentLeft;
     textView.tag = 2;
-//    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    //    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textView.autocorrectionType = UITextAutocorrectionTypeYes;
     
     textView.delegate = self;
     
     textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     _textView = textView;
-    
-    [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
-    ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length];
-    
+    if([self.selfPhotos count] >0){
+        [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
+        
+        ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length];
+        
+    }
     
     
     
     [self.navigationController.view addSubview:_textView];
     
     
-
+    
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
@@ -172,9 +174,9 @@
     
     
     UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[ self imageFromSystemBarButton:UIBarButtonSystemItemTrash]
-                                                                   style:UIBarButtonItemStylePlain
-                                                                  target:self
-                                                                  action:@selector(removePhoto)];
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(removePhoto)];
     NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
     trashButton.title = trashString;
     
@@ -280,7 +282,7 @@
     picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
- 
+    
     picker.colsInPortrait = 3;
     picker.colsInLandscape = 5;
     picker.minimumInteritemSpacing = 2.0;
@@ -289,7 +291,7 @@
     picker.toolbarTintColor = LIGHT_BLUE_COLOR;
     picker.showCameraButton = YES;
     picker.autoSelectCameraImages = YES;
-
+    
     [self.navigationController presentViewController:picker animated:YES completion:nil];
 }
 
@@ -336,13 +338,13 @@
 -(void) onKeyboardDidShow :(NSNotification*)notification
 {
     if(!keyboardIsShown){
-//        NSDictionary* keyboardInfo = [notification userInfo];
-//        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-//        _keyboardRect= [keyboardFrameBegin CGRectValue];
-//        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
-//        
-//        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
-//        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
+        //        NSDictionary* keyboardInfo = [notification userInfo];
+        //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        //        _keyboardRect= [keyboardFrameBegin CGRectValue];
+        //        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
+        //
+        //        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
+        //        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
         keyboardIsShown = YES;
     }
     
@@ -351,10 +353,10 @@
 -(void) onKeyboardWillHide :(NSNotification*)notification
 {
     if(keyboardIsShown){
-//        NSDictionary* keyboardInfo = [notification userInfo];
-//        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-//        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
-//        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+        //        NSDictionary* keyboardInfo = [notification userInfo];
+        //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        //        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+        //        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
         [_textView setFrame:[self newFrameFromTextView:_textView]];
         
         keyboardIsShown = NO;
@@ -374,15 +376,15 @@
 }
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
-//    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
+    //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
     textView.backgroundColor = [UIColor whiteColor];
     textView.textColor = [UIColor blackColor];
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
-//    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
-//    [self animatetextView:textView up:NO :];
+    //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
+    //    [self animatetextView:textView up:NO :];
     textView.backgroundColor = [UIColor blackColor];
     textView.textColor = [UIColor whiteColor];
     [textView setFrame:[self newFrameFromTextView:textView]];
@@ -498,7 +500,7 @@
             self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         
-//        [self.delegate photoBrowser:self didDisplayPhotoAtIndex:indexPath.item];
+        //        [self.delegate photoBrowser:self didDisplayPhotoAtIndex:indexPath.item];
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             
@@ -507,7 +509,7 @@
             self.prevSelectItem = cell;
             
         }
-
+        
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
         ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
@@ -516,25 +518,25 @@
 }
 
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
-//    if(!keyboardIsShown){
-        if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
-            float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
-            textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
-        }else{
-            float initY = self.navigationController.view.frame.size.height * (10.0/12.0)-5;
-            textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
-        }
-        CGRect originFrame = textView.frame;
-        float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
-        float newRow =  MAX(MIN(5.0,rows), 2);
-        float newHeight = newRow*textView.font.lineHeight ;
-        float yOffset = ((newRow-1)*textView.font.lineHeight);
-        CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
-        textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-        return newFrame;
-//    }else{
-//        return textView.frame;
-//    }
+    //    if(!keyboardIsShown){
+    if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
+        float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
+        textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+    }else{
+        float initY = self.navigationController.view.frame.size.height * (10.0/12.0)-5;
+        textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+    }
+    CGRect originFrame = textView.frame;
+    float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
+    float newRow =  MAX(MIN(5.0,rows), 2);
+    float newHeight = newRow*textView.font.lineHeight ;
+    float yOffset = ((newRow-1)*textView.font.lineHeight);
+    CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
+    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    return newFrame;
+    //    }else{
+    //        return textView.frame;
+    //    }
 }
 
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
@@ -574,11 +576,11 @@
             [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
             ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
             [_textView setFrame:[self newFrameFromTextView:_textView]];
-//            [_textView scrollsToTop];
-             dispatch_async (dispatch_get_main_queue (), ^{
-                 [self.collectionView layoutIfNeeded];
-                 [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
-             });
+            //            [_textView scrollsToTop];
+            dispatch_async (dispatch_get_main_queue (), ^{
+                [self.collectionView layoutIfNeeded];
+                [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+            });
         }
         
     }
@@ -592,9 +594,9 @@
 }
 
 - (MWCaptionView *)photoBrowser:(MWPhotoBrowser *)photoBrowser captionViewForPhotoAtIndex:(NSUInteger)index{
-//    MWPhoto *photo = [self.photos objectAtIndex:index];
-//    MWCaptionView *captionView = [[MWCaptionView alloc] initWithPhoto:photo];
-//    return captionView;
+    //    MWPhoto *photo = [self.photos objectAtIndex:index];
+    //    MWCaptionView *captionView = [[MWCaptionView alloc] initWithPhoto:photo];
+    //    return captionView;
     return nil;
 }
 
@@ -603,14 +605,14 @@
     if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
         title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
     }else{
-     title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
+        title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
     }
     return title;
 }
 
 - (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
-
-//    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
+    
+    //    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
@@ -635,18 +637,18 @@
 }
 
 /*
-#pragma mark - Navigation
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-    
-    
-    
-    
+
+
+
 #pragma mark - GMImagePickerControllerDelegate
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
