@@ -296,8 +296,8 @@
 }
 
 -(void)removePhoto{
-    if([self.selfPhotos count] > 0){
-        NSLog(@"removePhoto");
+    if([self.selfPhotos count] > 1){
+//        NSLog(@"removePhoto");
         //may have problem
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         if([preSelectedAssets containsObject:photo.photoData]){
@@ -314,9 +314,10 @@
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
-        if([self.selfPhotos count]==0){
-            self.navigationItem.rightBarButtonItem = nil;
+        if([self.selfPhotos count]==1){
+            self.navigationItem.rightBarButtonItem.enabled = NO;
         }
+        
     }
     
 }
@@ -564,7 +565,7 @@
             self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-        NSLog(@"index path  %@",indexPath);
+//        NSLog(@"index path  %@",indexPath);
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             [cell setHighlighted:YES];
@@ -702,6 +703,9 @@
     }];
     [self setCurrentPhotoIndex:self.selfPhotos.count-1];
     [self reloadPhoto];
+    if(self.selfPhotos.count>1){
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }
     
 }
 
