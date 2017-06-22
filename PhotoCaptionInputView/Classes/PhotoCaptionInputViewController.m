@@ -253,7 +253,7 @@
 
 
 -(void)backAction{
-    NSLog(@"backAction");
+//    NSLog(@"backAction");
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
@@ -323,7 +323,7 @@
 }
 
 -(void)reloadPhoto{
-    NSLog(@"removePhoto");
+//    NSLog(@"removePhoto");
     [self.collectionView reloadData];
     [self reloadData];
     self.navigationItem.rightBarButtonItem = _trashButton;
@@ -391,7 +391,7 @@
     [textView setFrame:[self newFrameFromTextView:textView]];
 }
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
-    NSLog(@"textViewShouldReturn:");
+//    NSLog(@"textViewShouldReturn:");
     if (textView.tag == 1) {
         UITextView *textView = (UITextView *)[self.navigationController.view viewWithTag:2];
         [textView becomeFirstResponder];
@@ -674,7 +674,7 @@
     
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     
-    NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
+//    NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
     
     UIScreen *screen = [UIScreen mainScreen];
     CGFloat scale = screen.scale;
@@ -685,7 +685,7 @@
     //TODO not yet handle deselect action
     [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         
-        NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
+//        NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
         
         
         BOOL preselected = NO;
@@ -712,7 +712,7 @@
 //Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
-    NSLog(@"GMImagePicker: User pressed cancel button");
+//    NSLog(@"GMImagePicker: User pressed cancel button");
 }
 
 - (BOOL)shouldSelectAllAlbumCell{
