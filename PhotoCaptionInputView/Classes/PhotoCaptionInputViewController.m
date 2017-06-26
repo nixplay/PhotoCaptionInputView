@@ -20,7 +20,7 @@
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 #define MAX_CHARACTER 160
 #define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"Add a caption…",nil) , MAX_CHARACTER]
-#define LAYOUT_START_Y 10.0f
+#define LAYOUT_START_Y 10.5f
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
@@ -73,7 +73,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-5;
+    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
     textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -524,10 +524,10 @@
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     //    if(!keyboardIsShown){
     if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
-        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-5;
+        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
         textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     }else{
-        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-5;
+        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-10;
         textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     }
     CGRect originFrame = textView.frame;
@@ -648,8 +648,12 @@
     [photoBrowser.navigationController setNavigationBarHidden:NO animated:NO];
     navigationBar.barStyle = UIBarStyleDefault;
     navigationBar.barTintColor = [UIColor whiteColor];
-    navigationBar.tintColor = LIGHT_BLUE_COLOR;
-    navigationBar.shadowImage = [[UIImage alloc] init];
+    navigationBar.tintColor = [UIColor whiteColor];
+    [navigationBar setBackgroundImage:[UIImage new]
+                             forBarMetrics:UIBarMetricsDefault];
+    navigationBar.shadowImage = [UIImage new];
+    [navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+//    navigationBar.shadowImage = [[UIImage alloc] init];
     navigationBar.layer.borderWidth = 0;
     
 
@@ -769,5 +773,8 @@
     return NO;
 }
 
+- (BOOL)prefersStatusBarHidden {
+    return YES;
+}
 
 @end
