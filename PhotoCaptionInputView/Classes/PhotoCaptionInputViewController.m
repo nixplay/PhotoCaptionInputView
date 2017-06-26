@@ -20,6 +20,9 @@
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 #define MAX_CHARACTER 160
 #define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"Add a caption…",nil) , MAX_CHARACTER]
+#define LAYOUT_START_Y 10.0f
+#define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
+#define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
@@ -70,16 +73,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
+    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-5;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
-    textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+    textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
     flowLayout.sectionInset = UIEdgeInsetsMake(0, 25, 0, 25);
     flowLayout.itemSize = CGSizeMake(initHeight, initHeight);
-    flowLayout.minimumLineSpacing = 2;
-    flowLayout.minimumInteritemSpacing = 2;
+    flowLayout.minimumLineSpacing = 3;
+    flowLayout.minimumInteritemSpacing = 3;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
     CGRect rect = CGRectMake(0,
@@ -121,7 +124,7 @@
     
     [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
-    //    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
+    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
     [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
     [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
     [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
@@ -173,12 +176,12 @@
     _backButton = backButton;
     
     
-    UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[ self imageFromSystemBarButton:UIBarButtonSystemItemTrash]
+    UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"bin"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
                                                                     style:UIBarButtonItemStylePlain
                                                                    target:self
                                                                    action:@selector(removePhoto)];
-    NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
-    trashButton.title = trashString;
+//    NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
+//    trashButton.title = trashString;
     
     self.navigationItem.rightBarButtonItem = trashButton;
     
@@ -521,11 +524,11 @@
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     //    if(!keyboardIsShown){
     if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
-        float initY = self.navigationController.view.frame.size.height * (11.0/12.0)-5;
-        textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-5;
+        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     }else{
-        float initY = self.navigationController.view.frame.size.height * (10.0/12.0)-5;
-        textViewOrigYRatio = (initY-40) / self.navigationController.view.frame.size.height;
+        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-5;
+        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     }
     CGRect originFrame = textView.frame;
     float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
@@ -628,6 +631,29 @@
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
     }
     
+}
+
+- (NSMutableArray*)photoBrowser:(MWPhotoBrowser *)photoBrowser buildToolbarItems:(UIToolbar*)toolBar{
+    NSMutableArray *items = nil;
+    if([self.selfDelegate respondsToSelector:@selector(photoBrowser:buildToolbarItems:)]){
+        items = [self.selfDelegate photoBrowser:photoBrowser buildToolbarItems:toolBar];
+    }else{
+        items = [NSMutableArray new];
+    }
+    return items;
+}
+
+- (BOOL)photoBrowser:(MWPhotoBrowser *)photoBrowser setNavBarAppearance:(UINavigationBar *)navigationBar{
+    
+    [photoBrowser.navigationController setNavigationBarHidden:NO animated:NO];
+    navigationBar.barStyle = UIBarStyleDefault;
+    navigationBar.barTintColor = [UIColor whiteColor];
+    navigationBar.tintColor = LIGHT_BLUE_COLOR;
+    navigationBar.shadowImage = [[UIImage alloc] init];
+    navigationBar.layer.borderWidth = 0;
+    
+
+    return YES;
 }
 
 
