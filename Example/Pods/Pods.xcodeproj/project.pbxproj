@@ -375,6 +375,9 @@
 		E1A2A2604B62B71837306DB6B9AFED5E /* KWContainStringMatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E2DC0B1BFE64F380A9CA611CCCA658 /* KWContainStringMatcher.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
 		E1DE22CA21F615E0C469B07D7BD03DC6 /* KWBeKindOfClassMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 0145C91A1BFB592BBA16836533156227 /* KWBeKindOfClassMatcher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E1E3A28CBE42D9E9D4D72E79B6B6A1B3 /* SDWebImageDownloaderOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = F7B6CDBD710543A367CB7ED6037A2C95 /* SDWebImageDownloaderOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E361B4221F00AFE600AD5050 /* bin@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E361B4191F00AE3E00AD5050 /* bin@2x.png */; };
+		E361B4231F00AFE600AD5050 /* bin@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E361B41A1F00AE3E00AD5050 /* bin@3x.png */; };
+		E361B4241F00AFE600AD5050 /* bin.png in Resources */ = {isa = PBXBuildFile; fileRef = E361B41B1F00AE3E00AD5050 /* bin.png */; };
 		E3A990E5163D7DE66E1930A54A23212C /* KWExpectationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 6AB3A7DC23BBBA0BCF3C6D2B1AE6C113 /* KWExpectationType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E3ABA567FA3A5E1D92D86C5DE85E9E63 /* KWStringPrefixMatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = BA4A5F7CFEA583D8FF601E3726719104 /* KWStringPrefixMatcher.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
 		E3ADFD68A6A2756F44F838DD12C95BD1 /* KWContextNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C5E715544977D3094E6A1D0218CD469 /* KWContextNode.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
@@ -2646,6 +2649,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E361B4221F00AFE600AD5050 /* bin@2x.png in Resources */,
+				E361B4231F00AFE600AD5050 /* bin@3x.png in Resources */,
+				E361B4241F00AFE600AD5050 /* bin.png in Resources */,
 				02A86CA198338741065A79B748DCE927 /* add_button.png in Resources */,
 				D2988F422E2287F8B52B1DF9F5F74343 /* toolbarBackWhite.png in Resources */,
 				5EC7A8CE23035B0E1E267F74874432D6 /* toolbarBackWhite@2x.png in Resources */,
