@@ -73,7 +73,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
+    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-15;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
     textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -86,7 +86,7 @@
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
     CGRect rect = CGRectMake(0,
-                             initY-5,
+                             initY,
                              self.navigationController.view.frame.size.width-initHeight,
                              initHeight);
     
