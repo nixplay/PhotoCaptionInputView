@@ -18,6 +18,8 @@
 #import "IQTextView.h"
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
+#define TEXTFIELD_BG_COLOR [UIColor whiteColor]
+#define TEXTFIELD_TEXT_COLOR [UIColor blackColor]
 #define MAX_CHARACTER 160
 #define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"Add a caption…",nil) , MAX_CHARACTER]
 #define LAYOUT_START_Y 10.5f
@@ -132,10 +134,10 @@
     
     //    textView.autocorrectionType = UITextAutocorrectionTypeYes;
     textView.spellCheckingType = UITextSpellCheckingTypeYes;
-    textView.backgroundColor = [UIColor blackColor];
-    textView.textColor = [UIColor whiteColor];
+    textView.backgroundColor = TEXTFIELD_BG_COLOR;
+    textView.textColor = TEXTFIELD_TEXT_COLOR;
     
-    textView.layer.cornerRadius=0.0f;
+    textView.layer.cornerRadius=tfrect.size.height*0.5f;
     textView.layer.masksToBounds=YES;
     textView.placeholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor];
@@ -381,16 +383,16 @@
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
     //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
-    textView.backgroundColor = [UIColor whiteColor];
-    textView.textColor = [UIColor blackColor];
+    textView.backgroundColor = TEXTFIELD_BG_COLOR;
+    textView.textColor = TEXTFIELD_TEXT_COLOR;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
     //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
     //    [self animatetextView:textView up:NO :];
-    textView.backgroundColor = [UIColor blackColor];
-    textView.textColor = [UIColor whiteColor];
+    textView.backgroundColor = TEXTFIELD_BG_COLOR;
+    textView.textColor = TEXTFIELD_TEXT_COLOR;
     [textView setFrame:[self newFrameFromTextView:textView]];
 }
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
