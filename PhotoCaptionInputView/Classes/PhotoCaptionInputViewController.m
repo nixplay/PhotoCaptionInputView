@@ -121,7 +121,7 @@
     [self.navigationController.view addSubview:self.collectionView];
     
     
-    CGRect tfrect = CGRectMake(0, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width, 31);
+    CGRect tfrect = CGRectMake(5, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width-10, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     
     [[IQKeyboardManager sharedManager]setEnable:YES];
@@ -137,7 +137,7 @@
     textView.backgroundColor = TEXTFIELD_BG_COLOR;
     textView.textColor = TEXTFIELD_TEXT_COLOR;
     
-    textView.layer.cornerRadius=tfrect.size.height*0.5f;
+    textView.layer.cornerRadius=tfrect.size.height*0.2f;
     textView.layer.masksToBounds=YES;
     textView.placeholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor];
@@ -432,6 +432,7 @@
     NSUInteger newLength = [textView.text length] + [text length] - range.length;
     return newLength < MAX_CHARACTER;
 }
+
 
 -(void)animatetextView:(UITextView*)textView up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
 {
