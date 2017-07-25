@@ -75,21 +75,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-15;
+    float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-20;
     float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
     textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
-    flowLayout.sectionInset = UIEdgeInsetsMake(0, 25, 0, 25);
+//    flowLayout.sectionInset = UIEdgeInsetsMake(5, 25, 5, 25);
     flowLayout.itemSize = CGSizeMake(initHeight, initHeight);
     flowLayout.minimumLineSpacing = 3;
     flowLayout.minimumInteritemSpacing = 3;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
-    CGRect rect = CGRectMake(0,
+    CGRect rect = CGRectMake(5,
                              initY,
-                             self.navigationController.view.frame.size.width-initHeight,
+                             self.navigationController.view.frame.size.width-initHeight-15,
                              initHeight);
     
     self.collectionView = [[UICollectionView alloc]initWithFrame:rect
@@ -98,14 +98,14 @@
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     
     [self.collectionView registerClass:[MWGridCell class] forCellWithReuseIdentifier:@"GridCell"];
-    
+    self.collectionView.backgroundColor = [UIColor clearColor];
     
     [self.collectionView setCollectionViewLayout:flowLayout];
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     
-    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.collectionView.frame.origin.x + self.collectionView.frame.size.width,
+    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.navigationController.view.frame.size.width-initHeight-5,
                                                                rect.origin.y,
                                                                initHeight,
                                                                initHeight
@@ -124,12 +124,12 @@
     CGRect tfrect = CGRectMake(5, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width-10, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     
-    [[IQKeyboardManager sharedManager]setEnable:YES];
+//    [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
-    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:60];
-    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
-    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
-    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
+    [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:initHeight];
+//    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
+//    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
+//    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
     
     
     //    textView.autocorrectionType = UITextAutocorrectionTypeYes;
@@ -137,7 +137,7 @@
     textView.backgroundColor = TEXTFIELD_BG_COLOR;
     textView.textColor = TEXTFIELD_TEXT_COLOR;
     
-    textView.layer.cornerRadius=tfrect.size.height*0.2f;
+    textView.layer.cornerRadius=2;
     textView.layer.masksToBounds=YES;
     textView.placeholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor];
@@ -148,7 +148,7 @@
     textView.returnKeyType = UIReturnKeyDone;
     textView.textAlignment = NSTextAlignmentLeft;
     textView.tag = 2;
-    //    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     textView.autocorrectionType = UITextAutocorrectionTypeYes;
     
     textView.delegate = self;
@@ -375,6 +375,9 @@
     
     [photo setCaption:textView.text];
     [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
+    IQTextView* iqTextView = (IQTextView*)textView;
+    iqTextView.shouldHidePlaceholderText = NO;
+    iqTextView.placeholderText = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
     
 }
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView{
@@ -394,6 +397,7 @@
     textView.backgroundColor = TEXTFIELD_BG_COLOR;
     textView.textColor = TEXTFIELD_TEXT_COLOR;
     [textView setFrame:[self newFrameFromTextView:textView]];
+    
 }
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
 //    NSLog(@"textViewShouldReturn:");
