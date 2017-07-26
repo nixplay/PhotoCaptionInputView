@@ -188,7 +188,9 @@
     self.navigationItem.rightBarButtonItem = trashButton;
     
     _trashButton = trashButton;
-    
+    if([self.selfPhotos count] == 1){
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+    }
     [[IQKeyboardManager sharedManager] setEnable:YES];
     
 }
