@@ -26,7 +26,7 @@
     if ((self = [super initWithCollectionViewLayout:[UICollectionViewFlowLayout new]])) {
         
         // Defaults
-        _columns = 3, _columnsL = 4;
+        _columns = 4, _columnsL = 4;
         _margin = 0, _gutter = 1;
         _marginL = 0, _gutterL = 1;
         
@@ -60,7 +60,7 @@
     [super viewDidLoad];
     [self.collectionView registerClass:[MWGridCell class] forCellWithReuseIdentifier:@"GridCell"];
     self.collectionView.alwaysBounceVertical = YES;
-    self.collectionView.backgroundColor = [UIColor blackColor];
+    self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

@@ -28,6 +28,7 @@ static CGSize const kPopoverContentSize = {480, 720};
 
 @property (nonatomic, assign) BOOL allow_video;
 
+
 /**
  *  The assets picker’s delegate object.
  */
@@ -333,4 +334,9 @@ static CGSize const kPopoverContentSize = {480, 720};
 - (NSString*) controllerCustomCancelButtonTitle;
 
 - (NSString*) controllerCustomNavigationBarPrompt;
+
+- (BOOL)shouldAutorotate;
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations;
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
+
 @end
