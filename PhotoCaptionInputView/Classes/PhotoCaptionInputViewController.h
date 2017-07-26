@@ -28,6 +28,7 @@
 @property (nonatomic) CGRect keyboardRect;
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
+@property (nonatomic, assign) NSInteger maximumImagesCount;
 -(void) getPhotosCaptions;
 @end
 
