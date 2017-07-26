@@ -191,6 +191,12 @@
     if([self.selfPhotos count] == 1){
         self.navigationItem.rightBarButtonItem.enabled = NO;
     }
+    
+    self.maximumImagesCount = (self.maximumImagesCount == 0)?100:self.maximumImagesCount;
+    
+    if([self.selfPhotos count] >= self.maximumImagesCount){
+        self.addButton.enabled = NO;
+    }
     [[IQKeyboardManager sharedManager] setEnable:YES];
     
 }
@@ -325,6 +331,11 @@
             self.navigationItem.rightBarButtonItem.enabled = NO;
         }
         
+    }
+    if([self.selfPhotos count] >= self.maximumImagesCount){
+        self.addButton.enabled = NO;
+    }else{
+        self.addButton.enabled = YES;
     }
     
 }
@@ -763,9 +774,31 @@
     if(self.selfPhotos.count>1){
         self.navigationItem.rightBarButtonItem.enabled = YES;
     }
+    if([self.selfPhotos count] >= self.maximumImagesCount){
+        self.addButton.enabled = NO;
+    }
     
 }
+-(BOOL)assetsPickerController:(GMImagePickerController *)picker shouldSelectAsset:(PHAsset *)asset{
+    
+    if([picker.selectedAssets count] >= self.maximumImagesCount){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
+                                                                         objectForInfoDictionaryKey:@"CFBundleDisplayName"]
+                                                                message:NSLocalizedString(@"IMAGE_SELECTION_LIMIT", nil)
+                                                               delegate:self
+                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                      otherButtonTitles:nil, nil];
+            [alertView show];
+            
+        });
+        return NO;
+        
+    }else{
+        return YES;
+    }
 
+}
 //Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
