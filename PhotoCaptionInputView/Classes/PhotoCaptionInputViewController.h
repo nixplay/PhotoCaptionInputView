@@ -29,6 +29,7 @@
 @property (nonatomic, strong) UIBarButtonItem *backButton;
 @property (nonatomic, strong) UIBarButtonItem *trashButton;
 @property (nonatomic, assign) NSInteger maximumImagesCount;
+@property (nonatomic, assign) BOOL allow_video;
 -(void) getPhotosCaptions;
 @end
 

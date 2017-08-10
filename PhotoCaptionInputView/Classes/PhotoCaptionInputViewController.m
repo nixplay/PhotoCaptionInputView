@@ -294,6 +294,19 @@
 {
     GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:self.preSelectedAssets delegate:self];
     
+    if(self.allow_video){
+        picker.mediaTypes = @[@(PHAssetMediaTypeImage),
+                              @(PHAssetMediaTypeVideo)];
+        picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumVideos),
+                                          @(PHAssetCollectionSubtypeSmartAlbumFavorites),
+                                          @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
+                                          @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
+    }else{
+        picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
+        picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumFavorites),
+                                          @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
+                                          @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
+    }
     picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
