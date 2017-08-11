@@ -7,9 +7,9 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'PhotoCaptionInputView'
-  s.version          = '0.4.5'
-  s.summary          = 'A short description of PhotoCaptionInputView.'
+	s.name             = 'PhotoCaptionInputView'
+	s.version          = '0.4.6'
+	s.summary          = 'A short description of PhotoCaptionInputView.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -17,35 +17,35 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
+	s.description      = <<-DESC
 TODO: Add long description of the pod here.
-                       DESC
+											 DESC
 
-  s.homepage         = 'https://github.com/nixplay/PhotoCaptionInputView'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'James Kong' => 'james.kong@nixplay.com' }
-  s.source           = { :git => 'https://github.com/nixplay/PhotoCaptionInputView.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+	s.homepage         = 'https://github.com/nixplay/PhotoCaptionInputView'
+	# s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+	s.license          = { :type => 'MIT', :file => 'LICENSE' }
+	s.author           = { 'James Kong' => 'james.kong@nixplay.com' }
+	s.source           = { :git => 'https://github.com/nixplay/PhotoCaptionInputView.git', :tag => s.version.to_s }
+	# s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+	s.ios.deployment_target = '8.0'
 
-  s.source_files = 'PhotoCaptionInputView/Classes/**/*'
-  s.requires_arc = true
-  s.frameworks = 'ImageIO', 'QuartzCore', 'AssetsLibrary', 'MediaPlayer'
-  s.weak_frameworks = 'Photos'
+	s.source_files = 'PhotoCaptionInputView/Classes/**/*'
+	s.requires_arc = true
+	s.frameworks = 'ImageIO', 'QuartzCore', 'AssetsLibrary', 'MediaPlayer'
+	s.weak_frameworks = 'Photos'
 
-  s.resource_bundles = {
-    'PhotoCaptionInputView' => ['PhotoCaptionInputView/Assets/*.png']
-  }
+	s.resource_bundles = {
+		'PhotoCaptionInputView' => ['PhotoCaptionInputView/Assets/*.png']
+	}
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
-    s.dependency 'MWPhotoBrowser'
-    s.dependency 'GMImagePicker'
-    s.dependency 'UITextView+Placeholder', '~> 1.2'
-    s.dependency 'IQKeyboardManager'
+	# s.public_header_files = 'Pod/Classes/**/*.h'
+	# s.frameworks = 'UIKit', 'MapKit'
+	# s.dependency 'AFNetworking', '~> 2.3'
+		s.dependency 'MWPhotoBrowser'
+		s.dependency 'GMImagePicker'
+		s.dependency 'UITextView+Placeholder', '~> 1.2'
+		s.dependency 'IQKeyboardManager'
 
 
 end
