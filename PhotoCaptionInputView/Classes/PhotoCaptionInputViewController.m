@@ -26,11 +26,13 @@
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
-    NSMutableArray* preSelectedAssets;
+//    NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
     float textViewOrigYRatio;
+    
 }
+@property (nonatomic, weak) NSArray* preSelectedAssets;
 @end
 
 @implementation PhotoCaptionInputViewController
@@ -48,11 +50,11 @@
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
         self.selfThumbs = [NSMutableArray arrayWithArray:thumbnails];
-        if(_preselectedAssets == nil){
-            preSelectedAssets = [NSMutableArray array];
-        }else{
-            preSelectedAssets = [NSMutableArray arrayWithArray:_preselectedAssets];
-        }
+//        if(_preselectedAssets == nil){
+//            preSelectedAssets = [NSMutableArray array];
+//        }else{
+//            preSelectedAssets = [NSMutableArray arrayWithArray:_preselectedAssets];
+//        }
         
         if(_selfPhotos == nil){
             [NSException raise:@"PhotoCaptionInputViewController photos is nil" format:@"PhotoCaptionInputViewController photos can not be nil."];
@@ -281,7 +283,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets];
     }
 }
 
@@ -290,7 +292,7 @@
 }
 - (void)launchGMImagePicker
 {
-    GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:preSelectedAssets delegate:self];
+    GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:self.preSelectedAssets delegate:self];
     
     picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
@@ -313,9 +315,9 @@
 //        NSLog(@"removePhoto");
         //may have problem
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
-        if([preSelectedAssets containsObject:photo.photoData]){
-            [preSelectedAssets removeObject:photo.photoData];
-        }
+//        if([preSelectedAssets containsObject:photo.photoData]){
+//            [preSelectedAssets removeObject:photo.photoData];
+//        }
         [self.selfPhotos removeObjectAtIndex:self.currentIndex];
         [self.selfThumbs removeObjectAtIndex:self.currentIndex];
         [self.collectionView reloadData];
@@ -648,7 +650,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:self.preSelectedAssets];
     }
     
 }
@@ -722,22 +724,26 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
-    [preSelectedAssets removeAllObjects];
+//    [preSelectedAssets removeAllObjects];
+    
+    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
+    //No sure if remo all data from list and add it back
     
     NSIndexSet *toBeRemoved = [self.selfPhotos indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
         // The block is called for each object in the array.
-        NSURL* url = [NSURL URLWithString:[ obj photoData]];
-        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
-        return removeIt;
+        //remove item if not exist
+        BOOL stillExist = NO;
+        for(PHAsset * asset in assetArray){
+            if([[obj photoData ] isEqualToString:asset.localIdentifier]){
+                stillExist = YES;
+            }
+        }
+
+//        NSURL* url = [NSURL URLWithString:[ obj photoData]];
+//        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
+        return !stillExist;
     }];
     [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
-    
-    toBeRemoved = [self.selfThumbs indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
-        // The block is called for each object in the array.
-        NSURL* url = [NSURL URLWithString:[ obj photoData]];
-        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
-        return removeIt;
-    }];
     [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
     
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
@@ -753,21 +759,21 @@
     //TODO not yet handle deselect action
     [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         
-//        NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
-        
-        
         BOOL preselected = NO;
-        for (NSString * localidentifier in preSelectedAssets){
-            if([localidentifier isEqualToString:asset.localIdentifier]){
+        for (MWPhotoExt * photo in backPhotos){
+            NSString* newLocalIdentifier = asset.localIdentifier;
+            if([photo.photoData isEqualToString:newLocalIdentifier]){
                 preselected = YES;
                 break;
             }
         }
+
+//        [preSelectedAssets addObject:asset.localIdentifier];
         if(!preselected){
-            [preSelectedAssets addObject:asset.localIdentifier];
             [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
             [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
         }
+    
     }];
     [self setCurrentPhotoIndex:self.selfPhotos.count-1];
     [self reloadPhoto];
@@ -817,7 +823,14 @@
 -(NSString*) controllerCustomCancelButtonTitle{
     return NSLocalizedString(@"Cancel",nil);
 }
-
+#pragma mark -  Accessor
+-(NSArray*) preSelectedAssets{
+    if([self.selfPhotos count] > 0){
+        NSArray *result = [self.selfPhotos valueForKey:@"photoData"];
+        return result;
+    }
+    return nil;
+}
 
 //lock orientation
 
