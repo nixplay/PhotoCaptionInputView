@@ -26,11 +26,13 @@
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
-    NSMutableArray* preSelectedAssets;
+    //    NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
     float textViewOrigYRatio;
+    
 }
+@property (nonatomic, weak) NSArray* preSelectedAssets;
 @end
 
 @implementation PhotoCaptionInputViewController
@@ -48,11 +50,11 @@
         [self initialisation];
         self.selfPhotos = [NSMutableArray arrayWithArray:photos];
         self.selfThumbs = [NSMutableArray arrayWithArray:thumbnails];
-        if(_preselectedAssets == nil){
-            preSelectedAssets = [NSMutableArray array];
-        }else{
-            preSelectedAssets = [NSMutableArray arrayWithArray:_preselectedAssets];
-        }
+        //        if(_preselectedAssets == nil){
+        //            preSelectedAssets = [NSMutableArray array];
+        //        }else{
+        //            preSelectedAssets = [NSMutableArray arrayWithArray:_preselectedAssets];
+        //        }
         
         if(_selfPhotos == nil){
             [NSException raise:@"PhotoCaptionInputViewController photos is nil" format:@"PhotoCaptionInputViewController photos can not be nil."];
@@ -81,7 +83,7 @@
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
     [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
-//    flowLayout.sectionInset = UIEdgeInsetsMake(5, 25, 5, 25);
+    //    flowLayout.sectionInset = UIEdgeInsetsMake(5, 25, 5, 25);
     flowLayout.itemSize = CGSizeMake(initHeight, initHeight);
     flowLayout.minimumLineSpacing = 3;
     flowLayout.minimumInteritemSpacing = 3;
@@ -124,12 +126,12 @@
     CGRect tfrect = CGRectMake(5, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width-10, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     
-//    [[IQKeyboardManager sharedManager]setEnable:YES];
+    //    [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:initHeight];
-//    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
-//    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
-//    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
+    //    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
+    //    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
+    //    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
     
     
     //    textView.autocorrectionType = UITextAutocorrectionTypeYes;
@@ -182,8 +184,8 @@
                                                                     style:UIBarButtonItemStylePlain
                                                                    target:self
                                                                    action:@selector(removePhoto)];
-//    NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
-//    trashButton.title = trashString;
+    //    NSString *trashString = @"\U000025C0\U0000FE0E"; //BLACK LEFT-POINTING TRIANGLE PLUS VARIATION SELECTOR
+    //    trashButton.title = trashString;
     
     self.navigationItem.rightBarButtonItem = trashButton;
     
@@ -266,7 +268,7 @@
 
 
 -(void)backAction{
-//    NSLog(@"backAction");
+    //    NSLog(@"backAction");
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
@@ -281,7 +283,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets];
     }
 }
 
@@ -290,7 +292,7 @@
 }
 - (void)launchGMImagePicker
 {
-    GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:preSelectedAssets delegate:self];
+    GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:self.preSelectedAssets delegate:self];
     
     picker.title = NSLocalizedString(@"Select an Album",nil);
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
@@ -310,12 +312,12 @@
 
 -(void)removePhoto{
     if([self.selfPhotos count] > 1){
-//        NSLog(@"removePhoto");
+        //        NSLog(@"removePhoto");
         //may have problem
         MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
-        if([preSelectedAssets containsObject:photo.photoData]){
-            [preSelectedAssets removeObject:photo.photoData];
-        }
+        //        if([preSelectedAssets containsObject:photo.photoData]){
+        //            [preSelectedAssets removeObject:photo.photoData];
+        //        }
         [self.selfPhotos removeObjectAtIndex:self.currentIndex];
         [self.selfThumbs removeObjectAtIndex:self.currentIndex];
         [self.collectionView reloadData];
@@ -341,7 +343,7 @@
 }
 
 -(void)reloadPhoto{
-//    NSLog(@"removePhoto");
+    //    NSLog(@"removePhoto");
     [self.collectionView reloadData];
     [self reloadData];
     self.navigationItem.rightBarButtonItem = _trashButton;
@@ -413,7 +415,7 @@
     
 }
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
-//    NSLog(@"textViewShouldReturn:");
+    //    NSLog(@"textViewShouldReturn:");
     if (textView.tag == 1) {
         UITextView *textView = (UITextView *)[self.navigationController.view viewWithTag:2];
         [textView becomeFirstResponder];
@@ -588,7 +590,7 @@
             self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:0];
-//        NSLog(@"index path  %@",indexPath);
+        //        NSLog(@"index path  %@",indexPath);
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             [cell setHighlighted:YES];
@@ -648,7 +650,7 @@
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
         }];
-        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:preSelectedAssets];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:self.preSelectedAssets];
     }
     
 }
@@ -675,14 +677,14 @@
     gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
     [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
     
-//    [navigationBar setBackgroundImage:[UIImage new]
-//                             forBarMetrics:UIBarMetricsDefault];
+    //    [navigationBar setBackgroundImage:[UIImage new]
+    //                             forBarMetrics:UIBarMetricsDefault];
     navigationBar.shadowImage = [UIImage new];
     [navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-//    navigationBar.shadowImage = [[UIImage alloc] init];
+    //    navigationBar.shadowImage = [[UIImage alloc] init];
     navigationBar.layer.borderWidth = 0;
     
-
+    
     return YES;
 }
 
@@ -722,27 +724,31 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
-    [preSelectedAssets removeAllObjects];
+    //    [preSelectedAssets removeAllObjects];
     
+    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
+    //No sure if remo all data from list and add it back
+    NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
+    NSMutableArray *removeAssets = [NSMutableArray new];
     NSIndexSet *toBeRemoved = [self.selfPhotos indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
         // The block is called for each object in the array.
-        NSURL* url = [NSURL URLWithString:[ obj photoData]];
-        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
-        return removeIt;
+        //remove item if not exist
+        BOOL stillExist = NO;
+        
+        for(PHAsset * asset in assets){
+            if([[obj photoData ] isEqualToString:asset.localIdentifier]){
+                [removeAssets addObject:asset];
+                stillExist = YES;
+            }
+        }
+        return !stillExist;
     }];
+    [assets removeObjectsInArray:removeAssets];
     [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
-    
-    toBeRemoved = [self.selfThumbs indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
-        // The block is called for each object in the array.
-        NSURL* url = [NSURL URLWithString:[ obj photoData]];
-        BOOL removeIt = (![url isFileReferenceURL] && ![[ obj photoData] hasPrefix:@"http"]) ;
-        return removeIt;
-    }];
     [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
     
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     
-//    NSLog(@"GMImagePicker: User ended picking assets. Number of selected items is: %lu", (unsigned long)assetArray.count);
     
     UIScreen *screen = [UIScreen mainScreen];
     CGFloat scale = screen.scale;
@@ -751,23 +757,9 @@
     CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
     CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
     //TODO not yet handle deselect action
-    [assetArray enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-//        NSLog(@"obj.localIdentifier %@",asset.localIdentifier );
-        
-        
-        BOOL preselected = NO;
-        for (NSString * localidentifier in preSelectedAssets){
-            if([localidentifier isEqualToString:asset.localIdentifier]){
-                preselected = YES;
-                break;
-            }
-        }
-        if(!preselected){
-            [preSelectedAssets addObject:asset.localIdentifier];
-            [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
-            [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
-        }
+    [assets enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
+        [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
     }];
     [self setCurrentPhotoIndex:self.selfPhotos.count-1];
     [self reloadPhoto];
@@ -797,12 +789,12 @@
     }else{
         return YES;
     }
-
+    
 }
 //Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
-//    NSLog(@"GMImagePicker: User pressed cancel button");
+    //    NSLog(@"GMImagePicker: User pressed cancel button");
 }
 
 - (BOOL)shouldSelectAllAlbumCell{
@@ -817,7 +809,14 @@
 -(NSString*) controllerCustomCancelButtonTitle{
     return NSLocalizedString(@"Cancel",nil);
 }
-
+#pragma mark -  Accessor
+-(NSArray*) preSelectedAssets{
+    if([self.selfPhotos count] > 0){
+        NSArray *result = [self.selfPhotos valueForKey:@"photoData"];
+        return result;
+    }
+    return nil;
+}
 
 //lock orientation
 
@@ -843,3 +842,5 @@
 
 
 @end
+
+
