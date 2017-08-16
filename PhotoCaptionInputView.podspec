@@ -43,7 +43,7 @@ TODO: Add long description of the pod here.
 	# s.frameworks = 'UIKit', 'MapKit'
 	# s.dependency 'AFNetworking', '~> 2.3'
 		s.dependency 'MWPhotoBrowser'
-		s.dependency 'GMImagePicker'
+		s.dependency 'GMImagePicker' , :git => 'https://github.com/nixplay/GMImagePicker.git', :branch => 'develop'
 		s.dependency 'UITextView+Placeholder', '~> 1.2'
 		s.dependency 'IQKeyboardManager'
 
