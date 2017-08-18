@@ -16,6 +16,9 @@
 #import "IQKeyboardManager.h"
 #import "IQUIView+IQKeyboardToolbar.h"
 #import "IQTextView.h"
+
+#import "MWZoomingScrollViewExt.h"
+
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 #define TEXTFIELD_BG_COLOR [UIColor whiteColor]
@@ -717,6 +720,13 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+
+#pragma mark - Video
+- (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
+    NSLog(@"play video url %@ , %lu", videoURL, index );
+    
+}
 /*
  #pragma mark - Navigation
  
@@ -850,6 +860,13 @@
     return UIStatusBarStyleLightContent;
 }
 
+-(NSBundle*) getBundle{
+    return [NSBundle bundleForClass:[self superclass]];
+}
+-(MWZoomingScrollView *) InitMWZoomingScrollView {
+    MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
+    return scrollView;
+}
 
 @end
 
