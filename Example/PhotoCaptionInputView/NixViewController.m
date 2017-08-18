@@ -784,7 +784,7 @@
     
     PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs preselectedAssets:nil delegate:self];
     UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
-    
+    vc.allow_video = YES;
     [self presentViewController:nc animated:NO completion:^{
         
     }];
