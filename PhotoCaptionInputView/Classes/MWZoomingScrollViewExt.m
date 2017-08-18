@@ -48,29 +48,49 @@
         self.videoPlayer = nil;
         self.trimmerView = nil;
     }else{
-        if(photo.isVideo){
-            
-            typeof(self) __weak weakSelf = self;
-            [self.photo getVideoURL:^(NSURL *url) {
-                NSLog(@"url %@",url);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // If the video is not playing anymore then bail
-                    typeof(self) strongSelf = weakSelf;
-                    if (!strongSelf) return;
-                    
-                    if (url) {
-                        [strongSelf setupVideoPreview:strongSelf url:url];
-                        
-                    } else {
-                        
-                    }
-                });
-            }];
-        }
+//        if(photo.isVideo){
+//
+//            typeof(self) __weak weakSelf = self;
+//            [self.photo getVideoURL:^(NSURL *url) {
+//                NSLog(@"url %@",url);
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    // If the video is not playing anymore then bail
+//                    typeof(self) strongSelf = weakSelf;
+//                    if (!strongSelf) return;
+//
+//                    if (url) {
+//                        [strongSelf setupVideoPreview:strongSelf url:url];
+//
+//                    } else {
+//
+//                    }
+//                });
+//            }];
+//        }
     }
 }
-
--(void) setupVideoPreview:(MWZoomingScrollViewExt *) scrollView url:(NSURL*)url{
+-(void) displaySubView:(CGRect)photoImageViewFrame{
+    if(self.photo.isVideo){
+        
+        typeof(self) __weak weakSelf = self;
+        [self.photo getVideoURL:^(NSURL *url) {
+            NSLog(@"url %@",url);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // If the video is not playing anymore then bail
+                typeof(self) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                if (url) {
+                    [strongSelf setupVideoPreview:strongSelf url:url photoImageViewFrame:photoImageViewFrame];
+                    
+                } else {
+                    
+                }
+            });
+        }];
+    }
+}
+-(void) setupVideoPreview:(MWZoomingScrollViewExt *) scrollView url:(NSURL*)url photoImageViewFrame:(CGRect)photoImageViewFrame{
     if(scrollView.trimmerView == nil || scrollView.trimmerView.superview != nil){
         scrollView.asset = [AVAsset assetWithURL:url];
         
@@ -81,8 +101,8 @@
         scrollView.playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
         scrollView.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
         
-        scrollView.videoLayer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, scrollView.frame.size.width, scrollView.frame.size.height)];
-        scrollView.videoPlayer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, scrollView.frame.size.width, scrollView.frame.size.height)];
+        scrollView.videoLayer = [[UIView alloc] initWithFrame:photoImageViewFrame];
+        scrollView.videoPlayer = [[UIView alloc] initWithFrame:photoImageViewFrame];
         
         [scrollView.videoPlayer addSubview:scrollView.videoLayer];
         [scrollView addSubview:scrollView.videoPlayer];
@@ -90,19 +110,20 @@
         UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
         [scrollView.videoLayer.layer addSublayer:scrollView.playerLayer];
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:scrollView action:@selector(tapOnVideoLayer:)];
+//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:scrollView action:@selector(tapOnVideoLayer:)];
         scrollView.videoLayer.tag = 1;
-        scrollView.playerLayer.frame = CGRectMake(0, 0, scrollView.videoLayer.frame.size.width, scrollView.videoLayer.frame.size.height);
-        [scrollView.videoLayer addGestureRecognizer:tap];
+        scrollView.playerLayer.frame = photoImageViewFrame;//CGRectMake(0, 0, scrollView.videoLayer.frame.size.width, scrollView.videoLayer.frame.size.height);
+//        [scrollView.videoLayer addGestureRecognizer:tap];
         
         scrollView.videoPlaybackPosition = 0;
         
         //                            [scrollView tapOnVideoLayer:tap];
-        scrollView.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(0, 50, CGRectGetWidth(scrollView.frame), 50)];
+        scrollView.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(scrollView.frame)-20, 50) asset:scrollView.asset];
         // set properties for trimmer view
         [scrollView.trimmerView setThemeColor:[UIColor lightGrayColor]];
-        [scrollView.trimmerView setAsset:scrollView.asset];
         [scrollView.trimmerView setShowsRulerView:YES];
+        [scrollView.trimmerView setMaxLength:10];
+        
         [scrollView.trimmerView setRulerLabelInterval:10];
         
         [scrollView.trimmerView setTrackerColor:[UIColor cyanColor]];
@@ -115,6 +136,10 @@
         [scrollView.trimmerView resetSubviews];
     }
 
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
 }
 
 - (void)tapOnVideoLayer:(UITapGestureRecognizer *)tap
