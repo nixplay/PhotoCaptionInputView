@@ -4,7 +4,7 @@ platform :ios, "8.0"
 
 target 'PhotoCaptionInputView_Example' do
   pod 'PhotoCaptionInputView', :path => '../'
-  pod 'MWPhotoBrowser' , :git => 'https://github.com/nixplay/MWPhotoBrowser.git', :branch => 'develop' 
+  pod 'MWPhotoBrowser' , :git => 'https://github.com/nixplay/MWPhotoBrowser.git', :branch => 'video_upload' 
   pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :branch => 'develop'
   pod 'SDWebImage' , '4.0.0'
   target 'PhotoCaptionInputView_Tests' do

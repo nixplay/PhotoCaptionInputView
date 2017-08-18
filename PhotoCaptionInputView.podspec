@@ -46,6 +46,6 @@ TODO: Add long description of the pod here.
 		s.dependency 'GMImagePicker'
 		s.dependency 'UITextView+Placeholder', '~> 1.2'
 		s.dependency 'IQKeyboardManager'
-
+        s.dependency 'ICGVideoTrimmer', '~> 1.0.6'
 
 end
