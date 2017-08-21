@@ -401,7 +401,7 @@
 
 -(void)textViewDidChange:(UITextView *)textView{
     MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
-    
+       
     [photo setCaption:textView.text];
     [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
     IQTextView* iqTextView = (IQTextView*)textView;
@@ -624,10 +624,16 @@
             
         }
         
+//        [self resetTrimmerSubview];
+        
     }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    [self resetTrimmerSubview];
+}
+
+-(void) resetTrimmerSubview{
     id page = [self pageDisplayedAtIndex:[self currentIndex]];
     if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
         MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
@@ -736,12 +742,12 @@
 #pragma mark - Video
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
     
-    id page = [self pageDisplayedAtIndex:index];
-    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
-        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
-        [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
-        [scrollView onVideoTapped];
-    }
+//    id page = [self pageDisplayedAtIndex:index];
+//    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
+//        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
+//        [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
+//        [scrollView onVideoTapped];
+//    }
     
 }
 /*

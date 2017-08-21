@@ -8,6 +8,7 @@ target 'PhotoCaptionInputView_Example' do
   pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :branch => 'develop'
   pod 'SDWebImage' , '4.0.0'
   pod 'ICGVideoTrimmer' , :git => 'https://github.com/itsmeichigo/ICGVideoTrimmer.git', :branch => 'master'
+  pod 'AVPlayerView' , :git => 'https://github.com/nixplay/AVPlayerView.git', :branch => 'develop'
   target 'PhotoCaptionInputView_Tests' do
     inherit! :search_paths
 

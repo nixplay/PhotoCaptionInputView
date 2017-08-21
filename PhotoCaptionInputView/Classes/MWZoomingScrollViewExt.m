@@ -32,13 +32,15 @@
 @property (assign, nonatomic) CGFloat stopTime;
 @property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) BOOL restartOnPlay;
+
 @end
 @implementation MWZoomingScrollViewExt
-
+@synthesize playButton = _playButton;
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
         _startTime = -1;
         _stopTime = -1;
+        
     }
     return self;
 }
@@ -56,6 +58,11 @@
     self.videoPlayer = nil;
     self.trimmerView = nil;
     [self playButton].hidden = NO;
+}
+
+-(void) setPlayButton:(UIButton*)button{
+    _playButton = button;
+    [_playButton addTarget:self action:@selector(onPlayButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 }
 - (void)setPhoto:(id<MWPhoto>)photo {
     [super setPhoto:photo];
@@ -135,8 +142,8 @@
         self.playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
         self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
         
-        self.videoLayer = [[UIView alloc] initWithFrame:_photoImageViewFrame];
-        self.videoPlayer = [[UIView alloc] initWithFrame:_photoImageViewFrame];
+        self.videoLayer = [[UIView alloc] initWithFrame:CGRectZero];
+        self.videoPlayer = [[UIView alloc] initWithFrame:CGRectZero];
         
         [self.videoPlayer addSubview:self.videoLayer];
         [self addSubview:self.videoPlayer];
@@ -144,15 +151,13 @@
         self.videoPlayer.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
         [self.videoLayer.layer addSublayer:self.playerLayer];
         
-//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:scrollView action:@selector(tapOnVideoLayer:)];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnVideoLayer:)];
         self.videoLayer.tag = 1;
-        self.playerLayer.frame = _photoImageViewFrame;
-//                [self.videoLayer addGestureRecognizer:tap];
+        self.playerLayer.frame = CGRectZero;
+        [self addGestureRecognizer:tap];
         
         self.videoPlaybackPosition = 0;
-        
-        //                            [scrollView tapOnVideoLayer:tap];
-        
+//        [self resetTrimmerSubview];
         
     }
     
@@ -186,13 +191,18 @@
             //            [self setupVideoPreview:self url:_url photoImageViewFrame:_photoImageViewFrame];
         }
         if(_trimmerView != nil){
-                        [_trimmerView resetSubviews];
+            [_trimmerView resetSubviews];
         }
     }
+    
 }
 
 - (void) tapOnVideoLayer:(UITapGestureRecognizer *)tap
 {
+    [self onVideoTapped];
+}
+
+-(void) onPlayButtonPressed:(id) sender{
     [self onVideoTapped];
 }
 - (void) onVideoTapped{
@@ -204,6 +214,11 @@
         [self stopPlaybackTimeChecker];
         [self playButton].hidden = NO;
     }else {
+        
+        self.videoLayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
+        self.videoPlayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
+        self.playerLayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
+        
         [self playButton].hidden = YES;
         if (_restartOnPlay){
             [self seekVideoToPos: self.startTime];
