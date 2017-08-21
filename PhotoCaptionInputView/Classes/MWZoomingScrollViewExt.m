@@ -12,7 +12,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
-
+    NSURL* _url;
+    CGRect _photoImageViewFrame;
 }
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) AVPlayerItem *playerItem;
@@ -34,42 +35,71 @@
 @end
 @implementation MWZoomingScrollViewExt
 
+- (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
+    if ((self = [super initWithPhotoBrowser:browser])) {
+        _startTime = -1;
+        _stopTime = -1;
+    }
+    return self;
+}
 
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    self.isPlaying = NO;
+    [self.player pause];
+    _startTime = -1;
+    _stopTime = -1;
+    self.asset = nil;
+    self.player = nil;
+    self.playerLayer = nil;
+    self.videoLayer = nil;
+    self.videoPlayer = nil;
+    self.trimmerView = nil;
+    [self playButton].hidden = NO;
+}
 - (void)setPhoto:(id<MWPhoto>)photo {
     [super setPhoto:photo];
     if(self.photo == nil){
+        _startTime = -1;
+        _stopTime = -1;
         self.asset = nil;
+        
+//        [self.avPlayerView removeFromSuperview];
+//        self.avPlayerView = nil;
         self.player = nil;
         [self.videoPlayer removeFromSuperview];
         [self.videoLayer removeFromSuperview];
+        [self.playerLayer removeFromSuperlayer];
         [self.trimmerView removeFromSuperview];
         self.playerLayer = nil;
         self.videoLayer = nil;
         self.videoPlayer = nil;
         self.trimmerView = nil;
     }else{
-//        if(photo.isVideo){
-//
-//            typeof(self) __weak weakSelf = self;
-//            [self.photo getVideoURL:^(NSURL *url) {
-//                NSLog(@"url %@",url);
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    // If the video is not playing anymore then bail
-//                    typeof(self) strongSelf = weakSelf;
-//                    if (!strongSelf) return;
-//
-//                    if (url) {
-//                        [strongSelf setupVideoPreview:strongSelf url:url];
-//
-//                    } else {
-//
-//                    }
-//                });
-//            }];
-//        }
+        
+        //        if(photo.isVideo){
+        //
+        //            typeof(self) __weak weakSelf = self;
+        //            [self.photo getVideoURL:^(NSURL *url) {
+        //                NSLog(@"url %@",url);
+        //                dispatch_async(dispatch_get_main_queue(), ^{
+        //                    // If the video is not playing anymore then bail
+        //                    typeof(self) strongSelf = weakSelf;
+        //                    if (!strongSelf) return;
+        //
+        //                    if (url) {
+        //                        [strongSelf setupVideoPreview:strongSelf url:url];
+        //
+        //                    } else {
+        //
+        //                    }
+        //                });
+        //            }];
+        //        }
     }
 }
 -(void) displaySubView:(CGRect)photoImageViewFrame{
+    _photoImageViewFrame = photoImageViewFrame;
     if(self.photo.isVideo){
         
         typeof(self) __weak weakSelf = self;
@@ -81,7 +111,10 @@
                 if (!strongSelf) return;
                 
                 if (url) {
-                    [strongSelf setupVideoPreview:strongSelf url:url photoImageViewFrame:photoImageViewFrame];
+                    _url = url;
+                    
+                    [self setupVideoPreviewUrl:_url photoImageViewFrame:_photoImageViewFrame];
+                    
                     
                 } else {
                     
@@ -89,65 +122,89 @@
             });
         }];
     }
+    
 }
--(void) setupVideoPreview:(MWZoomingScrollViewExt *) scrollView url:(NSURL*)url photoImageViewFrame:(CGRect)photoImageViewFrame{
-    if(scrollView.trimmerView == nil || scrollView.trimmerView.superview != nil){
-        scrollView.asset = [AVAsset assetWithURL:url];
+-(void) setupVideoPreviewUrl:(NSURL*)url photoImageViewFrame:(CGRect)photoImageViewFrame{
+    if(self.trimmerView == nil || self.trimmerView.superview != nil){
+        self.asset = [AVAsset assetWithURL:url];
         
-        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:scrollView.asset];
+        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:self.asset];
         
-        scrollView.player = [AVPlayer playerWithPlayerItem:item];
-        scrollView.playerLayer = [AVPlayerLayer playerLayerWithPlayer:scrollView.player];
-        scrollView.playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
-        scrollView.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+        self.player = [AVPlayer playerWithPlayerItem:item];
+        self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
+        self.playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
+        self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
         
-        scrollView.videoLayer = [[UIView alloc] initWithFrame:photoImageViewFrame];
-        scrollView.videoPlayer = [[UIView alloc] initWithFrame:photoImageViewFrame];
+        self.videoLayer = [[UIView alloc] initWithFrame:_photoImageViewFrame];
+        self.videoPlayer = [[UIView alloc] initWithFrame:_photoImageViewFrame];
         
-        [scrollView.videoPlayer addSubview:scrollView.videoLayer];
-        [scrollView addSubview:scrollView.videoPlayer];
-        scrollView.videoLayer.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-        [scrollView.videoLayer.layer addSublayer:scrollView.playerLayer];
+        [self.videoPlayer addSubview:self.videoLayer];
+        [self addSubview:self.videoPlayer];
+        self.videoPlayer.center = self.center;
+        self.videoPlayer.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+        [self.videoLayer.layer addSublayer:self.playerLayer];
         
 //        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:scrollView action:@selector(tapOnVideoLayer:)];
-        scrollView.videoLayer.tag = 1;
-        scrollView.playerLayer.frame = photoImageViewFrame;//CGRectMake(0, 0, scrollView.videoLayer.frame.size.width, scrollView.videoLayer.frame.size.height);
-//        [scrollView.videoLayer addGestureRecognizer:tap];
+        self.videoLayer.tag = 1;
+        self.playerLayer.frame = _photoImageViewFrame;
+//                [self.videoLayer addGestureRecognizer:tap];
         
-        scrollView.videoPlaybackPosition = 0;
+        self.videoPlaybackPosition = 0;
         
         //                            [scrollView tapOnVideoLayer:tap];
-        scrollView.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(scrollView.frame)-20, 50) asset:scrollView.asset];
-        // set properties for trimmer view
-        [scrollView.trimmerView setThemeColor:[UIColor lightGrayColor]];
-        [scrollView.trimmerView setShowsRulerView:YES];
-        [scrollView.trimmerView setMaxLength:10];
         
-        [scrollView.trimmerView setRulerLabelInterval:10];
         
-        [scrollView.trimmerView setTrackerColor:[UIColor cyanColor]];
-        [scrollView.trimmerView setDelegate:scrollView];
-        
-        // important: reset subviews
-        [scrollView addSubview: _trimmerView];
-        scrollView.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-        [scrollView.trimmerView resetSubviews];
     }
-
+    
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
 }
 
-- (void)tapOnVideoLayer:(UITapGestureRecognizer *)tap
+- (void)resetTrimmerSubview{
+    if(_startTime == -1 && _stopTime == -1){
+        if(_url != nil && _trimmerView == nil){
+            if(self.trimmerView == nil){
+                self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 80) asset:self.asset];
+                // set properties for trimmer view
+                [self.trimmerView setThumbWidth:20];
+                [self.trimmerView setThemeColor:[UIColor lightGrayColor]];
+                [self.trimmerView setShowsRulerView:YES];
+                [self.trimmerView setMaxLength:10];
+                
+                [self.trimmerView setRulerLabelInterval:10];
+                
+                [self.trimmerView setTrackerColor:[UIColor cyanColor]];
+                [self.trimmerView setDelegate:self];
+                
+                // important: reset subviews
+                [self addSubview: _trimmerView];
+                self.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+            }
+            //            [self setupVideoPreview:self url:_url photoImageViewFrame:_photoImageViewFrame];
+        }
+        if(_trimmerView != nil){
+                        [_trimmerView resetSubviews];
+        }
+    }
+}
+
+- (void) tapOnVideoLayer:(UITapGestureRecognizer *)tap
 {
+    [self onVideoTapped];
+}
+- (void) onVideoTapped{
+    
+    
+    
     if (self.isPlaying) {
         [self.player pause];
         [self stopPlaybackTimeChecker];
+        [self playButton].hidden = NO;
     }else {
+        [self playButton].hidden = YES;
         if (_restartOnPlay){
             [self seekVideoToPos: self.startTime];
             [self.trimmerView seekToTime:self.startTime];
@@ -158,8 +215,8 @@
     }
     self.isPlaying = !self.isPlaying;
     [self.trimmerView hideTracker:!self.isPlaying];
+    
 }
-
 - (void)startPlaybackTimeChecker
 {
     [self stopPlaybackTimeChecker];
@@ -197,22 +254,23 @@
 - (void)seekVideoToPos:(CGFloat)pos
 {
     self.videoPlaybackPosition = pos;
-    CMTime time = CMTimeMakeWithSeconds(self.videoPlaybackPosition, self.player.currentTime.timescale);
+//    CMTime time = CMTimeMakeWithSeconds(self.videoPlaybackPosition, self.player.currentTime.timescale);
     //NSLog(@"seekVideoToPos time:%.2f", CMTimeGetSeconds(time));
-    [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+//    [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
 }
 
 
 /*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
 #pragma mark - ICGVideoTrimmerDelegate
 
 - (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime{
-    
+    _startTime = startTime ;
+    _stopTime = endTime;
 }
 @end

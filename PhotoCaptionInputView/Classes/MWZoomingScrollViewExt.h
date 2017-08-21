@@ -9,5 +9,6 @@
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import "MWZoomingScrollView.h"
 @interface MWZoomingScrollViewExt : MWZoomingScrollView
-
+- (void) resetTrimmerSubview;
+- (void) onVideoTapped;
 @end

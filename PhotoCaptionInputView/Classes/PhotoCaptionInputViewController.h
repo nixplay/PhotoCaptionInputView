@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
+#import <MWPhotoBrowser/MWPhotoBrowserPrivate.h>
 #import <MWPhotoBrowser/MWGridCell.h>
 #import <IQKeyboardManager/IQTextView.h>
 #import <IQKeyboardManager/IQUITextFieldView+Additions.h>

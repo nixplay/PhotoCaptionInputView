@@ -592,7 +592,6 @@
 }
 
 
-
 #pragma mark MWPhotoBrowserDelegate
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index{
@@ -621,10 +620,21 @@
                 [self.collectionView layoutIfNeeded];
                 [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
             });
+            
         }
         
     }
 }
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    id page = [self pageDisplayedAtIndex:[self currentIndex]];
+    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
+        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
+        NSLog(@"resetTrimmerSubview");
+        [scrollView resetTrimmerSubview];
+    }
+}
+
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
     return [self.selfPhotos count];
 }
@@ -724,7 +734,13 @@
 
 #pragma mark - Video
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
-    NSLog(@"play video url %@ , %lu", videoURL, index );
+    
+    id page = [self pageDisplayedAtIndex:index];
+    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
+        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
+        [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
+        [scrollView onVideoTapped];
+    }
     
 }
 /*
