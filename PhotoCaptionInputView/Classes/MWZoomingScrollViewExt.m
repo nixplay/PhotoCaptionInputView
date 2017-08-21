@@ -14,6 +14,8 @@
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     NSURL* _url;
     CGRect _photoImageViewFrame;
+    UITapGestureRecognizer * _tap;
+    BOOL _isLoop;
 }
 @property (strong, nonatomic) AVPlayer *player;
 @property (strong, nonatomic) AVPlayerItem *playerItem;
@@ -32,15 +34,19 @@
 @property (assign, nonatomic) CGFloat stopTime;
 @property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) BOOL restartOnPlay;
-
+@property (assign, nonatomic) BOOL initTrimmer;
 @end
 @implementation MWZoomingScrollViewExt
 @synthesize playButton = _playButton;
+@synthesize startTime = _startTime;
+@synthesize stopTime = _stopTime;
+@synthesize initTrimmer = _initTrimmer;
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
         _startTime = -1;
         _stopTime = -1;
-        
+        _isLoop = NO;
+        _initTrimmer = NO;
     }
     return self;
 }
@@ -51,6 +57,7 @@
     [self.player pause];
     _startTime = -1;
     _stopTime = -1;
+    _initTrimmer = NO;
     self.asset = nil;
     self.player = nil;
     self.playerLayer = nil;
@@ -62,15 +69,15 @@
 
 -(void) setPlayButton:(UIButton*)button{
     _playButton = button;
-    [_playButton addTarget:self action:@selector(onPlayButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+    [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 }
 - (void)setPhoto:(id<MWPhoto>)photo {
     [super setPhoto:photo];
     if(self.photo == nil){
         _startTime = -1;
         _stopTime = -1;
+        _initTrimmer = NO;
         self.asset = nil;
-        
 //        [self.avPlayerView removeFromSuperview];
 //        self.avPlayerView = nil;
         self.player = nil;
@@ -83,7 +90,6 @@
         self.videoPlayer = nil;
         self.trimmerView = nil;
     }else{
-        
         //        if(photo.isVideo){
         //
         //            typeof(self) __weak weakSelf = self;
@@ -106,7 +112,7 @@
     }
 }
 -(void) displaySubView:(CGRect)photoImageViewFrame{
-    _photoImageViewFrame = photoImageViewFrame;
+//    _photoImageViewFrame = photoImageViewFrame;
     if(self.photo.isVideo){
         
         typeof(self) __weak weakSelf = self;
@@ -142,19 +148,20 @@
         self.playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
         self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
         
-        self.videoLayer = [[UIView alloc] initWithFrame:CGRectZero];
-        self.videoPlayer = [[UIView alloc] initWithFrame:CGRectZero];
-        
+        self.videoLayer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320,240)];
+        self.videoPlayer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320,240)];
+        [self.playerLayer setFrame:CGRectMake(0, 0, 320,240)];
         [self.videoPlayer addSubview:self.videoLayer];
         [self addSubview:self.videoPlayer];
-        self.videoPlayer.center = self.center;
+        self.videoLayer.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+  
         self.videoPlayer.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
         [self.videoLayer.layer addSublayer:self.playerLayer];
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnVideoLayer:)];
+//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnVideoLayer:)];
         self.videoLayer.tag = 1;
-        self.playerLayer.frame = CGRectZero;
-        [self addGestureRecognizer:tap];
+        
+//        [self addGestureRecognizer:tap];
         
         self.videoPlaybackPosition = 0;
 //        [self resetTrimmerSubview];
@@ -165,6 +172,24 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    if(_trimmerView != nil){
+        if(!_initTrimmer){
+            [self.trimmerView resetSubviews];
+            
+            self.videoPlayer.frame = _photoImageViewFrame;
+            self.videoLayer.frame = CGRectMake(0, 0, CGRectGetWidth(_photoImageViewFrame), CGRectGetHeight(_photoImageViewFrame));
+            [self.playerLayer removeFromSuperlayer];
+            self.playerLayer.frame = CGRectMake(0, 0, CGRectGetWidth(_photoImageViewFrame), CGRectGetHeight(_photoImageViewFrame));
+            [self.videoLayer.layer addSublayer:self.playerLayer];
+            
+            _initTrimmer = YES;
+        }
+    }
+}
+
+-(void) setFrameToCenter:(CGRect)frameToCenter{
+    _photoImageViewFrame = frameToCenter;
+    
 }
 
 - (void)resetTrimmerSubview{
@@ -172,6 +197,7 @@
         if(_url != nil && _trimmerView == nil){
             if(self.trimmerView == nil){
                 self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 80) asset:self.asset];
+                [self.trimmerView setDelegate:self];
                 // set properties for trimmer view
                 [self.trimmerView setThumbWidth:20];
                 [self.trimmerView setThemeColor:[UIColor lightGrayColor]];
@@ -181,18 +207,19 @@
                 [self.trimmerView setRulerLabelInterval:10];
                 
                 [self.trimmerView setTrackerColor:[UIColor cyanColor]];
-                [self.trimmerView setDelegate:self];
+                
                 
                 // important: reset subviews
                 [self addSubview: _trimmerView];
                 self.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
                 UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+//
             }
             //            [self setupVideoPreview:self url:_url photoImageViewFrame:_photoImageViewFrame];
         }
-        if(_trimmerView != nil){
-            [_trimmerView resetSubviews];
-        }
+//        if(_trimmerView != nil){
+//            [self.trimmerView resetSubviews];
+//        }
     }
     
 }
@@ -203,26 +230,33 @@
 }
 
 -(void) onPlayButtonPressed:(id) sender{
+    
     [self onVideoTapped];
+    
+    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnVideoLayer:)];
+    [self addGestureRecognizer:_tap];
+    
+
 }
 - (void) onVideoTapped{
     
     
     
     if (self.isPlaying) {
+        if(_tap != nil){
+            [self removeGestureRecognizer:_tap];
+        }
+
         [self.player pause];
         [self stopPlaybackTimeChecker];
         [self playButton].hidden = NO;
     }else {
         
-        self.videoLayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
-        self.videoPlayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
-        self.playerLayer.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
         
         [self playButton].hidden = YES;
         if (_restartOnPlay){
-            [self seekVideoToPos: self.startTime];
-            [self.trimmerView seekToTime:self.startTime];
+            [self seekVideoToPos: _startTime];
+            [self.trimmerView seekToTime:_startTime];
             _restartOnPlay = NO;
         }
         [self.player play];
@@ -247,6 +281,7 @@
     }
 }
 
+
 #pragma mark - PlaybackTimeCheckerTimer
 
 - (void)onPlaybackTimeCheckerTimer
@@ -260,20 +295,24 @@
     
     [self.trimmerView seekToTime:seconds];
     
-    if (self.videoPlaybackPosition >= self.stopTime) {
-        self.videoPlaybackPosition = self.startTime;
-        [self seekVideoToPos: self.startTime];
-        [self.trimmerView seekToTime:self.startTime];
+    if (self.videoPlaybackPosition >= _stopTime) {
+        self.videoPlaybackPosition = _startTime;
+        [self seekVideoToPos: _startTime];
+        [self.trimmerView seekToTime:_startTime];
+        if(!_isLoop){
+            [self.playButton setHidden:NO];
+            [self.player pause];
+        }
     }
 }
+
 - (void)seekVideoToPos:(CGFloat)pos
 {
     self.videoPlaybackPosition = pos;
-//    CMTime time = CMTimeMakeWithSeconds(self.videoPlaybackPosition, self.player.currentTime.timescale);
+    CMTime time = CMTimeMakeWithSeconds(self.videoPlaybackPosition, self.player.currentTime.timescale);
     //NSLog(@"seekVideoToPos time:%.2f", CMTimeGetSeconds(time));
-//    [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+    [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
 }
-
 
 /*
  // Only override drawRect: if you perform custom drawing.
@@ -284,8 +323,25 @@
  */
 #pragma mark - ICGVideoTrimmerDelegate
 
-- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime{
-    _startTime = startTime ;
+- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime
+{
+    _restartOnPlay = YES;
+    [self.player pause];
+    self.isPlaying = NO;
+    [self stopPlaybackTimeChecker];
+    
+    [self.trimmerView hideTracker:true];
+    
+    if (startTime != _startTime) {
+        //then it moved the left position, we should rearrange the bar
+        [self seekVideoToPos:startTime];
+    }
+    else{ // right has changed
+        [self seekVideoToPos:endTime];
+    }
+    _startTime = startTime;
     _stopTime = endTime;
+    
 }
+
 @end

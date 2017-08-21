@@ -624,7 +624,6 @@
             
         }
         
-//        [self resetTrimmerSubview];
         
     }
 }
@@ -741,7 +740,7 @@
 
 #pragma mark - Video
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
-    
+    [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
 //    id page = [self pageDisplayedAtIndex:index];
 //    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
 //        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
