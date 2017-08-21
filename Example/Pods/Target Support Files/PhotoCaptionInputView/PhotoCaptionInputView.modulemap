@@ -1,6 +1,0 @@
-framework module PhotoCaptionInputView {
-  umbrella header "PhotoCaptionInputView-umbrella.h"
-
-  export *
-  module * { export * }
-}
