@@ -49,5 +49,6 @@ TODO: Add long description of the pod here.
         s.dependency 'ICGVideoTrimmer'
         s.dependency 'AVPlayerView'
         s.dependency 'SDAVAssetExportSession'
+        s.dependency 'PryntTrimmerView'
 
 end

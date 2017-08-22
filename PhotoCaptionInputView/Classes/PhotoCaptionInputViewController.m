@@ -557,7 +557,10 @@
         
     });
 }
-
+- (void)jumpToPageAtIndex:(NSUInteger)index animated:(BOOL)animated{
+    [super jumpToPageAtIndex:index animated:animated];
+    [self resetTrimmerSubview];
+}
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     //    if(!keyboardIsShown){
     if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
@@ -740,14 +743,29 @@
 
 #pragma mark - Video
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
-    [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
+//    [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
 //    id page = [self pageDisplayedAtIndex:index];
 //    if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
 //        MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
-//        [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
+        [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
 //        [scrollView onVideoTapped];
 //    }
     
+}
+
+- (void)setVideoLoadingIndicatorVisible:(BOOL)visible atPageIndex:(NSUInteger)pageIndex {
+//    if (_currentVideoLoadingIndicator && !visible) {
+//        [_currentVideoLoadingIndicator removeFromSuperview];
+//        _currentVideoLoadingIndicator = nil;
+//        [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = NO;
+//    } else if (!_currentVideoLoadingIndicator && visible) {
+//        _currentVideoLoadingIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
+//        [_currentVideoLoadingIndicator sizeToFit];
+//        [_currentVideoLoadingIndicator startAnimating];
+//        [_pagingScrollView addSubview:_currentVideoLoadingIndicator];
+//        [self positionVideoLoadingIndicator];
+//        [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = YES;
+//    }
 }
 /*
  #pragma mark - Navigation
