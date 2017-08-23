@@ -31,8 +31,6 @@
 @property (strong, nonatomic) NSString *tempVideoPath;
 @property (strong, nonatomic) AVAsset *asset;
 
-@property (assign, nonatomic) CGFloat startTime;
-@property (assign, nonatomic) CGFloat stopTime;
 @property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) BOOL restartOnPlay;
 @property (assign, nonatomic) BOOL initTrimmer;
@@ -212,7 +210,7 @@
                             // set properties for trimmer view
                             [self.trimmerView setThumbWidth:20];
                             [self.trimmerView setThemeColor:[UIColor lightGrayColor]];
-                            [self.trimmerView setShowsRulerView:YES];
+                            [self.trimmerView setShowsRulerView:NO];
                             [self.trimmerView setMaxLength:10];
                             
                             [self.trimmerView setRulerLabelInterval:10];

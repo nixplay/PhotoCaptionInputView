@@ -9,6 +9,8 @@
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import "MWZoomingScrollView.h"
 @interface MWZoomingScrollViewExt : MWZoomingScrollView
+@property (assign, nonatomic) CGFloat startTime;
+@property (assign, nonatomic) CGFloat stopTime;
 - (void) resetTrimmerSubview;
 - (void) onVideoTapped;
 @end
