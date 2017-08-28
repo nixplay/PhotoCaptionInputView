@@ -17,4 +17,5 @@
 - (id)initWithAsset:(PHAsset *)asset targetSize:(CGSize)targetSize;
 
 @property (nonatomic, strong) NSString* photoData;
+@property (nonatomic, strong) NSDictionary* startEndTime;
 @end

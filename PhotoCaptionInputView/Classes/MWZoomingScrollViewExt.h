@@ -8,9 +8,17 @@
 
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import "MWZoomingScrollView.h"
+@class MWZoomingScrollViewExt;
+@protocol MWZoomingScrollViewDelegate<NSObject>
+-(void) zoomingScrollView:(MWZoomingScrollViewExt*) zoomingScrollViewExt photo:(id<MWPhoto>)photo startTime:(CGFloat)startTime endTime:(CGFloat) endTime;
+@end
 @interface MWZoomingScrollViewExt : MWZoomingScrollView
+@property (strong, nonatomic) id<MWZoomingScrollViewDelegate> mDelegate;
+
 @property (assign, nonatomic) CGFloat startTime;
-@property (assign, nonatomic) CGFloat stopTime;
+@property (assign, nonatomic) CGFloat endTime;
+
+- (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime;
 - (void) resetTrimmerSubview;
 - (void) onVideoTapped;
 @end

@@ -33,6 +33,7 @@
     UIView* hightlightView;
     BOOL keyboardIsShown;
     float textViewOrigYRatio;
+
     
 }
 @property (nonatomic, weak) NSArray* preSelectedAssets;
@@ -287,6 +288,18 @@
             [photos addObject:obj.photoData];
         }];
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets];
+    }
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:startEndTime:)]) {
+        NSMutableArray *captions = [NSMutableArray array];
+        NSMutableArray *photos = [NSMutableArray array];
+        NSMutableArray *startEndTimes = [NSMutableArray array];
+        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+            [photos addObject:obj.photoData];
+            [photos addObject:obj.startEndTime];
+        }];
+        [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
     }
 }
 
@@ -675,14 +688,15 @@
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
-    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
-        NSMutableArray *captions = [NSMutableArray array];
-        NSMutableArray *photos = [NSMutableArray array];
-        [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            
-            [captions addObject:obj.caption != nil ? [obj caption] : @" "];
-            [photos addObject:obj.photoData];
-        }];
+    NSMutableArray *captions = [NSMutableArray array];
+    NSMutableArray *photos = [NSMutableArray array];
+    [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        [captions addObject:obj.caption != nil ? [obj caption] : @" "];
+        [photos addObject:obj.photoData];
+    }];
+    if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)] ) {
+        
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:self.preSelectedAssets];
     }
     
@@ -905,9 +919,27 @@
 }
 -(MWZoomingScrollView *) InitMWZoomingScrollView {
     MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
+    [scrollView setMDelegate:self];
     return scrollView;
 }
-
+-(void) zoomingScrollView:(MWZoomingScrollViewExt*) zoomingScrollViewExt photo:(id<MWPhoto>)photo startTime:(CGFloat)startTime endTime:(CGFloat) stopTime{
+    NSDictionary *startEndTime = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                  @(startTime), @"startTime",
+                                  @(stopTime), @"stopTime",
+                                  nil];
+    [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if([obj.photoData isEqualToString:((MWPhotoExt*)photo).photoData]){
+            if(obj.startEndTime == nil){
+                obj.startEndTime = startEndTime;
+            }else{
+                [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
+                                           endTime:[[obj.startEndTime valueForKey:@"endTimeTime"] floatValue]];
+            }
+            *stop = YES;
+            return;
+        }
+    }];
+}
 @end
 
 

@@ -10,6 +10,7 @@
 
 @implementation MWPhotoExt
 @synthesize photoData = _photoData;
+@synthesize startEndTime = _startEndTime;
 + (MWPhotoExt *)photoWithURL:(NSURL *)url {
     return [[MWPhotoExt alloc] initWithURL:url];
 }
@@ -30,5 +31,13 @@
     return self;
 }
 
+- (void) startEndTime:(NSDictionary *) startEndTime{
+    _startEndTime = startEndTime;
+}
+
+
+- (NSDictionary*) startEndTime{
+    return _startEndTime;
+}
 
 @end

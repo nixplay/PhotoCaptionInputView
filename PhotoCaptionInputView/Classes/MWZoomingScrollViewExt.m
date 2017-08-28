@@ -11,7 +11,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 #import <PryntTrimmerView/PryntTrimmerView-Swift.h>
-
+#import "MWPhotoExt.h"
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     NSURL* _url;
     CGRect _photoImageViewFrame;
@@ -38,12 +38,14 @@
 @implementation MWZoomingScrollViewExt
 @synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
-@synthesize stopTime = _stopTime;
+@synthesize stopTime = _endTime;
 @synthesize initTrimmer = _initTrimmer;
+@synthesize mDelegate = _mDelegate;
+
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
         _startTime = -1;
-        _stopTime = -1;
+        _endTime = -1;
         _isLoop = YES;
         _initTrimmer = NO;
     }
@@ -55,7 +57,7 @@
     self.isPlaying = NO;
     [self.player pause];
     _startTime = -1;
-    _stopTime = -1;
+    _endTime = -1;
     _initTrimmer = NO;
     _url = nil;
     self.asset = nil;
@@ -75,7 +77,7 @@
     [super setPhoto:photo];
     if(self.photo == nil){
         _startTime = -1;
-        _stopTime = -1;
+        _endTime = -1;
         _initTrimmer = NO;
         _url = nil;
         self.asset = nil;
@@ -199,7 +201,7 @@
             if (url) {
                 _url = url;
                 
-                if(_startTime == -1 && _stopTime == -1){
+                if(_startTime == -1 && _endTime == -1){
                     if(_url != nil && _trimmerView == nil){
                         if(self.trimmerView == nil ){
                             if(self.asset == nil){
@@ -310,7 +312,7 @@
     
     [self.trimmerView seekToTime:seconds];
     
-    if (self.videoPlaybackPosition >= _stopTime) {
+    if (self.videoPlaybackPosition >= _endTime) {
         self.videoPlaybackPosition = _startTime;
         [self seekVideoToPos: _startTime];
         [self.trimmerView seekToTime:_startTime];
@@ -355,12 +357,20 @@
         [self seekVideoToPos:endTime];
     }
     _startTime = startTime;
-    _stopTime = endTime;
+    _endTime = endTime;
+    if([_mDelegate respondsToSelector:@selector(zoomingScrollView:photo:startTime:endTime:)])
+    {
+        [_mDelegate zoomingScrollView:self photo:self.photo  startTime:_startTime endTime:_endTime];
+    }
     
 }
 
 - (void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
     
 }
-
+- (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime{
+    if(_startTime != startTime && _endTime != endTime){
+        [_trimmerView setVideoBoundsToStartTime:startTime endTime:endTime];
+    }
+}
 @end

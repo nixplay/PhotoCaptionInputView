@@ -13,9 +13,10 @@
 #import <IQKeyboardManager/IQTextView.h>
 #import <IQKeyboardManager/IQUITextFieldView+Additions.h>
 #import <IQKeyboardManager/IQUIView+IQKeyboardToolbar.h>
+#import "MWZoomingScrollViewExt.h"
 @protocol PhotoCaptionInputViewDelegate;
 
-@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserProtectedMethod, MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate>
+@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserProtectedMethod, MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate, MWZoomingScrollViewDelegate>
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails  preselectedAssets:(NSArray*) _preselectedAssets delegate:(id <PhotoCaptionInputViewDelegate>)delegate;
 
@@ -40,6 +41,7 @@
 @optional
 -(void) dismissPhotoCaptionInputView:(PhotoCaptionInputViewController*)controller;
 -(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos preSelectedAssets:(NSArray*)preSelectedAssets;
+-(void) photoCaptionInputView:(PhotoCaptionInputViewController*)controller captions:(NSArray *)captions photos:(NSArray*)photos preSelectedAssets:(NSArray*)preSelectedAssets startEndTime:(NSArray*)startEndTime;
 @optional
 - (NSString *)photoCaptionInputView:(PhotoCaptionInputViewController *)controller titleForPhotoAtIndex:(NSUInteger)index;
 - (NSMutableArray*)photoBrowser:(MWPhotoBrowser *)photoBrowser buildToolbarItems:(UIToolbar*)toolBar;
