@@ -38,7 +38,7 @@
 @implementation MWZoomingScrollViewExt
 @synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
-@synthesize stopTime = _endTime;
+@synthesize endTime = _endTime;
 @synthesize initTrimmer = _initTrimmer;
 @synthesize mDelegate = _mDelegate;
 

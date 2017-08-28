@@ -33,7 +33,7 @@
     UIView* hightlightView;
     BOOL keyboardIsShown;
     float textViewOrigYRatio;
-
+    BOOL needResetLayout;
     
 }
 @property (nonatomic, weak) NSArray* preSelectedAssets;
@@ -68,6 +68,7 @@
         }
         _selfDelegate = delegate;
         self.delegate = self;
+        needResetLayout = YES;
     }
     return self;
     
@@ -297,7 +298,7 @@
             
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
-            [photos addObject:obj.startEndTime];
+            [startEndTimes addObject:obj.startEndTime != nil ? [obj startEndTime] : [NSNull null]];
         }];
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
     }
@@ -639,6 +640,10 @@
             });
             
         }
+        if(needResetLayout){
+            [self resetTrimmerSubview];
+            needResetLayout = NO;
+        }
         
         
     }
@@ -922,10 +927,10 @@
     [scrollView setMDelegate:self];
     return scrollView;
 }
--(void) zoomingScrollView:(MWZoomingScrollViewExt*) zoomingScrollViewExt photo:(id<MWPhoto>)photo startTime:(CGFloat)startTime endTime:(CGFloat) stopTime{
+-(void) zoomingScrollView:(MWZoomingScrollViewExt*) zoomingScrollViewExt photo:(id<MWPhoto>)photo startTime:(CGFloat)startTime endTime:(CGFloat) endTime{
     NSDictionary *startEndTime = [[NSDictionary alloc] initWithObjectsAndKeys:
                                   @(startTime), @"startTime",
-                                  @(stopTime), @"stopTime",
+                                  @(endTime), @"endTime",
                                   nil];
     [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if([obj.photoData isEqualToString:((MWPhotoExt*)photo).photoData]){
@@ -933,7 +938,7 @@
                 obj.startEndTime = startEndTime;
             }else{
                 [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
-                                           endTime:[[obj.startEndTime valueForKey:@"endTimeTime"] floatValue]];
+                                           endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
             }
             *stop = YES;
             return;
