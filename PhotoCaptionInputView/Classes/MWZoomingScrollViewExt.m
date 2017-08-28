@@ -138,18 +138,18 @@
         
         self.videoPlaybackPosition = 0;
         
-//        if(!_initTrimmer){
-//            if(_trimmerView == nil){
-//                [self resetTrimmerSubview];
-//            }
-//            if(_trimmerView != nil){
-//                
-//                [_trimmerView resetSubviews];
-//                
-//                
-//            }
-//            _initTrimmer = YES;
-//        }
+        //        if(!_initTrimmer){
+        //            if(_trimmerView == nil){
+        //                [self resetTrimmerSubview];
+        //            }
+        //            if(_trimmerView != nil){
+        //
+        //                [_trimmerView resetSubviews];
+        //
+        //
+        //            }
+        //            _initTrimmer = YES;
+        //        }
     }
     
 }
@@ -158,9 +158,9 @@
     [super layoutSubviews];
     if(self.photo.isVideo){
         if(!_initTrimmer){
-//            if(_trimmerView == nil){
-//                [self resetTrimmerSubview];
-//            }
+            //            if(_trimmerView == nil){
+            //                [self resetTrimmerSubview];
+            //            }
             if(_trimmerView != nil){
                 
                 [_trimmerView resetSubviews];
@@ -205,7 +205,7 @@
                             if(self.asset == nil){
                                 self.asset = [AVAsset assetWithURL:_url];
                             }
-                            self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 80) asset:self.asset];
+                            self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 50) asset:self.asset delegate:self];
                             [self.trimmerView setDelegate:self];
                             // set properties for trimmer view
                             [self.trimmerView setThumbWidth:20];
@@ -266,7 +266,7 @@
             [self stopPlaybackTimeChecker];
             [self playButton].hidden = NO;
         }else {
-//            [self resetTrimmerSubview];
+            //            [self resetTrimmerSubview];
             
             [self playButton].hidden = YES;
             if (_restartOnPlay){
