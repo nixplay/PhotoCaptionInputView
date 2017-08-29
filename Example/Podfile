@@ -8,7 +8,6 @@ target 'PhotoCaptionInputView_Example' do
   pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :branch => 'develop'
   pod 'SDWebImage' , '4.0.0'
   pod 'ICGVideoTrimmer' , :git => 'https://github.com/nixplay/ICGVideoTrimmer.git', :branch => 'develop'
-  pod 'PryntTrimmerView'
   pod 'SDAVAssetExportSession' , :git=> 'https://github.com/rs/SDAVAssetExportSession', :branch => 'master'
   pod 'AVPlayerView' , :git => 'https://github.com/nixplay/AVPlayerView.git', :branch => 'develop'
   target 'PhotoCaptionInputView_Tests' do
