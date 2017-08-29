@@ -208,6 +208,7 @@
                                 self.asset = [AVAsset assetWithURL:_url];
                             }
                             self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 50) asset:self.asset delegate:self];
+                            
                             [self.trimmerView setDelegate:self];
                             // set properties for trimmer view
                             [self.trimmerView setThumbWidth:20];
