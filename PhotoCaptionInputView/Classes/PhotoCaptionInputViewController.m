@@ -298,7 +298,8 @@
             
             [captions addObject:obj.caption != nil ? [obj caption] : @" "];
             [photos addObject:obj.photoData];
-            [startEndTimes addObject:obj.startEndTime != nil ? [obj startEndTime] : [NSNull null]];
+            [startEndTimes addObject:obj.startEndTime != nil ? [obj startEndTime] : (obj.isVideo) ? @{@"startTime":@(0),
+                                                                                                      @"endTime":@(10)}:[NSNull null]];
         }];
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
     }
