@@ -10,7 +10,6 @@
 #import "ICGVideoTrimmerView.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
-#import <PryntTrimmerView/PryntTrimmerView-Swift.h>
 #import "MWPhotoExt.h"
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     NSURL* _url;
