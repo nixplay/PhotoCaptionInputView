@@ -51,11 +51,34 @@
     }
     return self;
 }
+-(void) didMoveToWindow {
+    [super didMoveToWindow]; // (does nothing by default)
+    if (self.window == nil) {
+        // YOUR CODE FOR WHEN UIVIEW IS REMOVED
+        self.isPlaying = NO;
+        [self.player seekToTime:CMTimeMake(0, 1)];
+        [self.player pause];
+        [self.player replaceCurrentItemWithPlayerItem:nil];
+        _startTime = -1;
+        _endTime = -1;
+        _initTrimmer = NO;
+        _url = nil;
+        self.asset = nil;
+        self.player = nil;
+        self.playerLayer = nil;
+        self.videoLayer = nil;
+        self.videoPlayer = nil;
+        self.trimmerView = nil;
 
+    }
+}
 - (void)prepareForReuse {
     [super prepareForReuse];
     self.isPlaying = NO;
+    
+    [self.player seekToTime:CMTimeMake(0, 1)];
     [self.player pause];
+    [self.player replaceCurrentItemWithPlayerItem:nil];
     _startTime = -1;
     _endTime = -1;
     _initTrimmer = NO;
@@ -81,11 +104,16 @@
         _initTrimmer = NO;
         _url = nil;
         self.asset = nil;
-        self.player = nil;
+        
+        [self.player seekToTime:CMTimeMake(0, 1)];
+        [self.player pause];
+        [self.player replaceCurrentItemWithPlayerItem:nil];
+        
         [self.videoPlayer removeFromSuperview];
         [self.videoLayer removeFromSuperview];
         [self.playerLayer removeFromSuperlayer];
         [self.trimmerView removeFromSuperview];
+        self.player = nil;
         self.playerLayer = nil;
         self.videoLayer = nil;
         self.videoPlayer = nil;
