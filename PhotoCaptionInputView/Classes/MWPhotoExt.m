@@ -23,11 +23,13 @@
 - (id)initWithURL:(NSURL *)url{
     self = [super initWithURL:url];
     _photoData = [url absoluteString];
+    _startEndTime = nil;
     return self;
 }
 - (id)initWithAsset:(PHAsset *)asset targetSize:(CGSize)targetSize{
     self = [super initWithAsset:asset targetSize:targetSize];
     _photoData = [asset localIdentifier];
+    _startEndTime = nil;
     return self;
 }
 

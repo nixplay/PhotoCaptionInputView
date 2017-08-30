@@ -804,9 +804,6 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
-    //    [preSelectedAssets removeAllObjects];
-    
-    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
     //No sure if remo all data from list and add it back
     NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
     NSMutableArray *removeAssets = [NSMutableArray new];
@@ -849,6 +846,10 @@
     if([self.selfPhotos count] >= self.maximumImagesCount){
         self.addButton.enabled = NO;
     }
+    needResetLayout = YES;
+    [self resetTrimmerSubview];
+    
+    
     
 }
 -(BOOL)assetsPickerController:(GMImagePickerController *)picker shouldSelectAsset:(PHAsset *)asset{
@@ -869,7 +870,6 @@
     }else{
         return YES;
     }
-    
 }
 //Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
@@ -935,12 +935,19 @@
                                   nil];
     [self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if([obj.photoData isEqualToString:((MWPhotoExt*)photo).photoData]){
-            
-            obj.startEndTime = startEndTime;
-            
-            [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
-                                       endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
-            
+            if(obj.startEndTime != nil){
+//                float oldStartTime = [[obj.startEndTime valueForKey:@"startTime"] floatValue];
+//                float oldEndTime = [[obj.startEndTime valueForKey:@"endTime"] floatValue];
+//                if(oldStartTime != startTime || oldEndTime != endTime ){
+//                    [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
+//                                           endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
+//                }
+            }else{
+                obj.startEndTime = startEndTime;
+                
+//                [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
+//                                           endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
+            }
             *stop = YES;
             return;
         }

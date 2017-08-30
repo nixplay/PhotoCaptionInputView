@@ -11,6 +11,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 #import "MWPhotoExt.h"
+#define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     NSURL* _url;
     CGRect _photoImageViewFrame;
@@ -200,32 +201,46 @@
             if (url) {
                 _url = url;
                 
-                if(_startTime == -1 && _endTime == -1){
-                    if(_url != nil && _trimmerView == nil){
-                        if(self.trimmerView == nil ){
-                            if(self.asset == nil){
-                                self.asset = [AVAsset assetWithURL:_url];
+                if(strongSelf.startTime == -1 && strongSelf.endTime == -1){
+                    if(_url != nil && strongSelf.trimmerView == nil){
+                        if(strongSelf.trimmerView == nil ){
+                            if(strongSelf.asset == nil){
+                                strongSelf.asset = [AVAsset assetWithURL:_url];
                             }
-                            self.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(self.frame)-20, 50) asset:self.asset delegate:self];
+                            //restore time range before init
+                            MWPhotoExt *photoExt = strongSelf.photo;
+                            CGFloat restoredStartTime = strongSelf.startTime;
+                            CGFloat restoredEndTime = strongSelf.endTime;
+                            if(photoExt.startEndTime != nil){
+                                restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
+                                restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+                            }
                             
-                            [self.trimmerView setDelegate:self];
+                            strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(strongSelf.frame)-20, 50) asset:strongSelf.asset delegate:strongSelf];
+                            
+                            
+                            [strongSelf.trimmerView setDelegate:strongSelf];
                             // set properties for trimmer view
-                            [self.trimmerView setThumbWidth:20];
-                            [self.trimmerView setThemeColor:[UIColor lightGrayColor]];
-                            [self.trimmerView setShowsRulerView:NO];
-                            [self.trimmerView setMaxLength:10];
+                            [strongSelf.trimmerView setThumbWidth:20];
+                            [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
+                            [strongSelf.trimmerView setShowsRulerView:NO];
+                            [strongSelf.trimmerView setMaxLength:10];
                             
-                            [self.trimmerView setRulerLabelInterval:10];
+                            [strongSelf.trimmerView setRulerLabelInterval:10];
                             
-                            [self.trimmerView setTrackerColor:[UIColor cyanColor]];
+                            [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
                             
                             
                             // important: reset subviews
-                            [self addSubview: _trimmerView];
-                            self.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                            [strongSelf addSubview: strongSelf.trimmerView];
+                            strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
                             UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-                            [self.trimmerView resetSubviews];
-                            
+                            [strongSelf.trimmerView resetSubviews];
+                            if(restoredStartTime != -1 && restoredEndTime != -1){
+                                strongSelf.startTime = restoredStartTime;
+                                strongSelf.endTime = restoredEndTime;
+                                [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
+                            }
                         }
                         
                     }
@@ -358,6 +373,16 @@
     }
     _startTime = startTime;
     _endTime = endTime;
+    
+    MWPhotoExt *photoExt = self.photo;
+    
+    if(photoExt.startEndTime == nil){
+        photoExt.startEndTime = [NSMutableDictionary new];
+    }
+    
+    [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
+    [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
+
     if([_mDelegate respondsToSelector:@selector(zoomingScrollView:photo:startTime:endTime:)])
     {
         [_mDelegate zoomingScrollView:self photo:self.photo  startTime:_startTime endTime:_endTime];
@@ -370,7 +395,10 @@
 }
 - (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime{
     if(_startTime != startTime && _endTime != endTime){
-        [_trimmerView setVideoBoundsToStartTime:startTime endTime:endTime];
+        typeof(self) __weak weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.trimmerView setVideoBoundsToStartTime:startTime endTime:endTime];
+        });
     }
 }
 @end
