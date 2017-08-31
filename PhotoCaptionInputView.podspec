@@ -49,6 +49,6 @@ TODO: Add long description of the pod here.
         s.dependency 'ICGVideoTrimmer'
         s.dependency 'AVPlayerView'
         s.dependency 'SDAVAssetExportSession'
-        s.dependency 'JDStatusBarNotification'
+        s.dependency 'AFDropdownNotification', '~> 1.0'
 
 end
