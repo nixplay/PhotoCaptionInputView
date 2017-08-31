@@ -16,8 +16,9 @@
 #import "IQKeyboardManager.h"
 #import "IQUIView+IQKeyboardToolbar.h"
 #import "IQTextView.h"
-
+#import "Reachability.h"
 #import "MWZoomingScrollViewExt.h"
+#import "AFDropdownNotification.h"
 
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
@@ -28,7 +29,8 @@
 #define LAYOUT_START_Y 10.5f
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
-@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
+#define MAX_VIDEO_ALERT 10
+@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate,AFDropdownNotificationDelegate>{
     //    NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
@@ -329,6 +331,8 @@
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
     
+    picker.colsInPortrait = 3;
+    picker.colsInLandscape = 5;
     picker.minimumInteritemSpacing = 2.0;
     picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
     picker.toolbarTextColor = LIGHT_BLUE_COLOR;
@@ -337,6 +341,7 @@
     picker.autoSelectCameraImages = YES;
     
     [self.navigationController presentViewController:picker animated:YES completion:nil];
+    
 }
 
 -(void)removePhoto{
@@ -721,22 +726,22 @@
 - (BOOL)photoBrowser:(MWPhotoBrowser *)photoBrowser setNavBarAppearance:(UINavigationBar *)navigationBar{
     
     [photoBrowser.navigationController setNavigationBarHidden:NO animated:NO];
-    navigationBar.barStyle = UIBarStyleDefault;
+    navigationBar.barStyle = UIBarStyleBlackOpaque;
     navigationBar.barTintColor = [UIColor whiteColor];
     navigationBar.tintColor = [UIColor whiteColor];
     
-//    CAGradientLayer *gradient = [CAGradientLayer layer];
-//    gradient.frame = self.navigationController.navigationBar.bounds;
-//    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
-//    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
-    
-    [navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    CGRect frame = self.navigationController.navigationBar.bounds;
+    CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
+    gradient.frame = CGRectMake(frame.origin.x,
+                                frame.origin.y,
+                                frame.size.width,
+                                frame.size.height+statusBarHeight);
+    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.8f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
+    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
     navigationBar.shadowImage = [UIImage new];
     [navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-    //    navigationBar.shadowImage = [[UIImage alloc] init];
     navigationBar.layer.borderWidth = 0;
-    
-    
     return YES;
 }
 
@@ -802,8 +807,39 @@
 
 #pragma mark - GMImagePickerControllerDelegate
 
+
+
+- (NSPredicate *)predicateOfAssetType:(PHAssetMediaType)type
+{
+    return [NSPredicate predicateWithBlock:^BOOL(PHAsset *asset, NSDictionary *bindings) {
+        return (asset.mediaType == type);
+    }];
+}
+
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
+    
+    
+    NSPredicate *videoPredicate = [self predicateOfAssetType:PHAssetMediaTypeVideo];
+    NSInteger nVideos = [assetArray filteredArrayUsingPredicate:videoPredicate].count;
+    if(nVideos > 0){
+        Reachability *reachability = [Reachability reachabilityForInternetConnection];
+        [reachability startNotifier];
+        
+        NetworkStatus status = [reachability currentReachabilityStatus];
+        
+        if(status == NotReachable || status != ReachableViaWiFi)
+        {
+            AFDropdownNotification *notification = [[AFDropdownNotification alloc] init];
+            notification.notificationDelegate = self;
+            notification.titleText = NSLocalizedString(@"ATTENTION", nil);
+            notification.subtitleText = NSLocalizedString(@"VIDEO_UPLOADING_VIA_WIFI_RECOMMENDED", nil);
+            notification.topButtonText = NSLocalizedString(@"DONT_SHOW_IT_AGAIN", nil);
+            notification.dismissOnTap = YES;
+        }
+        
+    }
+    
     //No sure if remo all data from list and add it back
     NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
     NSMutableArray *removeAssets = [NSMutableArray new];
@@ -853,7 +889,8 @@
     
 }
 -(BOOL)assetsPickerController:(GMImagePickerController *)picker shouldSelectAsset:(PHAsset *)asset{
-    
+    NSPredicate *videoPredicate = [self predicateOfAssetType:PHAssetMediaTypeVideo];
+    NSInteger nVideos = [picker.selectedAssets filteredArrayUsingPredicate:videoPredicate].count;
     if([picker.selectedAssets count] >= self.maximumImagesCount){
         dispatch_async(dispatch_get_main_queue(), ^{
             UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
@@ -867,6 +904,18 @@
         });
         return NO;
         
+    }else if(nVideos > MAX_VIDEO_ALERT){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
+                                                                         objectForInfoDictionaryKey:@"CFBundleDisplayName"]
+                                                                message:NSLocalizedString(@"VIDEO_SELECTION_LIMIT", nil)
+                                                               delegate:self
+                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                      otherButtonTitles:nil, nil];
+            [alertView show];
+            
+        });
+        return NO;
     }else{
         return YES;
     }
@@ -953,6 +1002,18 @@
         }
     }];
 }
+
+#pragma mark - AFDropdownNotificationDelegate
+
+-(void)dropdownNotificationTopButtonTapped{
+    
+}
+-(void)dropdownNotificationBottomButtonTapped{
+    
+}
+
+
+
 @end
 
 
