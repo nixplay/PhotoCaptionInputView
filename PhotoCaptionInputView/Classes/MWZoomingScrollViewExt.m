@@ -27,6 +27,10 @@
 @property (strong, nonatomic) ICGVideoTrimmerView *trimmerView;
 @property (strong, nonatomic) UIView *videoPlayer;
 @property (strong, nonatomic) UIView *videoLayer;
+@property (strong, nonatomic) UILabel *timeLengthLabel;
+@property (strong, nonatomic) UILabel *timeRangeLabel;
+@property (strong, nonatomic) UIView *timecodeView;
+
 
 @property (strong, nonatomic) NSString *tempVideoPath;
 @property (strong, nonatomic) AVAsset *asset;
@@ -69,7 +73,13 @@
         self.videoLayer = nil;
         self.videoPlayer = nil;
         self.trimmerView = nil;
-
+        
+        [self.timeLengthLabel removeFromSuperview];
+        [self.timeRangeLabel removeFromSuperview];
+        self.timeLengthLabel = nil;
+        self.timeRangeLabel = nil;
+        [self.timecodeView removeFromSuperview];
+        self.timecodeView = nil;
     }
 }
 - (void)prepareForReuse {
@@ -89,6 +99,12 @@
     self.videoLayer = nil;
     self.videoPlayer = nil;
     self.trimmerView = nil;
+    [self.timeLengthLabel removeFromSuperview];
+    [self.timeRangeLabel removeFromSuperview];
+    self.timeLengthLabel = nil;
+    self.timeRangeLabel = nil;
+    [self.timecodeView removeFromSuperview];
+    self.timecodeView = nil;
     [self playButton].hidden = NO;
 }
 
@@ -118,6 +134,13 @@
         self.videoLayer = nil;
         self.videoPlayer = nil;
         self.trimmerView = nil;
+        
+        [self.timeLengthLabel removeFromSuperview];
+        [self.timeRangeLabel removeFromSuperview];
+        self.timeLengthLabel = nil;
+        self.timeRangeLabel = nil;
+        [self.timecodeView removeFromSuperview];
+        self.timecodeView = nil;
         
     }else{
         if(photo.isVideo){
@@ -244,8 +267,37 @@
                                 restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
                             }
                             
-                            strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(10, 100, CGRectGetWidth(strongSelf.frame)-20, 50) asset:strongSelf.asset delegate:strongSelf];
+                            CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
+                            strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
+                            [[strongSelf.trimmerView layer] setCornerRadius:5];
                             
+                            CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
+                            UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
+                            [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
+                            [timecodeView.layer setCornerRadius:10];
+                            strongSelf.timecodeView = timecodeView;
+                            strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                            UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                            
+                            UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                            timeRangeLabel.textAlignment = NSTextAlignmentLeft;
+                            [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
+                            [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
+                            [timeRangeLabel adjustsFontSizeToFitWidth];
+                            [timeRangeLabel setTextColor:[UIColor whiteColor]];
+                            [timecodeView addSubview:timeRangeLabel];
+                            strongSelf.timeRangeLabel = timeRangeLabel;
+                            
+                            
+                            UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
+                            timeLengthLabel.textAlignment = NSTextAlignmentRight;
+                            [timeLengthLabel setText:@"00:00:00"];
+                            [timeLengthLabel setTextColor:[UIColor whiteColor]];
+                            [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
+                            
+                            [timecodeView addSubview:timeLengthLabel];
+                            [strongSelf addSubview: timecodeView];
+                            strongSelf.timeLengthLabel = timeLengthLabel;
                             
                             [strongSelf.trimmerView setDelegate:strongSelf];
                             // set properties for trimmer view
@@ -399,7 +451,7 @@
     else{ // right has changed
         [self seekVideoToPos:endTime];
     }
-    _startTime = startTime;
+    _startTime = startTime > 0 ? startTime : 0;
     _endTime = endTime;
     
     MWPhotoExt *photoExt = self.photo;
@@ -407,6 +459,10 @@
     if(photoExt.startEndTime == nil){
         photoExt.startEndTime = [NSMutableDictionary new];
     }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
+    });
+    
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -418,8 +474,20 @@
     
 }
 
-- (void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
+-(NSString*) timeFormatted:(CGFloat) sec{
     
+    int totalSeconds = floorf(sec);
+    int seconds = totalSeconds % 60;
+    int minutes = (totalSeconds / 60) % 60;
+    int hours = totalSeconds / 3600;
+    
+    return [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds];
+}
+
+- (void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+    });
 }
 - (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime{
     if(_startTime != startTime && _endTime != endTime){
