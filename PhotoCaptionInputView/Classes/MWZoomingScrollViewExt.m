@@ -240,87 +240,87 @@
     
     typeof(self) __weak weakSelf = self;
     //advoid put too much proceee to main queue
-    if(weakSelf.startTime == -1 && weakSelf.endTime == -1 && weakSelf.url != nil && weakSelf.trimmerView == nil && weakSelf.trimmerView == nil && !weakSelf.needInitTrimmer){
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            typeof(self) strongSelf = weakSelf;
-            
-            if (!strongSelf) return;
-            if(!strongSelf.needInitTrimmer){
-                strongSelf.needInitTrimmer = NO;
-                if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.url != nil && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
-                    if(strongSelf.asset == nil){
-                        strongSelf.asset = [AVAsset assetWithURL:strongSelf.url];
-                    }
-                    //restore time range before init
-                    MWPhotoExt *photoExt = strongSelf.photo;
-                    CGFloat restoredStartTime = strongSelf.startTime;
-                    CGFloat restoredEndTime = strongSelf.endTime;
-                    if(photoExt.startEndTime != nil){
-                        restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
-                        restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
-                    }
-                    
-                    CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
-                    strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
-                    [[strongSelf.trimmerView layer] setCornerRadius:5];
-                    
-                    CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
-                    UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
-                    [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
-                    [timecodeView.layer setCornerRadius:10];
-                    strongSelf.timecodeView = timecodeView;
-                    strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-                    
-                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
-                    timeRangeLabel.textAlignment = NSTextAlignmentLeft;
-                    [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
-                    [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
-                    [timeRangeLabel adjustsFontSizeToFitWidth];
-                    [timeRangeLabel setTextColor:[UIColor whiteColor]];
-                    [timecodeView addSubview:timeRangeLabel];
-                    strongSelf.timeRangeLabel = timeRangeLabel;
-                    
-                    
-                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
-                    timeLengthLabel.textAlignment = NSTextAlignmentRight;
-                    [timeLengthLabel setText:@"00:00:00"];
-                    [timeLengthLabel setTextColor:[UIColor whiteColor]];
-                    [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
-                    
-                    [timecodeView addSubview:timeLengthLabel];
-                    [strongSelf addSubview: timecodeView];
-                    strongSelf.timeLengthLabel = timeLengthLabel;
-                    
-                    [strongSelf.trimmerView setDelegate:strongSelf];
-                    // set properties for trimmer view
-                    [strongSelf.trimmerView setThumbWidth:20];
-                    [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
-                    [strongSelf.trimmerView setShowsRulerView:NO];
-                    [strongSelf.trimmerView setMaxLength:10];
-                    
-                    [strongSelf.trimmerView setRulerLabelInterval:10];
-                    
-                    [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
-                    
-                    
-                    // important: reset subviews
-                    [strongSelf addSubview: strongSelf.trimmerView];
-                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-//                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
-                    [strongSelf.trimmerView resetSubviews];
-                    if(restoredStartTime != -1 && restoredEndTime != -1){
-                        strongSelf.startTime = restoredStartTime;
-                        strongSelf.endTime = restoredEndTime;
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
-                    }
-                    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        typeof(self) strongSelf = weakSelf;
+        
+        if (!strongSelf) return;
+        if(!strongSelf.needInitTrimmer){
+            strongSelf.needInitTrimmer = NO;
+            if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.url != nil && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
+                if(strongSelf.asset == nil){
+                    strongSelf.asset = [AVAsset assetWithURL:strongSelf.url];
                 }
+                //restore time range before init
+                MWPhotoExt *photoExt = strongSelf.photo;
+                CGFloat restoredStartTime = strongSelf.startTime;
+                CGFloat restoredEndTime = strongSelf.endTime;
+                if(photoExt.startEndTime != nil){
+                    restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
+                    restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+                }
+                
+                CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
+                strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
+                [[strongSelf.trimmerView layer] setCornerRadius:5];
+                
+                CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
+                UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
+                [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
+                [timecodeView.layer setCornerRadius:10];
+                strongSelf.timecodeView = timecodeView;
+                strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                
+                UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                timeRangeLabel.textAlignment = NSTextAlignmentLeft;
+                [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
+                [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
+                [timeRangeLabel adjustsFontSizeToFitWidth];
+                [timeRangeLabel setTextColor:[UIColor whiteColor]];
+                [timecodeView addSubview:timeRangeLabel];
+                strongSelf.timeRangeLabel = timeRangeLabel;
+                
+                
+                UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
+                timeLengthLabel.textAlignment = NSTextAlignmentRight;
+                [timeLengthLabel setText:@"00:00:00"];
+                [timeLengthLabel setTextColor:[UIColor whiteColor]];
+                [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
+                
+                [timecodeView addSubview:timeLengthLabel];
+                [strongSelf addSubview: timecodeView];
+                strongSelf.timeLengthLabel = timeLengthLabel;
+                
+                [strongSelf.trimmerView setDelegate:strongSelf];
+                // set properties for trimmer view
+                [strongSelf.trimmerView setThumbWidth:20];
+                [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
+                [strongSelf.trimmerView setShowsRulerView:NO];
+                [strongSelf.trimmerView setMaxLength:10];
+                
+                [strongSelf.trimmerView setRulerLabelInterval:10];
+                
+                [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
+                
+                
+                // important: reset subviews
+                [strongSelf addSubview: strongSelf.trimmerView];
+                strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                //                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
+                [strongSelf.trimmerView resetSubviews];
+                if(restoredStartTime != -1 && restoredEndTime != -1){
+                    strongSelf.startTime = restoredStartTime;
+                    strongSelf.endTime = restoredEndTime;
+                    [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
+                }
+                
             }
-        });
-    }
+        }
+    });
+    
     
 }
 
