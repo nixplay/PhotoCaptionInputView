@@ -269,7 +269,7 @@
                     UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
                     timeRangeLabel.textAlignment = NSTextAlignmentLeft;
                     [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
-                    [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
+                    [timeRangeLabel setFont:[UIFont systemFontOfSize:11]];
                     [timeRangeLabel adjustsFontSizeToFitWidth];
                     [timeRangeLabel setTextColor:[UIColor whiteColor]];
                     [timecodeView addSubview:timeRangeLabel];
