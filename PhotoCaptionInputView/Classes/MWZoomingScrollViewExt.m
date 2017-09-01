@@ -23,7 +23,6 @@
 @property (strong, nonatomic) AVPlayerLayer *playerLayer;
 @property (strong, nonatomic) NSTimer *playbackTimeCheckerTimer;
 @property (assign, nonatomic) CGFloat videoPlaybackPosition;
-@property (assign, nonatomic) NSURL* url;
 @property (strong, nonatomic) ICGVideoTrimmerView *trimmerView;
 @property (strong, nonatomic) UIView *videoPlayer;
 @property (strong, nonatomic) UIView *videoLayer;
@@ -45,7 +44,6 @@
 @synthesize endTime = _endTime;
 @synthesize needInitTrimmer = _needInitTrimmer;
 @synthesize mDelegate = _mDelegate;
-@synthesize url = _url;
 
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
@@ -67,7 +65,7 @@
         _startTime = -1;
         _endTime = -1;
         self.needInitTrimmer = NO;
-        self.url = nil;
+        
         self.asset = nil;
         self.player = nil;
         self.playerLayer = nil;
@@ -93,7 +91,7 @@
     _startTime = -1;
     _endTime = -1;
     self.needInitTrimmer = NO;
-    self.url = nil;
+    
     self.asset = nil;
     self.player = nil;
     self.playerLayer = nil;
@@ -114,16 +112,8 @@
     [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-//-(void) setUrl:(NSURL *)url{
-//    NSLog(@"_url %@ set to url  :%@", _url, url);
-//    NSLog(@"self url class %@", NSStringFromClass([_url class]));
-//    NSLog(@"url class %@", NSStringFromClass([url class]));
-//    _url = url;
-//}
-
-
 -(void) setNeedInitTrimmer:(BOOL)needInitTrimmer{
-//    NSLog(@"initTrimmer %i set to initTrimmer  :%i", _needInitTrimmer, needInitTrimmer);
+    //    NSLog(@"initTrimmer %i set to initTrimmer  :%i", _needInitTrimmer, needInitTrimmer);
     _needInitTrimmer = needInitTrimmer;
 }
 
@@ -134,7 +124,7 @@
         _startTime = -1;
         _endTime = -1;
         self.needInitTrimmer = NO;
-        self.url = nil;
+        
         self.asset = nil;
         
         [self.player seekToTime:CMTimeMake(0, 1)];
@@ -171,7 +161,7 @@
                     if (!strongSelf) return;
                     
                     if (url) {
-                        strongSelf.url = url;
+                        ((MWPhoto*)strongSelf.photo).videoURL = url;
                         [strongSelf setupVideoPreviewUrl:url photoImageViewFrame:CGRectZero];
                         
                     } else {
@@ -239,87 +229,92 @@
 - (void)resetTrimmerSubview{
     
     typeof(self) __weak weakSelf = self;
-    //advoid put too much proceee to main queue
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        typeof(self) strongSelf = weakSelf;
-        
-        if (!strongSelf) return;
-        if(!strongSelf.needInitTrimmer){
-            strongSelf.needInitTrimmer = NO;
-            if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.url != nil && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
-                if(strongSelf.asset == nil){
-                    strongSelf.asset = [AVAsset assetWithURL:strongSelf.url];
+    [self.photo getVideoURL:^(NSURL *url) {
+        //advoid put too much proceee to main queue
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            typeof(self) strongSelf = weakSelf;
+            
+            if (!strongSelf) return;
+            if(!strongSelf.needInitTrimmer){
+                strongSelf.needInitTrimmer = YES;
+                ((MWPhoto*)strongSelf.photo).videoURL = url;
+                //            NSLog(@"description %@",strongSelf.description);
+                if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
+                    if(strongSelf.asset == nil){
+                        strongSelf.asset = [AVAsset assetWithURL:url];
+                    }
+                    
+                    //restore time range before init
+                    MWPhotoExt *photoExt = strongSelf.photo;
+                    CGFloat restoredStartTime = strongSelf.startTime;
+                    CGFloat restoredEndTime = strongSelf.endTime;
+                    if(photoExt.startEndTime != nil){
+                        restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
+                        restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+                    }
+                    
+                    CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
+                    strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
+                    [[strongSelf.trimmerView layer] setCornerRadius:5];
+                    
+                    CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
+                    UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
+                    [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
+                    [timecodeView.layer setCornerRadius:10];
+                    strongSelf.timecodeView = timecodeView;
+                    strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                    
+                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                    timeRangeLabel.textAlignment = NSTextAlignmentLeft;
+                    [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
+                    [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
+                    [timeRangeLabel adjustsFontSizeToFitWidth];
+                    [timeRangeLabel setTextColor:[UIColor whiteColor]];
+                    [timecodeView addSubview:timeRangeLabel];
+                    strongSelf.timeRangeLabel = timeRangeLabel;
+                    
+                    
+                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
+                    timeLengthLabel.textAlignment = NSTextAlignmentRight;
+                    [timeLengthLabel setText:@"00:00:00"];
+                    [timeLengthLabel setTextColor:[UIColor whiteColor]];
+                    [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
+                    
+                    [timecodeView addSubview:timeLengthLabel];
+                    [strongSelf addSubview: timecodeView];
+                    strongSelf.timeLengthLabel = timeLengthLabel;
+                    
+                    [strongSelf.trimmerView setDelegate:strongSelf];
+                    // set properties for trimmer view
+                    [strongSelf.trimmerView setThumbWidth:20];
+                    [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
+                    [strongSelf.trimmerView setShowsRulerView:NO];
+                    [strongSelf.trimmerView setMaxLength:10];
+                    
+                    [strongSelf.trimmerView setRulerLabelInterval:10];
+                    
+                    [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
+                    
+                    
+                    // important: reset subviews
+                    [strongSelf addSubview: strongSelf.trimmerView];
+                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
+                    [strongSelf.trimmerView resetSubviews];
+                    if(restoredStartTime != -1 && restoredEndTime != -1){
+                        strongSelf.startTime = restoredStartTime;
+                        strongSelf.endTime = restoredEndTime;
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
+                        [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
+                    }
+                    
                 }
-                //restore time range before init
-                MWPhotoExt *photoExt = strongSelf.photo;
-                CGFloat restoredStartTime = strongSelf.startTime;
-                CGFloat restoredEndTime = strongSelf.endTime;
-                if(photoExt.startEndTime != nil){
-                    restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
-                    restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
-                }
-                
-                CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
-                strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
-                [[strongSelf.trimmerView layer] setCornerRadius:5];
-                
-                CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
-                UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
-                [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
-                [timecodeView.layer setCornerRadius:10];
-                strongSelf.timecodeView = timecodeView;
-                strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-                
-                UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
-                timeRangeLabel.textAlignment = NSTextAlignmentLeft;
-                [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
-                [timeRangeLabel setFont:[UIFont systemFontOfSize:12]];
-                [timeRangeLabel adjustsFontSizeToFitWidth];
-                [timeRangeLabel setTextColor:[UIColor whiteColor]];
-                [timecodeView addSubview:timeRangeLabel];
-                strongSelf.timeRangeLabel = timeRangeLabel;
-                
-                
-                UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
-                timeLengthLabel.textAlignment = NSTextAlignmentRight;
-                [timeLengthLabel setText:@"00:00:00"];
-                [timeLengthLabel setTextColor:[UIColor whiteColor]];
-                [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
-                
-                [timecodeView addSubview:timeLengthLabel];
-                [strongSelf addSubview: timecodeView];
-                strongSelf.timeLengthLabel = timeLengthLabel;
-                
-                [strongSelf.trimmerView setDelegate:strongSelf];
-                // set properties for trimmer view
-                [strongSelf.trimmerView setThumbWidth:20];
-                [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
-                [strongSelf.trimmerView setShowsRulerView:NO];
-                [strongSelf.trimmerView setMaxLength:10];
-                
-                [strongSelf.trimmerView setRulerLabelInterval:10];
-                
-                [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
-                
-                
-                // important: reset subviews
-                [strongSelf addSubview: strongSelf.trimmerView];
-                strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-                //                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
-                [strongSelf.trimmerView resetSubviews];
-                if(restoredStartTime != -1 && restoredEndTime != -1){
-                    strongSelf.startTime = restoredStartTime;
-                    strongSelf.endTime = restoredEndTime;
-                    [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
-                }
-                
             }
-        }
-    });
+        });
+    }];
     
     
 }
@@ -450,7 +445,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
     });
-    
+    NSLog(@"start time %f endTime %f",startTime, endTime);
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -484,5 +479,17 @@
             [weakSelf.trimmerView setVideoBoundsToStartTime:startTime endTime:endTime];
         });
     }
+}
+
+- (NSString*)description {
+    return [NSString stringWithFormat:@"<%@:%p %@>",
+            NSStringFromClass([self class]),
+            self,
+            @{
+              @"needInitTrimmer"            : @(self.needInitTrimmer),
+              @"startTime": @(self.startTime),
+              @"endTime": @(self.endTime),
+              
+              }];
 }
 @end
