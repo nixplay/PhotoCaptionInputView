@@ -836,6 +836,7 @@
             notification.subtitleText = NSLocalizedString(@"VIDEO_UPLOADING_VIA_WIFI_RECOMMENDED", nil);
             notification.topButtonText = NSLocalizedString(@"DONT_SHOW_IT_AGAIN", nil);
             notification.dismissOnTap = YES;
+            [notification presentInView:self.view withGravityAnimation:YES];
         }
         
     }
