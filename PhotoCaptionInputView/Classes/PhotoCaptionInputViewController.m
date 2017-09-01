@@ -16,9 +16,7 @@
 #import "IQKeyboardManager.h"
 #import "IQUIView+IQKeyboardToolbar.h"
 #import "IQTextView.h"
-#import "Reachability.h"
 #import "MWZoomingScrollViewExt.h"
-#import "AFDropdownNotification.h"
 
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
@@ -30,7 +28,7 @@
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 #define MAX_VIDEO_ALERT 10
-@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate,AFDropdownNotificationDelegate>{
+@interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
     //    NSMutableArray* preSelectedAssets;
     UIView* hightlightView;
     BOOL keyboardIsShown;
@@ -818,29 +816,6 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
-    
-    
-    NSPredicate *videoPredicate = [self predicateOfAssetType:PHAssetMediaTypeVideo];
-    NSInteger nVideos = [assetArray filteredArrayUsingPredicate:videoPredicate].count;
-    if(nVideos > 0){
-        Reachability *reachability = [Reachability reachabilityForInternetConnection];
-        [reachability startNotifier];
-        
-        NetworkStatus status = [reachability currentReachabilityStatus];
-        
-        if(status == NotReachable || status != ReachableViaWiFi)
-        {
-            AFDropdownNotification *notification = [[AFDropdownNotification alloc] init];
-            notification.notificationDelegate = self;
-            notification.titleText = NSLocalizedString(@"ATTENTION", nil);
-            notification.subtitleText = NSLocalizedString(@"VIDEO_UPLOADING_VIA_WIFI_RECOMMENDED", nil);
-            notification.topButtonText = NSLocalizedString(@"DONT_SHOW_IT_AGAIN", nil);
-            notification.dismissOnTap = YES;
-            [notification presentInView:self.view withGravityAnimation:YES];
-        }
-        
-    }
-    
     //No sure if remo all data from list and add it back
     NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
     NSMutableArray *removeAssets = [NSMutableArray new];
