@@ -298,8 +298,6 @@
     picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
     
-    picker.colsInPortrait = 3;
-    picker.colsInLandscape = 5;
     picker.minimumInteritemSpacing = 2.0;
     picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
     picker.toolbarTextColor = LIGHT_BLUE_COLOR;
