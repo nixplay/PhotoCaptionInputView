@@ -670,13 +670,12 @@
     navigationBar.barTintColor = [UIColor whiteColor];
     navigationBar.tintColor = [UIColor whiteColor];
     
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.navigationController.navigationBar.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
-    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
+//    CAGradientLayer *gradient = [CAGradientLayer layer];
+//    gradient.frame = self.navigationController.navigationBar.bounds;
+//    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
+//    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
     
-    //    [navigationBar setBackgroundImage:[UIImage new]
-    //                             forBarMetrics:UIBarMetricsDefault];
+    [navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     navigationBar.shadowImage = [UIImage new];
     [navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     //    navigationBar.shadowImage = [[UIImage alloc] init];
