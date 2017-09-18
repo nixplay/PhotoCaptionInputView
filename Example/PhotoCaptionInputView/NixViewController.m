@@ -797,7 +797,70 @@
 }
 
 #pragma mark - PhotoCaptionInputViewDelegate
+- (NSMutableArray*)photoBrowser:(MWPhotoBrowser *)photoBrowser buildToolbarItems:(UIToolbar*)toolBar{
+    NSMutableArray *items = [[NSMutableArray alloc] init];
+    
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+    [items addObject:flexSpace];
+    
+    float margin = 1.0f;
+    
+    
+    
+    
+    [toolBar setBackgroundImage:[UIImage new]
+             forToolbarPosition:UIToolbarPositionAny
+                     barMetrics:UIBarMetricsDefault];
+    
+    [toolBar setBackgroundColor:[UIColor blackColor]];
+    
+    for (UIView *subView in [toolBar subviews]) {
+        if ([subView isKindOfClass:[UIImageView class]]) {
+            // Hide the hairline border
+            subView.hidden = YES;
+        }
+    }
+    
+    UIButton *button =  [UIButton buttonWithType:UIButtonTypeCustom];
+    CGRect newFrame = CGRectMake(0,0,
+                                 (self.view.frame.size.width *.49)-5,
+                                 toolBar.frame.size.height - margin*2 );
+    [button setFrame:newFrame];
+    [button setBackgroundColor:[UIColor grayColor]];
+    button.layer.cornerRadius = 2; // this value vary as per your desire
+    button.clipsToBounds = YES;
+    [button setAttributedTitle:[self attributedString:@"Button 1" WithSize:12 color:[UIColor whiteColor]] forState:UIControlStateNormal];
+    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 
+    UIBarButtonItem *addFriendsButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    [items addObject:addFriendsButton];
+    
+    UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
+    fixedSpace.width = -8;
+    [items addObject:fixedSpace];
+    
+    
+    button = [[UIButton alloc] initWithFrame: newFrame];
+    [button setBackgroundColor:[UIColor grayColor]];
+    button.layer.cornerRadius = 2; // this value vary as per your desire
+    button.clipsToBounds = YES;
+    //                [button setTitle:labelText forState:UIControlStateNormal];
+    [button setAttributedTitle:[self attributedString:@"Button 2" WithSize:12 color:[UIColor whiteColor]] forState:UIControlStateNormal];
+    
+    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    UIBarButtonItem *addPhotoButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    [items addObject:addPhotoButton];
+    
+
+    
+                
+    
+    [items addObject:flexSpace];
+    toolBar.barStyle = UIBarStyleDefault;
+    
+    toolBar.barTintColor = [UIColor whiteColor];;
+    return items;
+}
 -(void) onDismiss{
     [self dismissViewControllerAnimated:NO completion:nil];
 }
@@ -814,4 +877,20 @@
         
     }];
 }
+
+-(NSAttributedString *) attributedString:(NSString*)string WithSize:(NSInteger)size color:(UIColor*)color{
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]init];
+    
+    NSDictionary *dictAttr0 = [self attributedDirectoryWithSize:size color:color];
+    NSAttributedString *attr0 = [[NSAttributedString alloc]initWithString:string attributes:dictAttr0];
+    [attributedString appendAttributedString:attr0];
+    return attributedString;
+}
+
+-(NSDictionary *) attributedDirectoryWithSize:(NSInteger)size color:(UIColor*)color{
+    NSDictionary *dictAttr0 = @{NSFontAttributeName:[UIFont systemFontOfSize:size],
+                                NSForegroundColorAttributeName:color};
+    return dictAttr0;
+}
+
 @end
