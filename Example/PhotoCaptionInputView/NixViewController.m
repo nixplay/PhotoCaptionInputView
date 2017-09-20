@@ -9,8 +9,9 @@
 #import "NixViewController.h"
 #import "PhotoCaptionInputViewController.h"
 #import "MWPhotoExt.h"
-@interface NixViewController ()
-
+@interface NixViewController (){
+    PHFetchResult<PHAsset*> * fetchResult;
+}
 @end
 
 @implementation NixViewController
@@ -31,6 +32,32 @@
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     NSMutableArray *thumbs = [[NSMutableArray alloc] init];
     {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            if(status == PHAuthorizationStatusAuthorized){
+                fetchResult = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeVideo options:nil];
+                
+                uint32_t randomAssetIndex = (uint32_t)arc4random_uniform((uint32_t)(fetchResult.count - 1));
+                
+                PHAsset * asset = [fetchResult objectAtIndex:randomAssetIndex];
+                UIScreen *screen = [UIScreen mainScreen];
+                CGFloat scale = screen.scale;
+                // Sizing is very rough... more thought required in a real implementation
+                CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
+                CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
+                CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+                
+                [photos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
+                [thumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs preselectedAssets:nil delegate:self];
+                    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
+                    vc.allow_video = YES;
+                    [self presentViewController:nc animated:NO completion:^{
+                        
+                    }];
+                });
+            }
+        }];
 //        MWPhotoExt * photo = [MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm4.static.flickr.com/3779/9522424255_28a5a9d99c_b.jpg"]];
 //        
 //        photo.caption = @"Lorem https://github.com/mariohahn/MHVideoPhotoGallery ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.";
@@ -782,12 +809,7 @@
         [thumbs addObject:[MWPhotoExt photoWithURL:[NSURL URLWithString:@"http://farm2.static.flickr.com/1235/1010416375_fe91e5ce22_q.jpg"]]];*/
     }
     
-    PhotoCaptionInputViewController *vc = [[PhotoCaptionInputViewController alloc] initWithPhotos:photos thumbnails:thumbs preselectedAssets:nil delegate:self];
-    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
-    vc.allow_video = YES;
-    [self presentViewController:nc animated:NO completion:^{
-        
-    }];
+    
 }
 - (void)didReceiveMemoryWarning
 {
