@@ -42,6 +42,7 @@
 @synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
+@synthesize contentOffset = _contentOffset;
 @synthesize needInitTrimmer = _needInitTrimmer;
 @synthesize mDelegate = _mDelegate;
 
@@ -249,9 +250,11 @@
                     MWPhotoExt *photoExt = strongSelf.photo;
                     CGFloat restoredStartTime = strongSelf.startTime;
                     CGFloat restoredEndTime = strongSelf.endTime;
+                    CGPoint restoredContentOffset = strongSelf.contentOffset;
                     if(photoExt.startEndTime != nil){
                         restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
                         restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+                        restoredContentOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
                     }
                     
                     CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
@@ -307,7 +310,8 @@
                     if(restoredStartTime != -1 && restoredEndTime != -1){
                         strongSelf.startTime = restoredStartTime;
                         strongSelf.endTime = restoredEndTime;
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime];
+                        strongSelf.contentOffset = restoredContentOffset;
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime contentOffset:restoredContentOffset];
                         [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
                     }
                     
@@ -417,7 +421,7 @@
  */
 #pragma mark - ICGVideoTrimmerDelegate
 
-- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime
+- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime contentOffset:(CGPoint)contentOffset
 {
     _restartOnPlay = YES;
     [self.playButton setHidden:NO];
@@ -436,7 +440,7 @@
     }
     _startTime = startTime > 0 ? startTime : 0;
     _endTime = endTime;
-    
+    _contentOffset = CGPointMake(contentOffset.x, contentOffset.y);
     MWPhotoExt *photoExt = self.photo;
     
     if(photoExt.startEndTime == nil){
@@ -449,6 +453,8 @@
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
+    [photoExt.startEndTime setValue:@(contentOffset.x) forKey:@"contentOffsetX"];
+    [photoExt.startEndTime setValue:@(contentOffset.y) forKey:@"contentOffsetY"];
     
     if([_mDelegate respondsToSelector:@selector(zoomingScrollView:photo:startTime:endTime:)])
     {
@@ -472,14 +478,14 @@
         [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
 }
-- (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime{
-    if(_startTime != startTime && _endTime != endTime){
-        typeof(self) __weak weakSelf = self;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.trimmerView setVideoBoundsToStartTime:startTime endTime:endTime];
-        });
-    }
-}
+//- (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime{
+//    if(_startTime != startTime && _endTime != endTime){
+//        typeof(self) __weak weakSelf = self;
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [weakSelf.trimmerView setVideoBoundsToStartTime:startTime endTime:endTime contentOffset:_contentOffset];
+//        });
+//    }
+//}
 
 - (NSString*)description {
     return [NSString stringWithFormat:@"<%@:%p %@>",
