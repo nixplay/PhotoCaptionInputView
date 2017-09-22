@@ -16,6 +16,7 @@
 #import "IQKeyboardManager.h"
 #import "IQUIView+IQKeyboardToolbar.h"
 #import "IQTextView.h"
+#import "Masonry.h"
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(99/255.0f)  green:(176/255.0f)  blue:(228.0f/255.0f) alpha:1.0]
 #define LIGHT_BLUE_CGCOLOR [LIGHT_BLUE_COLOR CGColor]
 #define TEXTFIELD_BG_COLOR [UIColor whiteColor]
@@ -78,7 +79,7 @@
     [super viewDidLoad];
     
     float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-20;
-    float initHeight = self.navigationController.view.frame.size.height * (1.0/12.0);
+    __block float initHeight = ((self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width) ? self.navigationController.view.frame.size.height : self.navigationController.view.frame.size.width)* (1.0/12.0);
     textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
     [flowLayout setItemSize:CGSizeMake(initHeight, initHeight)];
@@ -89,12 +90,12 @@
     flowLayout.minimumInteritemSpacing = 3;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
-    CGRect rect = CGRectMake(5,
-                             initY,
-                             self.navigationController.view.frame.size.width-initHeight-15,
-                             initHeight);
+//    CGRect rect = CGRectMake(0,
+//                             0,
+//                             self.navigationController.view.frame.size.width-initHeight-15,
+//                             initHeight);
     
-    self.collectionView = [[UICollectionView alloc]initWithFrame:rect
+    self.collectionView = [[UICollectionView alloc]initWithFrame:CGRectZero
                                             collectionViewLayout:flowLayout
                            ];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
@@ -107,27 +108,63 @@
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     
-    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(self.navigationController.view.frame.size.width-initHeight-5,
-                                                               rect.origin.y,
-                                                               initHeight,
-                                                               initHeight
-                                                               ) ];
+    self.addButton = [[UIButton alloc]initWithFrame:CGRectZero ];
     
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
     self.addButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [self.addButton addTarget:self action:@selector(addPhotoFromLibrary) forControlEvents:UIControlEventTouchUpInside];
     
-    [self.navigationController.view addSubview:self.addButton];
     
-    [self.navigationController.view addSubview:self.collectionView];
     
+    _parentView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.navigationController.view.frame.size.width, initHeight)];
+    
+    [_parentView addSubview:self.addButton];
+    
+    [_parentView addSubview:self.collectionView];
+    
+    [_addButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(_addButton.superview.mas_top);
+        make.bottom.equalTo(_addButton.superview.mas_bottom);
+        make.right.equalTo(_addButton.superview.mas_right);
+        
+        make.height.mas_equalTo(initHeight);
+        make.width.mas_equalTo(initHeight);
+        
+
+    }];
+    [_collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(_collectionView.superview.mas_top);
+        make.bottom.equalTo(_collectionView.superview.mas_bottom);
+        make.left.equalTo(_collectionView.superview.mas_left);
+        make.right.with.offset(-3-initHeight);
+        
+        make.height.mas_equalTo(initHeight);
+        
+    }];
+    
+    
+    [self.view addSubview:_parentView];
+    
+    [_parentView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.toolbar.mas_top).with.offset(-4);
+        if(@available(iOS 11, *)){
+            
+            make.left.equalTo(_parentView.superview.mas_safeAreaLayoutGuideLeft).with.offset(10);
+            make.right.equalTo(_parentView.superview.mas_safeAreaLayoutGuideRight).with.offset(-10);
+        }else{
+            make.right.equalTo(_parentView.superview.mas_right).with.offset(-10);
+            make.left.equalTo(_parentView.superview.mas_left).with.offset(10);
+        }
+    }];
     
     CGRect tfrect = CGRectMake(5, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width-10, 31);
-    IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
+    IQTextView * textView = [[IQTextView alloc] initWithFrame:CGRectZero textContainer:nil];
     
     //    [[IQKeyboardManager sharedManager]setEnable:YES];
-    [[IQKeyboardManager sharedManager] setShouldShowTextFieldPlaceholder:YES];
+    [[IQKeyboardManager sharedManager] setShouldShowToolbarPlaceholder:YES];
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:initHeight];
     //    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
     //    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
@@ -143,7 +180,7 @@
     textView.layer.masksToBounds=YES;
     textView.placeholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor];
-    textView.placeholderText = PLACEHOLDER_TEXT;
+    textView.toolbarPlaceholder = PLACEHOLDER_TEXT;
     textView.placeholderColor = [UIColor lightGrayColor]; // optional
     
     textView.font = [UIFont systemFontOfSize:14.0f];
@@ -151,23 +188,37 @@
     textView.textAlignment = NSTextAlignmentLeft;
     textView.tag = 2;
     textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textView.autocorrectionType = UITextAutocorrectionTypeYes;
+    textView.autocorrectionType = UITextAutocorrectionTypeNo;
     
     textView.delegate = self;
     
-    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+//    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     _textView = textView;
     if([self.selfPhotos count] >0){
         [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
         
-        ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length];
+        ((IQTextView*)_textView).toolbarPlaceholder = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/MAX_CHARACTER",(unsigned long)_textView.text.length];
         
     }
     
     
     
-    [self.navigationController.view addSubview:_textView];
-    
+    [self.view addSubview:_textView];
+    [_textView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.bottom.equalTo(_parentView.mas_top).with.offset(-10);
+//        make.height.mas_equalTo(31);
+        if(@available(iOS 11, *)){
+            
+            make.left.equalTo(_textView.superview.mas_safeAreaLayoutGuideLeft).with.offset(10);
+            make.right.equalTo(_textView.superview.mas_safeAreaLayoutGuideRight).with.offset(-10);
+        }else{
+            make.right.equalTo(_textView.superview.mas_right).with.offset(-10);
+            make.left.equalTo(_textView.superview.mas_left).with.offset(10);
+        }
+        NSLog(@"_textView %@", _textView);
+    }];
+    [_textView setScrollEnabled:NO];
     
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
@@ -203,6 +254,10 @@
     
 }
 
+-(void) viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+ 
+}
 
 - (UIImage *)imageFromSystemBarButton:(UIBarButtonSystemItem)systemItem {
     // Holding onto the oldItem (if any) to set it back later
@@ -323,7 +378,7 @@
         
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:self.currentIndex] caption]];
-        _textView.placeholderText = PLACEHOLDER_TEXT;
+        _textView.toolbarPlaceholder = PLACEHOLDER_TEXT;
         if([self.selfPhotos count]>1){
             self.navigationItem.rightBarButtonItem = _trashButton;
         }
@@ -389,8 +444,8 @@
     [photo setCaption:textView.text];
     [self.selfPhotos replaceObjectAtIndex:self.currentIndex withObject:photo];
     IQTextView* iqTextView = (IQTextView*)textView;
-    iqTextView.shouldHidePlaceholderText = NO;
-    iqTextView.placeholderText = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
+    iqTextView.shouldHideToolbarPlaceholder = NO;
+    iqTextView.toolbarPlaceholder = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
     
 }
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView{
@@ -434,8 +489,8 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // Prevent crashing undo bug – see note below.
     IQTextView* iqTextView = (IQTextView*)textView;
-    iqTextView.shouldHidePlaceholderText = NO;
-    iqTextView.placeholderText = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
+    iqTextView.shouldHideToolbarPlaceholder = NO;
+    iqTextView.toolbarPlaceholder = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
     
     if(range.length + range.location > textView.text.length)
     {
@@ -536,28 +591,30 @@
         
         
         [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
-        ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
-        [_textView setFrame:[self newFrameFromTextView:_textView]];
+        ((IQTextView*)_textView).toolbarPlaceholder = ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+//        [_textView setFrame:[self newFrameFromTextView:_textView]];
+//        [self newFrameFromTextView:_textView];
     });
 }
 
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     //    if(!keyboardIsShown){
-    if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
-        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
-        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
-    }else{
-        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-10;
-        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
-    }
+//    if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
+//        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
+//        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
+//    }else{
+//        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-10;
+//        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
+//    }
     CGRect originFrame = textView.frame;
     float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
     float newRow =  MAX(MIN(5.0,rows), 2);
     float newHeight = newRow*textView.font.lineHeight ;
-    float yOffset = ((newRow-1)*textView.font.lineHeight);
-    CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
-    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    return newFrame;
+//    float yOffset = ((newRow-1)*textView.font.lineHeight);
+//    CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
+//    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    originFrame.size.height = newHeight;
+    return originFrame;
     //    }else{
     //        return textView.frame;
     //    }
@@ -598,7 +655,7 @@
             self.prevSelectItem = cell;
             [self.collectionView reloadData];
             [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
-            ((IQTextView*)_textView).placeholderText = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+            ((IQTextView*)_textView).toolbarPlaceholder = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
             [_textView setFrame:[self newFrameFromTextView:_textView]];
             //            [_textView scrollsToTop];
             dispatch_async (dispatch_get_main_queue (), ^{
@@ -654,6 +711,7 @@
 }
 
 - (NSMutableArray*)photoBrowser:(MWPhotoBrowser *)photoBrowser buildToolbarItems:(UIToolbar*)toolBar{
+    
     NSMutableArray *items = nil;
     if([self.selfDelegate respondsToSelector:@selector(photoBrowser:buildToolbarItems:)]){
         items = [self.selfDelegate photoBrowser:photoBrowser buildToolbarItems:toolBar];
@@ -670,10 +728,10 @@
     navigationBar.barTintColor = [UIColor whiteColor];
     navigationBar.tintColor = [UIColor whiteColor];
     
-//    CAGradientLayer *gradient = [CAGradientLayer layer];
-//    gradient.frame = self.navigationController.navigationBar.bounds;
-//    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
-//    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
+    //    CAGradientLayer *gradient = [CAGradientLayer layer];
+    //    gradient.frame = self.navigationController.navigationBar.bounds;
+    //    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor], (id)[[UIColor colorWithWhite:0.0f alpha:0.0f] CGColor], nil];
+    //    [navigationBar setBackgroundImage:[self imageFromLayer:gradient] forBarMetrics:UIBarMetricsDefault];
     
     [navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
     navigationBar.shadowImage = [UIImage new];
@@ -723,7 +781,7 @@
 {
     //    [preSelectedAssets removeAllObjects];
     
-    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
+//    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
     //No sure if remo all data from list and add it back
     NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
     NSMutableArray *removeAssets = [NSMutableArray new];
@@ -816,17 +874,24 @@
 }
 
 //lock orientation
+- (void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+    //    UIEdgeInsets contentInset = self.collectionView.contentInset;
+    //    contentInset.left = self.view.safeAreaInsets.left;
+    //    contentInset.right = self.view.safeAreaInsets.right;
+    //    self.collectionView.contentInset = contentInset;
+}
 
 -(BOOL)shouldAutorotate {
-    return NO;
+    return YES;
 }
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskPortrait|UIInterfaceOrientationMaskLandscapeLeft|UIInterfaceOrientationMaskLandscapeRight;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-    return NO;
+    return YES;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -834,7 +899,7 @@
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleLightContent;
+    return UIStatusBarStyleDefault;
 }
 
 
