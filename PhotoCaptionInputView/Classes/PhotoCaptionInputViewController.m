@@ -166,12 +166,12 @@
     //    [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowToolbarPlaceholder:YES];
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:initHeight];
-    //    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
-    //    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
-    //    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
+//    [[IQKeyboardManager sharedManager] setEnableAutoToolbar:YES];
+//    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
+    [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
     
     
-    //    textView.autocorrectionType = UITextAutocorrectionTypeYes;
+    textView.autocorrectionType = UITextAutocorrectionTypeYes;
     textView.spellCheckingType = UITextSpellCheckingTypeYes;
     textView.backgroundColor = TEXTFIELD_BG_COLOR;
     textView.textColor = TEXTFIELD_TEXT_COLOR;
@@ -187,8 +187,6 @@
     textView.returnKeyType = UIReturnKeyDone;
     textView.textAlignment = NSTextAlignmentLeft;
     textView.tag = 2;
-    textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    textView.autocorrectionType = UITextAutocorrectionTypeNo;
     
     textView.delegate = self;
     
