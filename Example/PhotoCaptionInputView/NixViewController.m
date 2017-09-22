@@ -812,7 +812,7 @@
              forToolbarPosition:UIToolbarPositionAny
                      barMetrics:UIBarMetricsDefault];
     
-    [toolBar setBackgroundColor:[UIColor blackColor]];
+    [toolBar setBackgroundColor:[UIColor clearColor]];
     
     for (UIView *subView in [toolBar subviews]) {
         if ([subView isKindOfClass:[UIImageView class]]) {
@@ -823,7 +823,7 @@
     
     UIButton *button =  [UIButton buttonWithType:UIButtonTypeCustom];
     CGRect newFrame = CGRectMake(0,0,
-                                 (self.view.frame.size.width *.49)-5,
+                                 (self.view.frame.size.width *.45)-5,
                                  toolBar.frame.size.height - margin*2 );
     [button setFrame:newFrame];
     [button setBackgroundColor:[UIColor grayColor]];
@@ -836,7 +836,7 @@
     [items addObject:addFriendsButton];
     
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
-    fixedSpace.width = -8;
+    fixedSpace.width = 8;
     [items addObject:fixedSpace];
     
     
@@ -853,7 +853,7 @@
     
 
     
-                
+    
     
     [items addObject:flexSpace];
     toolBar.barStyle = UIBarStyleDefault;
