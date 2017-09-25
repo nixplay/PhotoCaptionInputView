@@ -170,7 +170,7 @@
 //    [[IQKeyboardManager sharedManager] setKeyboardAppearance:UIKeyboardAppearanceLight];
     [[IQKeyboardManager sharedManager] setShouldResignOnTouchOutside:YES];
     
-    
+    textView.autocapitalizationType = UITextAutocapitalizationTypeWords;
     textView.autocorrectionType = UITextAutocorrectionTypeYes;
     textView.spellCheckingType = UITextSpellCheckingTypeYes;
     textView.backgroundColor = TEXTFIELD_BG_COLOR;
