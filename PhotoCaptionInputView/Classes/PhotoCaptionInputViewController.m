@@ -104,6 +104,7 @@
     self.collectionView.backgroundColor = [UIColor clearColor];
     
     [self.collectionView setCollectionViewLayout:flowLayout];
+    [self.collectionView setShowsHorizontalScrollIndicator:NO];
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
@@ -190,7 +191,7 @@
     
     textView.delegate = self;
     
-    textView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
     _textView = textView;
     if([self.selfPhotos count] >0){
         [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
@@ -420,6 +421,8 @@
         //        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
         //        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
         keyboardIsShown = YES;
+        NSString * caption = [ [self.selfPhotos objectAtIndex:self.currentIndex] caption];
+        ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
     }
     
 }
@@ -431,7 +434,7 @@
         //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
         //        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
         //        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
-//        [_textView setFrame:[self newFrameFromTextView:_textView]];
+        [_textView setFrame:[self newFrameFromTextView:_textView]];
         
         keyboardIsShown = NO;
     }
@@ -446,6 +449,7 @@
     IQTextView* iqTextView = (IQTextView*)textView;
     iqTextView.shouldHideToolbarPlaceholder = NO;
     iqTextView.toolbarPlaceholder = [NSString stringWithFormat:@"%lu/%d",(unsigned long)textView.text.length, MAX_CHARACTER];
+    [_textView setFrame:[self newFrameFromTextView:textView]];
     
 }
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView{
@@ -591,7 +595,7 @@
         
         dispatch_async (dispatch_get_main_queue (), ^{
             NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
-            ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+            
             [_textView setText: caption];
             [_textView setFrame: [self newFrameFromTextView:_textView]];
         });
@@ -613,26 +617,15 @@
 }
 
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
-    //    if(!keyboardIsShown){
-//    if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
-//        float initY = self.navigationController.view.frame.size.height * (LAYOUT_START_Y/12.0)-9;
-//        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
-//    }else{
-//        float initY = self.navigationController.view.frame.size.height * (9.0/12.0)-10;
-//        textViewOrigYRatio = (initY-30) / self.navigationController.view.frame.size.height;
-//    }
-    CGRect originFrame = textView.frame;
+    
     float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
     float newRow =  MAX(MIN(5.0,rows), 2);
     float newHeight = MAX(31,newRow*textView.font.lineHeight) ;
-//    float yOffset = ((newRow-1)*textView.font.lineHeight);
-    CGRect newFrame = CGRectMake( originFrame.origin.x, _parentView.frame.origin.y-10-newHeight, originFrame.size.width, newHeight);
-//    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-//    originFrame.size.height = newHeight;
-    return newFrame;
-    //    }else{
-    //        return textView.frame;
-    //    }
+    if( @available(iOS 11, *) ){
+        return CGRectMake( self.view.safeAreaInsets.left, _parentView.frame.origin.y-10-newHeight, self.view.frame.size.width-self.view.safeAreaInsets.right , newHeight);
+    }else{
+        return CGRectMake( 10, _parentView.frame.origin.y-10-newHeight, self.view.frame.size.width-20 , newHeight);
+    }
 }
 
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
@@ -671,10 +664,9 @@
             
             
         }
-        __block NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+        
         dispatch_async (dispatch_get_main_queue (), ^{
-            
-            ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+            NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
             
             [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
             [_textView setText:caption];
@@ -797,6 +789,15 @@
 
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
 {
+    UIScreen *screen = [UIScreen mainScreen];
+    CGFloat scale = screen.scale;
+    // Sizing is very rough... more thought required in a real implementation
+    CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
+    CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
+    CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+
+    
+    [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     //    [preSelectedAssets removeAllObjects];
     
 //    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
@@ -820,15 +821,9 @@
     [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
     [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
     
-    [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     
     
-    UIScreen *screen = [UIScreen mainScreen];
-    CGFloat scale = screen.scale;
-    // Sizing is very rough... more thought required in a real implementation
-    CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
-    CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
-    CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+    
     //TODO not yet handle deselect action
     [assets enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
@@ -892,14 +887,11 @@
 }
 
 //lock orientation
-- (void)viewSafeAreaInsetsDidChange {
-    [super viewSafeAreaInsetsDidChange];
-    //    UIEdgeInsets contentInset = self.collectionView.contentInset;
-    //    contentInset.left = self.view.safeAreaInsets.left;
-    //    contentInset.right = self.view.safeAreaInsets.right;
-    //    self.collectionView.contentInset = contentInset;
-}
 
+- (void)viewLayoutMarginsDidChange{
+    [super viewLayoutMarginsDidChange];
+    [_textView setFrame:[self newFrameFromTextView:_textView]];
+}
 -(BOOL)shouldAutorotate {
     return YES;
 }
