@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 	s.name             = 'PhotoCaptionInputView'
-	s.version          = '0.5.0'
+	s.version          = '0.5.2'
 	s.summary          = 'A short description of PhotoCaptionInputView.'
 
 # This description is used to generate tags and improve search results.
