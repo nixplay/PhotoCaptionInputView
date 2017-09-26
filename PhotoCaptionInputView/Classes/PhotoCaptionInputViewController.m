@@ -160,7 +160,7 @@
         }
     }];
     
-    CGRect tfrect = CGRectMake(0, 0, self.navigationController.view.frame.size.width-10, 31);
+    CGRect tfrect = CGRectMake(10, _parentView.frame.origin.y-31-10, self.navigationController.view.frame.size.width-20, 31);
     IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     
     //    [[IQKeyboardManager sharedManager]setEnable:YES];
@@ -190,7 +190,7 @@
     
     textView.delegate = self;
     
-//    textView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+    textView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
     _textView = textView;
     if([self.selfPhotos count] >0){
         [_textView setText:[ [self.selfPhotos objectAtIndex:0] caption]];
@@ -202,21 +202,23 @@
     
     
     [self.view addSubview:_textView];
-    [_textView mas_makeConstraints:^(MASConstraintMaker *make) {
-        
-        make.bottom.equalTo(_parentView.mas_top).with.offset(-10);
-//        make.height.mas_equalTo(31);
-        if(@available(iOS 11, *)){
-            
-            make.left.equalTo(_textView.superview.mas_safeAreaLayoutGuideLeft).with.offset(10);
-            make.right.equalTo(_textView.superview.mas_safeAreaLayoutGuideRight).with.offset(-10);
-        }else{
-            make.right.equalTo(_textView.superview.mas_right).with.offset(-10);
-            make.left.equalTo(_textView.superview.mas_left).with.offset(10);
-        }
-        NSLog(@"_textView %@", _textView);
-    }];
-    [_textView setScrollEnabled:NO];
+//    [_textView mas_makeConstraints:^(MASConstraintMaker *make) {
+//
+//        make.bottom.equalTo(_parentView.mas_top).with.offset(-10);
+////        make.height.mas_equalTo(31);
+//
+//        if(@available(iOS 11, *)){
+//
+//            make.left.equalTo(_textView.superview.mas_safeAreaLayoutGuideLeft).with.offset(10);
+//            make.right.equalTo(_textView.superview.mas_safeAreaLayoutGuideRight).with.offset(-10);
+//        }else{
+//            make.right.equalTo(_textView.superview.mas_right).with.offset(-10);
+//            make.left.equalTo(_textView.superview.mas_left).with.offset(10);
+//        }
+////        NSLog(@"_textView %@", _textView);
+//    }];
+//    [self.textView sizeToFit];
+//    [_textView setScrollEnabled:NO];
     
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
@@ -429,7 +431,7 @@
         //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
         //        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
         //        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
-        [_textView setFrame:[self newFrameFromTextView:_textView]];
+//        [_textView setFrame:[self newFrameFromTextView:_textView]];
         
         keyboardIsShown = NO;
     }
@@ -566,7 +568,7 @@
     dispatch_async (dispatch_get_main_queue (), ^{
         [self setCurrentPhotoIndex:indexPath.item];
         
-        [self.collectionView layoutIfNeeded];
+//        [self.collectionView layoutIfNeeded];
         
         [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
         
@@ -577,7 +579,6 @@
             self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
         }
         
-        //        [self.delegate photoBrowser:self didDisplayPhotoAtIndex:indexPath.item];
         MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
         if(cell != NULL){
             
@@ -588,10 +589,12 @@
         }
         
         
-        [_textView setText:[ [self.selfPhotos objectAtIndex:indexPath.item] caption]];
-        ((IQTextView*)_textView).toolbarPlaceholder = ([[ [self.selfPhotos objectAtIndex:indexPath.item] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
-//        [_textView setFrame:[self newFrameFromTextView:_textView]];
-//        [self newFrameFromTextView:_textView];
+        dispatch_async (dispatch_get_main_queue (), ^{
+            NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+            ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+            [_textView setText: caption];
+            [_textView setFrame: [self newFrameFromTextView:_textView]];
+        });
     });
 }
 
@@ -621,12 +624,12 @@
     CGRect originFrame = textView.frame;
     float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
     float newRow =  MAX(MIN(5.0,rows), 2);
-    float newHeight = newRow*textView.font.lineHeight ;
+    float newHeight = MAX(31,newRow*textView.font.lineHeight) ;
 //    float yOffset = ((newRow-1)*textView.font.lineHeight);
-//    CGRect newFrame = CGRectMake( originFrame.origin.x, (textViewOrigYRatio * self.navigationController.view.frame.size.height)-yOffset, originFrame.size.width, newHeight);
+    CGRect newFrame = CGRectMake( originFrame.origin.x, _parentView.frame.origin.y-10-newHeight, originFrame.size.width, newHeight);
 //    textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    originFrame.size.height = newHeight;
-    return originFrame;
+//    originFrame.size.height = newHeight;
+    return newFrame;
     //    }else{
     //        return textView.frame;
     //    }
@@ -665,16 +668,19 @@
             cell.layer.borderWidth = 2.0;
             cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
             self.prevSelectItem = cell;
-            [self.collectionView reloadData];
-            [_textView setText:[[self.selfPhotos objectAtIndex:index] caption]];
-            ((IQTextView*)_textView).toolbarPlaceholder = ([[ [self.selfPhotos objectAtIndex:0] caption] length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
-            [_textView setFrame:[self newFrameFromTextView:_textView]];
-            //            [_textView scrollsToTop];
-            dispatch_async (dispatch_get_main_queue (), ^{
-                [self.collectionView layoutIfNeeded];
-                [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
-            });
+            
+            
         }
+        __block NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+        dispatch_async (dispatch_get_main_queue (), ^{
+            
+            ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
+            
+            [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+            [_textView setText:caption];
+            [_textView setFrame:[self newFrameFromTextView:_textView]];
+            
+        });
         
     }
 }
