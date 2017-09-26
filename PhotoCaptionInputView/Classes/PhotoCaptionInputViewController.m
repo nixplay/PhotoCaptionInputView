@@ -595,6 +595,20 @@
     });
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    CGFloat initHeight = collectionView.frame.size.height;
+    return CGSizeMake(initHeight, initHeight);
+    
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
+    return 3;
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    return 3;
+}
+
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     //    if(!keyboardIsShown){
 //    if(self.navigationController.view.frame.size.height > self.navigationController.view.frame.size.width){
