@@ -90,12 +90,12 @@
     flowLayout.minimumInteritemSpacing = 3;
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     
-//    CGRect rect = CGRectMake(0,
-//                             0,
-//                             self.navigationController.view.frame.size.width-initHeight-15,
-//                             initHeight);
+    CGRect rect = CGRectMake(0,
+                             0,
+                             self.navigationController.view.frame.size.width-initHeight-15,
+                             initHeight);
     
-    self.collectionView = [[UICollectionView alloc]initWithFrame:CGRectZero
+    self.collectionView = [[UICollectionView alloc]initWithFrame:rect
                                             collectionViewLayout:flowLayout
                            ];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
@@ -108,7 +108,7 @@
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     
-    self.addButton = [[UIButton alloc]initWithFrame:CGRectZero ];
+    self.addButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, initHeight, initHeight)];
     
     NSString *format = @"PhotoCaptionInputView.bundle/%@";
     [self.addButton setImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"add_button"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]  forState:UIControlStateNormal];
@@ -160,8 +160,8 @@
         }
     }];
     
-    CGRect tfrect = CGRectMake(5, textViewOrigYRatio * self.navigationController.view.frame.size.height, self.navigationController.view.frame.size.width-10, 31);
-    IQTextView * textView = [[IQTextView alloc] initWithFrame:CGRectZero textContainer:nil];
+    CGRect tfrect = CGRectMake(0, 0, self.navigationController.view.frame.size.width-10, 31);
+    IQTextView * textView = [[IQTextView alloc] initWithFrame:tfrect textContainer:nil];
     
     //    [[IQKeyboardManager sharedManager]setEnable:YES];
     [[IQKeyboardManager sharedManager] setShouldShowToolbarPlaceholder:YES];
