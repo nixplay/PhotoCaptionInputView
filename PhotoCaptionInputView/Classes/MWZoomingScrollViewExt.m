@@ -247,7 +247,7 @@
 
 - (void) onVideoTapped{
     [super onVideoTapped];
-    [self.trimmerView hideTracker:!self.isPlaying];
+//    [self.trimmerView hideTracker:!self.isPlaying];
 }
 
 
