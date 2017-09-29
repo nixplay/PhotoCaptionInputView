@@ -5,8 +5,8 @@ platform :ios, "9.0"
 target 'PhotoCaptionInputView_Example' do
   pod 'PhotoCaptionInputView', :path => '../'
   pod 'MWPhotoBrowser' , :git => 'https://github.com/nixplay/MWPhotoBrowser.git', :branch => 'video_upload'
-  pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :tag => '0.0.16'
-  pod 'SDWebImage' , '4.0.0'
+  pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :tag => 'develop'
+  pod 'SDWebImage' , '4.1.0'
   pod 'ICGVideoTrimmer' , :git => 'https://github.com/nixplay/ICGVideoTrimmer.git', :branch => 'develop'
   pod 'SDAVAssetExportSession' , :git=> 'https://github.com/rs/SDAVAssetExportSession', :branch => 'master'
   pod 'IQKeyboardManager'

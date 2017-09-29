@@ -25,6 +25,7 @@
 @property (nonatomic, strong) NSMutableArray *selfThumbs;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIButton *addButton;
+@property (nonatomic, strong) UIView *parentView;
 @property (nonatomic, strong) MWGridCell *prevSelectItem;
 @property (nonatomic, strong) IQTextView *textView;
 @property (nonatomic) CGRect keyboardRect;

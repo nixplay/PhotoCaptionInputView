@@ -834,7 +834,7 @@
              forToolbarPosition:UIToolbarPositionAny
                      barMetrics:UIBarMetricsDefault];
     
-    [toolBar setBackgroundColor:[UIColor blackColor]];
+    [toolBar setBackgroundColor:[UIColor clearColor]];
     
     for (UIView *subView in [toolBar subviews]) {
         if ([subView isKindOfClass:[UIImageView class]]) {
@@ -844,9 +844,15 @@
     }
     
     UIButton *button =  [UIButton buttonWithType:UIButtonTypeCustom];
+    CGFloat buttonWidth = self.view.frame.size.height > self.view.frame.size.width ? self.view.frame.size.width : self.view.frame.size.height;
     CGRect newFrame = CGRectMake(0,0,
-                                 (self.view.frame.size.width *.49)-5,
+                                 (buttonWidth *.45)-5,
                                  toolBar.frame.size.height - margin*2 );
+    if(@available(iOS 11, *)){
+        newFrame = CGRectMake(0,0,
+                              (buttonWidth *.45)-5,
+                              toolBar.frame.size.height - margin*2 );
+    }
     [button setFrame:newFrame];
     [button setBackgroundColor:[UIColor grayColor]];
     button.layer.cornerRadius = 2; // this value vary as per your desire
@@ -858,7 +864,11 @@
     [items addObject:addFriendsButton];
     
     UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil];
-    fixedSpace.width = -8;
+    if(@available(iOS 11, *)){
+        fixedSpace.width = 1;
+    }else{
+        fixedSpace.width = -8 ;
+    }
     [items addObject:fixedSpace];
     
     
@@ -875,7 +885,7 @@
     
 
     
-                
+    
     
     [items addObject:flexSpace];
     toolBar.barStyle = UIBarStyleDefault;
