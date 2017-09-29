@@ -365,7 +365,7 @@
 }
 - (void)launchGMImagePicker
 {
-	GMImagePickerController *picker = [[GMImagePickerController alloc] init:NO withAssets:self.preSelectedAssets delegate:self];
+	GMImagePickerController *picker = [[GMImagePickerController alloc] init:self.allow_video withAssets:self.preSelectedAssets delegate:self];
 
 	if(self.allow_video){
 		picker.mediaTypes = @[@(PHAssetMediaTypeImage),

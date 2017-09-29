@@ -177,6 +177,9 @@
                     }
                     
                     CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
+                    if(strongSelf.asset == nil){
+                        strongSelf.asset = [AVAsset assetWithURL:url];
+                    }
                     strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
                     [[strongSelf.trimmerView layer] setCornerRadius:5];
                     
