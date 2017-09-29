@@ -164,10 +164,7 @@
                 ((MWPhoto*)strongSelf.photo).videoURL = url;
                 //            NSLog(@"description %@",strongSelf.description);
                 if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
-                    if(strongSelf.asset == nil){
-                        strongSelf.asset = [AVAsset assetWithURL:url];
-                    }
-                    
+
                     //restore time range before init
                     MWPhotoExt *photoExt = strongSelf.photo;
                     CGFloat restoredStartTime = strongSelf.startTime;
@@ -213,7 +210,7 @@
                     
                     [strongSelf.trimmerView setDelegate:strongSelf];
                     // set properties for trimmer view
-                    [strongSelf.trimmerView setThumbWidth:0];
+                    [strongSelf.trimmerView setThumbWidth:20];
                     [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
                     [strongSelf.trimmerView setShowsRulerView:NO];
                     [strongSelf.trimmerView setMaxLength:10];
@@ -246,8 +243,9 @@
 }
 
 - (void) onVideoTapped{
+    [self.trimmerView hideTracker:self.isPlaying];
     [super onVideoTapped];
-//    [self.trimmerView hideTracker:!self.isPlaying];
+    
 }
 
 
@@ -311,6 +309,7 @@
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
+        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
     NSLog(@"start time %f endTime %f",startTime, endTime);
     
