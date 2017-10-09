@@ -419,6 +419,7 @@
 		if([self.selfPhotos count]==1){
 			self.navigationItem.rightBarButtonItem.enabled = NO;
 		}
+        [self resetTrimmerSubview];
 
 	}
 	if([self.selfPhotos count] >= self.maximumImagesCount){
@@ -608,7 +609,7 @@
 //        [self.collectionView layoutIfNeeded];
 
 		[self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
-
+        
 		if(self.prevSelectItem != NULL){
 
 			[self.prevSelectItem setHighlighted: NO];
@@ -624,12 +625,13 @@
 			self.prevSelectItem = cell;
 
 		}
-		dispatch_async (dispatch_get_main_queue (), ^{
-			NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+    
+        [self resetTrimmerSubview];
+        NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
 
-			[_textView setText: caption];
-			[_textView setFrame: [self newFrameFromTextView:_textView]];
-		});
+        [_textView setText: caption];
+        [_textView setFrame: [self newFrameFromTextView:_textView]];
+    
 	});
 }
 
@@ -694,11 +696,18 @@
 		}
 
 		dispatch_async (dispatch_get_main_queue (), ^{
-			NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
-
-			[self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
-			[_textView setText:caption];
-			[_textView setFrame:[self newFrameFromTextView:_textView]];
+            MWPhotoExt *photo = [self.selfPhotos objectAtIndex:indexPath.item];
+            if(!photo.isVideo){
+                NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+                
+                [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+                
+                [_textView setText:caption];
+                [_textView setFrame:[self newFrameFromTextView:_textView]];
+                [_textView setHidden:NO];
+            }else{
+                [_textView setHidden:YES];
+            }
 
 		});
 		if(needResetLayout){
@@ -1022,7 +1031,7 @@
 								  @(startTime), @"startTime",
 								  @(endTime), @"endTime",
 								  nil];
-	[self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+	/*[self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
 		if([obj.photoData isEqualToString:((MWPhotoExt*)photo).photoData]){
 			if(obj.startEndTime != nil){
 //                float oldStartTime = [[obj.startEndTime valueForKey:@"startTime"] floatValue];
@@ -1040,8 +1049,9 @@
 			*stop = YES;
 			return;
 		}
-	}];
+	}];*/
 }
+
 @end
 
 

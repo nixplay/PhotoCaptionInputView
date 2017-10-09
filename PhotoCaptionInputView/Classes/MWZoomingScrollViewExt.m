@@ -216,7 +216,7 @@
                     [strongSelf.trimmerView setThumbWidth:20];
                     [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
                     [strongSelf.trimmerView setShowsRulerView:NO];
-                    [strongSelf.trimmerView setMaxLength:10];
+                    [strongSelf.trimmerView setMaxLength:15];
                     
                     [strongSelf.trimmerView setRulerLabelInterval:10];
                     
@@ -314,7 +314,7 @@
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
         [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
-    NSLog(@"start time %f endTime %f",startTime, endTime);
+//    NSLog(@"start time %f endTime %f",startTime, endTime);
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
