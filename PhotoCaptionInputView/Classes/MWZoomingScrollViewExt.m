@@ -15,7 +15,7 @@
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     
     CGRect _photoImageViewFrame;
-
+    
     BOOL _isLoop;
 }
 @property (strong, nonatomic) ICGVideoTrimmerView *trimmerView;
@@ -164,7 +164,7 @@
                 ((MWPhoto*)strongSelf.photo).videoURL = url;
                 //            NSLog(@"description %@",strongSelf.description);
                 if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
-
+                    
                     //restore time range before init
                     MWPhotoExt *photoExt = strongSelf.photo;
                     CGFloat restoredStartTime = strongSelf.startTime;
@@ -216,7 +216,7 @@
                     [strongSelf.trimmerView setThumbWidth:20];
                     [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
                     [strongSelf.trimmerView setShowsRulerView:NO];
-                    [strongSelf.trimmerView setMaxLength:15];
+                    [strongSelf.trimmerView setMaxLength:CMTimeGetSeconds(asset.duration) < 15 ? CMTimeGetSeconds(asset.duration) : 15];
                     
                     [strongSelf.trimmerView setRulerLabelInterval:10];
                     
@@ -314,7 +314,7 @@
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
         [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
-//    NSLog(@"start time %f endTime %f",startTime, endTime);
+    //    NSLog(@"start time %f endTime %f",startTime, endTime);
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -356,3 +356,4 @@
               }];
 }
 @end
+
