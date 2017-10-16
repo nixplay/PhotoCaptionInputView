@@ -26,7 +26,7 @@
 @property (assign, nonatomic) BOOL needInitTrimmer;
 @end
 @implementation MWZoomingScrollViewExt
-@synthesize playButton = _playButton;
+//@synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize contentOffset = _contentOffset;
@@ -95,10 +95,10 @@
     [self playButton].hidden = NO;
 }
 
--(void) setPlayButton:(UIButton*)button{
-    _playButton = button;
-    [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-}
+//-(void) setPlayButton:(UIButton*)button{
+//    playButton = button;
+////    [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+//}
 
 -(void) setNeedInitTrimmer:(BOOL)needInitTrimmer{
     //    NSLog(@"initTrimmer %i set to initTrimmer  :%i", _needInitTrimmer, needInitTrimmer);
@@ -153,6 +153,9 @@
     
     typeof(self) __weak weakSelf = self;
     [self.photo getVideoURL:^(NSURL *url) {
+        if(url == nil){
+            return;
+        }
         //advoid put too much proceee to main queue
         dispatch_async(dispatch_get_main_queue(), ^{
             
@@ -161,6 +164,9 @@
             if (!strongSelf) return;
             if(!strongSelf.needInitTrimmer){
                 strongSelf.needInitTrimmer = YES;
+                if(url == nil){
+                    return;
+                }
                 ((MWPhoto*)strongSelf.photo).videoURL = url;
                 //            NSLog(@"description %@",strongSelf.description);
                 if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
@@ -176,7 +182,8 @@
                         restoredContentOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
                     }
                     
-                    CGRect frame = CGRectMake(5, 100, CGRectGetWidth(strongSelf.frame)-10, 50);
+                    ;
+                    CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
                     if(strongSelf.asset == nil){
                         strongSelf.asset = [AVAsset assetWithURL:url];
                     }

@@ -18,7 +18,7 @@
 @property (assign, nonatomic) CGFloat startTime;
 @property (assign, nonatomic) CGFloat endTime;
 @property (assign, nonatomic) CGPoint contentOffset;
-@property (strong, nonatomic) NSString *description;
+
 
 //- (void) setStartTime:(CGFloat)startTime endTime:(CGFloat)endTime;
 - (void) resetTrimmerSubview;
