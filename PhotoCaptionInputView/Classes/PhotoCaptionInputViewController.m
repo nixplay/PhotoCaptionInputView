@@ -28,6 +28,7 @@
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
 #define MAX_VIDEO_ALERT 10
+#define DEFUALT_VIDEO_LENGTH 15
 @interface PhotoCaptionInputViewController ()<GMImagePickerControllerDelegate>{
 	//    NSMutableArray* preSelectedAssets;
 	UIView* hightlightView;
@@ -353,8 +354,15 @@
 
 			[captions addObject:obj.caption != nil ? [obj caption] : @""];
 			[photos addObject:obj.photoData];
-			[startEndTimes addObject:obj.startEndTime != nil ? [obj startEndTime] : (obj.isVideo) ? @{@"startTime":@(0.0f),
-																									  @"endTime":@(10.0f)}:[NSNull null]];
+			[startEndTimes addObject:
+             obj.startEndTime != nil ?
+             [obj startEndTime] :
+             (obj.isVideo) ? @{
+                               @"startTime":@(0.0f),
+                               @"endTime":@(DEFUALT_VIDEO_LENGTH),
+                               @"auto":@(YES)
+                               } :
+             [NSNull null]];
 		}];
 		[_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
 	}
