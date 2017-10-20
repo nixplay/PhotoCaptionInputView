@@ -185,9 +185,9 @@
                     
                     ;
                     CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
-                    if(strongSelf.asset == nil){
-                        strongSelf.asset = [AVAsset assetWithURL:url];
-                    }
+                    strongSelf.asset = [AVAsset assetWithURL:url];
+                    if( CMTimeGetSeconds(strongSelf.asset.duration)==0 )
+                        return;
                     strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
                     [[strongSelf.trimmerView layer] setCornerRadius:5];
                     
