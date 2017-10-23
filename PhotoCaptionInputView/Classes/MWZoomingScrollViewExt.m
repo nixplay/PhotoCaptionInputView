@@ -153,7 +153,7 @@
 - (void)resetTrimmerSubview{
     
     typeof(self) __weak weakSelf = self;
-    [self.photo getVideoURL:^(NSURL *url) {
+    [self.photo getVideoURL:^(NSURL *url, AVURLAsset *avAsset) {
         if(url == nil){
             return;
         }
@@ -185,7 +185,11 @@
                     
                     ;
                     CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
-                    strongSelf.asset = [AVURLAsset assetWithURL:url];
+                    if(avAsset != nil){
+                        strongSelf.asset = avAsset;
+                    }else{
+                        strongSelf.asset = [AVURLAsset assetWithURL:url];
+                    }
                     if( CMTimeGetSeconds(strongSelf.asset.duration)==0 ){
                         NSLog(@"WARNING: Could not load av asset");
                         return;
