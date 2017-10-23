@@ -185,9 +185,11 @@
                     
                     ;
                     CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
-                    strongSelf.asset = [AVAsset assetWithURL:url];
-                    if( CMTimeGetSeconds(strongSelf.asset.duration)==0 )
+                    strongSelf.asset = [AVURLAsset assetWithURL:url];
+                    if( CMTimeGetSeconds(strongSelf.asset.duration)==0 ){
+                        NSLog(@"WARNING: Could not load av asset");
                         return;
+                    }
                     strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
                     [[strongSelf.trimmerView layer] setCornerRadius:5];
                     

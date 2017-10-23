@@ -766,6 +766,7 @@
 
 - (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
 
+    
 	//    [_navigationController dismissViewControllerAnimated:NO completion:nil ];
 	if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
 		[_selfDelegate dismissPhotoCaptionInputView:self];
@@ -778,7 +779,12 @@
 		[photos addObject:obj.photoData];
 	}];
 	if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)] ) {
-
+        id page = [self pageDisplayedAtIndex:[self currentIndex]];
+        if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
+            if([page respondsToSelector:@selector(resetPlayer)]){
+                [page resetPlayer];
+            }
+        }
 		[_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets:self.preSelectedAssets];
 	}
 
