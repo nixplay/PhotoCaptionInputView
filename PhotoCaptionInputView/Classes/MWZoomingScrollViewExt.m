@@ -281,7 +281,7 @@
     
     if (self.videoPlaybackPosition >= _endTime) {
         self.videoPlaybackPosition = _startTime;
-        [self seekVideoToPos: _startTime];
+        [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
         [self.trimmerView seekToTime:_startTime];
         if(!_isLoop){
             [self.playButton setHidden:NO];
