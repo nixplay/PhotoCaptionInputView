@@ -364,6 +364,14 @@
                                } :
              [NSNull null]];
 		}];
+        
+        id page = [self pageDisplayedAtIndex:[self currentIndex]];
+        if(page != nil && [page isKindOfClass:[MWZoomingScrollView class]]){
+            if([page respondsToSelector:@selector(resetPlayer)]){
+                [page resetPlayer];
+            }
+        }
+        
 		[_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
 	}
 }
