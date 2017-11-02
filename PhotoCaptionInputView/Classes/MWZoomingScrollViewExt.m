@@ -25,15 +25,18 @@
 @property (strong, nonatomic) UIView *timecodeView;
 @property (assign, nonatomic) BOOL restartOnPlay;
 @property (assign, nonatomic) BOOL needInitTrimmer;
+@property (assign, nonatomic) CGFloat startTime;
+@property (assign, nonatomic) CGFloat endTime;
+//dotn use contentOffeset it will mess up UIScrollView of UIScrollView
 @property (assign, nonatomic) CGPoint trimmerTimeOffset;
+
 @end
 @implementation MWZoomingScrollViewExt
-//@synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize trimmerTimeOffset = _trimmerTimeOffset;
 @synthesize needInitTrimmer = _needInitTrimmer;
-@synthesize mDelegate = _mDelegate;
+
 
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
@@ -97,17 +100,6 @@
     [self playButton].hidden = NO;
 }
 
-//-(void) setPlayButton:(UIButton*)button{
-//    playButton = button;
-////    [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-//}
-
--(void) setNeedInitTrimmer:(BOOL)needInitTrimmer{
-    //    NSLog(@"initTrimmer %i set to initTrimmer  :%i", _needInitTrimmer, needInitTrimmer);
-    _needInitTrimmer = needInitTrimmer;
-}
-
-
 - (void)setPhoto:(id<MWPhoto>)photo {
     [super setPhoto:photo];
     if(self.photo == nil){
@@ -141,15 +133,15 @@
     }
 }
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    if(self.photo.isVideo){
-        if(!self.needInitTrimmer && _trimmerView != nil){
-            [_trimmerView resetSubviews];
-            self.needInitTrimmer = YES;
-        }
-    }
-}
+//- (void)layoutSubviews {
+//    [super layoutSubviews];
+//    if(self.photo.isVideo){
+//        if(!self.needInitTrimmer && _trimmerView != nil){
+//            [_trimmerView resetSubviews];
+//            self.needInitTrimmer = YES;
+//        }
+//    }
+//}
 
 - (void)resetTrimmerSubview{
     
@@ -290,14 +282,6 @@
         }
     }
 }
-
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
 #pragma mark - ICGVideoTrimmerDelegate
 
 - (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime trimmerViewContentOffset:(CGPoint)trimmerViewContentOffset
@@ -329,18 +313,17 @@
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
         [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
-    //    NSLog(@"start time %f endTime %f",startTime, endTime);
-    
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
     [photoExt.startEndTime setValue:@(trimmerViewContentOffset.x) forKey:@"contentOffsetX"];
     [photoExt.startEndTime setValue:@(trimmerViewContentOffset.y) forKey:@"contentOffsetY"];
     
-    if([_mDelegate respondsToSelector:@selector(zoomingScrollView:photo:startTime:endTime:)])
-    {
-        [_mDelegate zoomingScrollView:self photo:self.photo  startTime:_startTime endTime:_endTime];
-    }
-    
+}
+
+-(void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+    });
 }
 
 -(NSString*) timeFormatted:(CGFloat) sec{
@@ -351,24 +334,6 @@
     int hours = totalSeconds / 3600;
     
     return [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds];
-}
-
-- (void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-    });
-}
-
-- (NSString*)description {
-    return [NSString stringWithFormat:@"<%@:%p %@>",
-            NSStringFromClass([self class]),
-            self,
-            @{
-              @"needInitTrimmer"            : @(self.needInitTrimmer),
-              @"startTime": @(self.startTime),
-              @"endTime": @(self.endTime),
-              
-              }];
 }
 @end
 

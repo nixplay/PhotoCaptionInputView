@@ -732,11 +732,13 @@
 
 -(void) resetTrimmerSubview{
 	id page = [self pageDisplayedAtIndex:[self currentIndex]];
-	if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
-		MWZoomingScrollViewExt *scrollView = (MWZoomingScrollViewExt*)page;
-		NSLog(@"resetTrimmerSubview");
-		[scrollView resetTrimmerSubview];
-	}
+//    if(page != nil && [page isKindOfClass:[MWZoomingScrollView class]]){
+//        MWZoomingScrollView *scrollView = (MWZoomingScrollView*)page;
+        if([page respondsToSelector:@selector(resetTrimmerSubview)]){
+            NSLog(@"resetTrimmerSubview");
+            [page resetTrimmerSubview];
+        }
+//    }
 }
 
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
@@ -780,7 +782,7 @@
 	}];
 	if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)] ) {
         id page = [self pageDisplayedAtIndex:[self currentIndex]];
-        if(page != nil && [page isKindOfClass:[MWZoomingScrollViewExt class]]){
+        if(page != nil && [page isKindOfClass:[MWZoomingScrollView class]]){
             if([page respondsToSelector:@selector(resetPlayer)]){
                 [page resetPlayer];
             }
@@ -1036,35 +1038,10 @@
 	return [NSBundle bundleForClass:[self superclass]];
 }
 -(MWZoomingScrollView *) InitMWZoomingScrollView {
-	MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
-	[scrollView setMDelegate:self];
-	return scrollView;
+    MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
+    return scrollView;
 }
--(void) zoomingScrollView:(MWZoomingScrollViewExt*) zoomingScrollViewExt photo:(id<MWPhoto>)photo startTime:(CGFloat)startTime endTime:(CGFloat) endTime{
-	NSDictionary *startEndTime = [[NSDictionary alloc] initWithObjectsAndKeys:
-								  @(startTime), @"startTime",
-								  @(endTime), @"endTime",
-								  nil];
-	/*[self.selfPhotos enumerateObjectsUsingBlock:^(MWPhotoExt* obj, NSUInteger idx, BOOL * _Nonnull stop) {
-		if([obj.photoData isEqualToString:((MWPhotoExt*)photo).photoData]){
-			if(obj.startEndTime != nil){
-//                float oldStartTime = [[obj.startEndTime valueForKey:@"startTime"] floatValue];
-//                float oldEndTime = [[obj.startEndTime valueForKey:@"endTime"] floatValue];
-//                if(oldStartTime != startTime || oldEndTime != endTime ){
-//                    [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
-//                                           endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
-//                }
-			}else{
-				obj.startEndTime = startEndTime;
 
-//                [zoomingScrollViewExt setStartTime:[[obj.startEndTime valueForKey:@"startTime"] floatValue]
-//                                           endTime:[[obj.startEndTime valueForKey:@"endTime"] floatValue]];
-			}
-			*stop = YES;
-			return;
-		}
-	}];*/
-}
 
 @end
 

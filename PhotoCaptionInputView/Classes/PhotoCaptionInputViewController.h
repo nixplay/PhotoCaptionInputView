@@ -16,7 +16,7 @@
 #import "MWZoomingScrollViewExt.h"
 @protocol PhotoCaptionInputViewDelegate;
 
-@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserProtectedMethod, MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate, MWZoomingScrollViewDelegate>
+@interface PhotoCaptionInputViewController : MWPhotoBrowser <MWPhotoBrowserProtectedMethod, MWPhotoBrowserDelegate , UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UITextViewDelegate>
 
 -(id)initWithPhotos:(NSArray*)photos thumbnails:(NSArray*)thumbnails  preselectedAssets:(NSArray*) _preselectedAssets delegate:(id <PhotoCaptionInputViewDelegate>)delegate;
 
