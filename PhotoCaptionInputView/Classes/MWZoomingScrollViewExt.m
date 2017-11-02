@@ -25,12 +25,13 @@
 @property (strong, nonatomic) UIView *timecodeView;
 @property (assign, nonatomic) BOOL restartOnPlay;
 @property (assign, nonatomic) BOOL needInitTrimmer;
+@property (assign, nonatomic) CGPoint trimmerTimeOffset;
 @end
 @implementation MWZoomingScrollViewExt
 //@synthesize playButton = _playButton;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
-@synthesize contentOffset = _contentOffset;
+@synthesize trimmerTimeOffset = _trimmerTimeOffset;
 @synthesize needInitTrimmer = _needInitTrimmer;
 @synthesize mDelegate = _mDelegate;
 
@@ -176,11 +177,11 @@
                     MWPhotoExt *photoExt = strongSelf.photo;
                     CGFloat restoredStartTime = strongSelf.startTime;
                     CGFloat restoredEndTime = strongSelf.endTime;
-                    CGPoint restoredContentOffset = strongSelf.contentOffset;
+                    CGPoint restoredTrimmerTimeOffset = strongSelf.trimmerTimeOffset;
                     if(photoExt.startEndTime != nil){
                         restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
                         restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
-                        restoredContentOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
+                        restoredTrimmerTimeOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
                     }
                     
                     ;
@@ -246,8 +247,8 @@
                     if(restoredStartTime != -1 && restoredEndTime != -1){
                         strongSelf.startTime = restoredStartTime;
                         strongSelf.endTime = restoredEndTime;
-                        strongSelf.contentOffset = restoredContentOffset;
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime contentOffset:restoredContentOffset];
+                        strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime contentOffset:restoredTrimmerTimeOffset];
                         [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
                     }
                     
@@ -299,7 +300,7 @@
  */
 #pragma mark - ICGVideoTrimmerDelegate
 
-- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime contentOffset:(CGPoint)contentOffset
+- (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime trimmerViewContentOffset:(CGPoint)trimmerViewContentOffset
 {
     _restartOnPlay = YES;
     [self.playButton setHidden:NO];
@@ -318,7 +319,7 @@
     }
     _startTime = startTime > 0 ? startTime : 0;
     _endTime = endTime;
-    _contentOffset = CGPointMake(contentOffset.x, contentOffset.y);
+    _trimmerTimeOffset = CGPointMake(trimmerViewContentOffset.x, trimmerViewContentOffset.y);
     MWPhotoExt *photoExt = self.photo;
     
     if(photoExt.startEndTime == nil){
@@ -332,8 +333,8 @@
     
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
-    [photoExt.startEndTime setValue:@(contentOffset.x) forKey:@"contentOffsetX"];
-    [photoExt.startEndTime setValue:@(contentOffset.y) forKey:@"contentOffsetY"];
+    [photoExt.startEndTime setValue:@(trimmerViewContentOffset.x) forKey:@"contentOffsetX"];
+    [photoExt.startEndTime setValue:@(trimmerViewContentOffset.y) forKey:@"contentOffsetY"];
     
     if([_mDelegate respondsToSelector:@selector(zoomingScrollView:photo:startTime:endTime:)])
     {
