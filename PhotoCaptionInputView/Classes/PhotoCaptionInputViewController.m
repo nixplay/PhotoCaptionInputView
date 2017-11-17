@@ -960,7 +960,19 @@
 -(BOOL)assetsPickerController:(GMImagePickerController *)picker shouldSelectAsset:(PHAsset *)asset{
 	NSPredicate *videoPredicate = [self predicateOfAssetType:PHAssetMediaTypeVideo];
 	NSInteger nVideos = [picker.selectedAssets filteredArrayUsingPredicate:videoPredicate].count;
-	if([picker.selectedAssets count] >= self.maximumImagesCount){
+    if(nVideos > MAX_VIDEO_ALERT){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
+                                                                         objectForInfoDictionaryKey:@"CFBundleDisplayName"]
+                                                                message:NSLocalizedString(@"VIDEO_SELECTION_LIMIT", nil)
+                                                               delegate:self
+                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                      otherButtonTitles:nil, nil];
+            [alertView show];
+            
+        });
+        return NO;
+    }else if([picker.selectedAssets count] >= self.maximumImagesCount){
 		dispatch_async(dispatch_get_main_queue(), ^{
 			UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
 																		 objectForInfoDictionaryKey:@"CFBundleDisplayName"]
@@ -973,18 +985,6 @@
 		});
 		return NO;
 
-	}else if(nVideos > MAX_VIDEO_ALERT){
-		dispatch_async(dispatch_get_main_queue(), ^{
-			UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle]
-																		 objectForInfoDictionaryKey:@"CFBundleDisplayName"]
-																message:NSLocalizedString(@"VIDEO_SELECTION_LIMIT", nil)
-															   delegate:self
-													  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-													  otherButtonTitles:nil, nil];
-			[alertView show];
-
-		});
-		return NO;
 	}else{
 		return YES;
 	}
