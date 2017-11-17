@@ -11,6 +11,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AVFoundation/AVFoundation.h>
 #import "MWPhotoExt.h"
+#import <Masonry/Masonry.h>
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
 #define DEFUALT_VIDEO_LENGTH 15
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
@@ -188,34 +189,43 @@
                         return;
                     }
                     strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
+                    
                     [[strongSelf.trimmerView layer] setCornerRadius:5];
                     
                     CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
-                    UIView *timecodeView = [[UIView alloc] initWithFrame:frame2];
+                    UIView *timecodeView = [[UIView alloc] initWithFrame:CGRectZero];
                     [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
                     [timecodeView.layer setCornerRadius:10];
                     strongSelf.timecodeView = timecodeView;
-                    strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+//                    strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+//                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                     
-                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+//                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
                     timeRangeLabel.textAlignment = NSTextAlignmentLeft;
                     [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
                     [timeRangeLabel setFont:[UIFont systemFontOfSize:11]];
                     [timeRangeLabel adjustsFontSizeToFitWidth];
                     [timeRangeLabel setTextColor:[UIColor whiteColor]];
-                    [timecodeView addSubview:timeRangeLabel];
+                    
                     strongSelf.timeRangeLabel = timeRangeLabel;
                     
                     
-                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
+//                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
+                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectZero];
                     timeLengthLabel.textAlignment = NSTextAlignmentRight;
                     [timeLengthLabel setText:@"00:00:00"];
                     [timeLengthLabel setTextColor:[UIColor whiteColor]];
                     [timeLengthLabel setFont:[UIFont systemFontOfSize:12]];
                     
                     [timecodeView addSubview:timeLengthLabel];
-                    [strongSelf addSubview: timecodeView];
+                    [timecodeView addSubview:timeRangeLabel];
+                    
+                    UIEdgeInsets padding = UIEdgeInsetsMake(5, 5, 5, -5);
+                    
+                    
+                    
+                    
                     strongSelf.timeLengthLabel = timeLengthLabel;
                     
                     [strongSelf.trimmerView setDelegate:strongSelf];
@@ -232,9 +242,48 @@
                     
                     // important: reset subviews
                     [strongSelf addSubview: strongSelf.trimmerView];
-                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
+                    [strongSelf addSubview: timecodeView];
+                    
+                    [strongSelf.trimmerView mas_makeConstraints:^(MASConstraintMaker *make) {
+                        if(@available(iOS 11, *)){
+                            make.top.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideTop).with.offset(padding.top);
+                            make.right.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideRight).with.offset(padding.right);
+                            make.left.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideLeft).with.offset(padding.left);
+                        }else{
+                            make.top.equalTo( strongSelf.trimmerView.superview.mas_top).with.offset(padding.top);
+                            make.right.equalTo( strongSelf.trimmerView.superview.mas_right).with.offset(padding.right);
+                            make.left.equalTo( strongSelf.trimmerView.superview.mas_left).with.offset(padding.left);
+                        }
+                        make.height.mas_equalTo(frame.size.height);
+                    }];
+                    [timecodeView mas_makeConstraints:^(MASConstraintMaker *make) {
+                        if(@available(iOS 11, *)){
+                            make.top.equalTo( strongSelf.trimmerView.mas_bottom ).with.offset(padding.top);
+                            make.right.equalTo( timecodeView.superview.mas_safeAreaLayoutGuideRight).with.offset(padding.right);
+                            make.left.equalTo( timecodeView.superview.mas_safeAreaLayoutGuideLeft).with.offset(padding.left);
+                        }else{
+                            make.top.equalTo( strongSelf.trimmerView.mas_bottom).with.offset(padding.top);
+                            make.right.equalTo( timecodeView.superview.mas_right).with.offset(padding.right);
+                            make.left.equalTo( timecodeView.superview.mas_left).with.offset(padding.left);
+                        }
+                        make.height.mas_equalTo(frame2.size.height);
+                    }];
+                    
+                    [timeRangeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.equalTo(timeRangeLabel.superview.mas_top);
+                        make.left.equalTo(timeRangeLabel.superview.mas_left).with.offset(padding.left);
+                        make.bottom.equalTo(timeRangeLabel.superview.mas_bottom);
+                        make.width.mas_equalTo(frame2.size.width*0.7);
+                    }];
+                    [timeLengthLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.equalTo(timeRangeLabel.superview.mas_top);
+                        make.right.equalTo(timeRangeLabel.superview.mas_right).with.offset(padding.right);
+                        make.bottom.equalTo(timeRangeLabel.superview.mas_bottom);
+                        make.width.mas_equalTo(frame2.size.width*0.3);
+                    }];
+//                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+//                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+//                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
                     [strongSelf.trimmerView resetSubviews];
                     if(restoredStartTime != -1 && restoredEndTime != -1){
                         strongSelf.startTime = restoredStartTime;

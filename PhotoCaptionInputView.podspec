@@ -49,4 +49,5 @@ TODO: Add long description of the pod here.
     s.dependency 'ICGVideoTrimmer'
     s.dependency 'SDAVAssetExportSession'
     s.dependency 'DeviceUtil'
+    s.dependency 'Masonry'
 end
