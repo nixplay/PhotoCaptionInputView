@@ -643,10 +643,18 @@
 		}
     
         [self resetTrimmerSubview];
-        NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
-
-        [_textView setText: caption];
-        [_textView setFrame: [self newFrameFromTextView:_textView]];
+        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:indexPath.item];
+        if(!photo.isVideo){
+            NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
+            
+            [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+            
+            [_textView setText:caption];
+            [_textView setFrame:[self newFrameFromTextView:_textView]];
+            [_textView setHidden:NO];
+        }else{
+            [_textView setHidden:YES];
+        }
     
 	});
 }
