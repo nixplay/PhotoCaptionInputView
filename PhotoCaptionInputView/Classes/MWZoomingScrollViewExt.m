@@ -307,10 +307,10 @@
                         strongSelf.startTime = restoredStartTime;
                         strongSelf.endTime = restoredEndTime;
                         strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime contentOffset:restoredTrimmerTimeOffset];
+                        [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
                         [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
                     }else{
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime:CMTimeGetSeconds(asset.duration) < DEFAULT_VIDEO_LENGTH ? CMTimeGetSeconds(asset.duration) : DEFAULT_VIDEO_LENGTH contentOffset:CGPointMake(0, 0)];
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(CMTimeGetSeconds(asset.duration)) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  CMTimeGetSeconds(asset.duration)) contentOffset:CGPointMake(0, 0)];
                     }
                     
                 }
