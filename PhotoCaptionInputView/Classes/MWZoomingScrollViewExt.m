@@ -13,7 +13,7 @@
 #import "MWPhotoExt.h"
 #import <Masonry/Masonry.h>
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
-#define DEFUALT_VIDEO_LENGTH 15
+#define DEFAULT_VIDEO_LENGTH 15
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     
     CGRect _photoImageViewFrame;
@@ -248,7 +248,7 @@
                     [strongSelf.trimmerView setThumbWidth:20];
                     [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
                     [strongSelf.trimmerView setShowsRulerView:NO];
-                    [strongSelf.trimmerView setMaxLength:CMTimeGetSeconds(asset.duration) < DEFUALT_VIDEO_LENGTH ? CMTimeGetSeconds(asset.duration) : DEFUALT_VIDEO_LENGTH];
+                    [strongSelf.trimmerView setMaxLength:CMTimeGetSeconds(asset.duration) < DEFAULT_VIDEO_LENGTH ? CMTimeGetSeconds(asset.duration) : DEFAULT_VIDEO_LENGTH];
                     
                     [strongSelf.trimmerView setRulerLabelInterval:10];
                     
@@ -309,6 +309,8 @@
                         strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
                         [strongSelf.trimmerView setVideoBoundsToStartTime:restoredStartTime endTime:restoredEndTime contentOffset:restoredTrimmerTimeOffset];
                         [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
+                    }else{
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime:CMTimeGetSeconds(asset.duration) < DEFAULT_VIDEO_LENGTH ? CMTimeGetSeconds(asset.duration) : DEFAULT_VIDEO_LENGTH contentOffset:CGPointMake(0, 0)];
                     }
                     
                 }
