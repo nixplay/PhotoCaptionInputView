@@ -184,7 +184,8 @@
                     }else{
                         strongSelf.asset = [AVURLAsset assetWithURL:url];
                     }
-                    if( CMTimeGetSeconds(strongSelf.asset.duration)==0 ){
+                    Float64 assetDuration = CMTimeGetSeconds( strongSelf.asset.duration );
+                    if( assetDuration == 0 ){
                         NSLog(@"WARNING: Could not load av asset");
                         return;
                     }
@@ -246,9 +247,9 @@
                     [strongSelf.trimmerView setDelegate:strongSelf];
                     // set properties for trimmer view
                     [strongSelf.trimmerView setThumbWidth:20];
-                    [strongSelf.trimmerView setThemeColor:[UIColor lightGrayColor]];
+                    [strongSelf.trimmerView setThemeColor:LIGHT_BLUE_COLOR];
                     [strongSelf.trimmerView setShowsRulerView:NO];
-                    [strongSelf.trimmerView setMaxLength:CMTimeGetSeconds(asset.duration) < DEFAULT_VIDEO_LENGTH ? CMTimeGetSeconds(asset.duration) : DEFAULT_VIDEO_LENGTH];
+                    [strongSelf.trimmerView setMaxLength:assetDuration < DEFAULT_VIDEO_LENGTH ? assetDuration : DEFAULT_VIDEO_LENGTH];
                     
                     [strongSelf.trimmerView setRulerLabelInterval:10];
                     
@@ -310,7 +311,7 @@
                         [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
                         [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
                     }else{
-                        [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(CMTimeGetSeconds(asset.duration)) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  CMTimeGetSeconds(asset.duration)) contentOffset:CGPointMake(0, 0)];
+                        [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(assetDuration) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  assetDuration) contentOffset:CGPointMake(0, 0)];
                     }
                     
                 }
