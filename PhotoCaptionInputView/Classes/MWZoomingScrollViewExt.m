@@ -134,15 +134,10 @@
     }
 }
 
-//- (void)layoutSubviews {
-//    [super layoutSubviews];
-//    if(self.photo.isVideo){
-//        if(!self.needInitTrimmer && _trimmerView != nil){
-//            [_trimmerView resetSubviews];
-//            self.needInitTrimmer = YES;
-//        }
-//    }
-//}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self.trimmerView resetSubviews];
+}
 
 - (void)resetTrimmerSubview{
     
