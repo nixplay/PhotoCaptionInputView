@@ -137,6 +137,13 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self.trimmerView resetSubviews];
+    
+    CGFloat restoredStartTime = self.startTime;
+    CGFloat restoredEndTime = self.endTime;
+    CGPoint restoredTrimmerTimeOffset = self.trimmerTimeOffset;
+    [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
+    [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+    
 }
 
 - (void)resetTrimmerSubview{
