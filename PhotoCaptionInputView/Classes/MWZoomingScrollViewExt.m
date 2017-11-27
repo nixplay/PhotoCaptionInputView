@@ -45,9 +45,24 @@
         _endTime = -1;
         _isLoop = YES;
         self.needInitTrimmer = NO;
+        [self listeningRotating];
     }
     return self;
 }
+- (void)listeningRotating {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onDeviceOrientationChange)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+}
+
+
 -(void) didMoveToWindow {
     [super didMoveToWindow]; // (does nothing by default)
     if (self.window == nil) {
@@ -136,14 +151,24 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    [self.trimmerView resetSubviews];
+    [self restoreRangeAndOffset];
+}
+- (void)onDeviceOrientationChange {
     
-    CGFloat restoredStartTime = self.startTime;
-    CGFloat restoredEndTime = self.endTime;
-    CGPoint restoredTrimmerTimeOffset = self.trimmerTimeOffset;
-    [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
-    [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-    
+    [self restoreRangeAndOffset];
+}
+
+-(void) restoreRangeAndOffset{
+    MWPhotoExt *photoExt = self.photo;
+    if(photoExt.startEndTime != nil){
+        
+        CGFloat restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
+        CGFloat restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+        CGPoint restoredTrimmerTimeOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
+        [self.trimmerView resetSubviews];
+        [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
+        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+    }
 }
 
 - (void)resetTrimmerSubview{
