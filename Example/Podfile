@@ -8,7 +8,7 @@ target 'PhotoCaptionInputView_Example' do
   pod 'GMImagePicker', :git => 'https://github.com/nixplay/GMImagePicker.git', :tag => 'develop'
   pod 'SDWebImage' , '4.2.2'
   pod 'ICGVideoTrimmer' , :git => 'https://github.com/nixplay/ICGVideoTrimmer.git', :branch => 'develop'
-  pod 'SDAVAssetExportSession' , :git=> 'https://github.com/rs/SDAVAssetExportSession', :branch => 'master'
+  pod 'SDAVAssetExportSession' , :git=> 'https://github.com/nixplay/SDAVAssetExportSession', :branch => 'master'
   pod 'IQKeyboardManager'
   target 'PhotoCaptionInputView_Tests' do
     inherit! :search_paths
