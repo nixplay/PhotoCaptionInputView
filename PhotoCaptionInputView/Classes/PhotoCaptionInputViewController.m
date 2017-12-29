@@ -396,9 +396,9 @@
 										  @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
 										  @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
 	}
-	picker.title = NSLocalizedString(@"Select an Album",nil);
-	picker.customDoneButtonTitle = NSLocalizedString(@"Done",nil);
-	picker.customCancelButtonTitle = NSLocalizedString(@"Cancel",nil);
+	picker.title = NSLocalizedString(@"SELECT_AN_ALBUM",nil);
+	picker.customDoneButtonTitle = NSLocalizedString(@"DONE",nil);
+	picker.customCancelButtonTitle = NSLocalizedString(@"CANCEL",nil);
 
 	picker.colsInPortrait = 3;
 	picker.colsInLandscape = 5;
@@ -1014,13 +1014,13 @@
 	return YES;
 }
 -(NSString*) controllerTitle{
-	return NSLocalizedString(@"Select an Album",nil);
+	return NSLocalizedString(@"SELECT_AN_ALBUM",nil);
 }
 -(NSString*) controllerCustomDoneButtonTitle{
-	return NSLocalizedString(@"Done",nil);
+	return NSLocalizedString(@"DONE",nil);
 }
 -(NSString*) controllerCustomCancelButtonTitle{
-	return NSLocalizedString(@"Cancel",nil);
+	return NSLocalizedString(@"CANCEL",nil);
 }
 #pragma mark -  Accessor
 -(NSArray*) preSelectedAssets{
