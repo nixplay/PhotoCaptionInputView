@@ -6,7 +6,7 @@
 //  Copyright 2010 d3i. All rights reserved.
 //
 
-#import <SDWebImage/SDWebImageDecoder.h>
+//#import <SDWebImage/SDWebImageDecoder.h>
 #import <SDWebImage/SDWebImageManager.h>
 #import <SDWebImage/SDWebImageOperation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -14,12 +14,12 @@
 #import "MWPhotoBrowser.h"
 
 @interface MWPhoto () {
-
+    
     BOOL _loadingInProgress;
     id <SDWebImageOperation> _webImageOperation;
     PHImageRequestID _assetRequestID;
     PHImageRequestID _assetVideoRequestID;
-        
+    
 }
 
 @property (nonatomic, strong) UIImage *image;
@@ -38,7 +38,7 @@
 #pragma mark - Class Methods
 
 + (MWPhoto *)photoWithImage:(UIImage *)image {
-	return [[MWPhoto alloc] initWithImage:image];
+    return [[MWPhoto alloc] initWithImage:image];
 }
 
 + (MWPhoto *)photoWithURL:(NSURL *)url {
@@ -117,13 +117,26 @@
     self.isVideo = YES;
 }
 
-- (void)getVideoURL:(void (^)(NSURL *url))completion {
-    if (_videoURL) {
-        completion(_videoURL);
-    } else if (_asset && _asset.mediaType == PHAssetMediaTypeVideo) {
+- (void)getVideoURL:(void (^)(NSURL *url,AVURLAsset *__nullable avurlAsset))completion {
+    if (_asset && _asset.mediaType == PHAssetMediaTypeVideo) {
         [self cancelVideoRequest]; // Cancel any existing
+        
         PHVideoRequestOptions *options = [PHVideoRequestOptions new];
         options.networkAccessAllowed = YES;
+        
+        options.progressHandler = ^(double progress, NSError *__nullable error, BOOL *stop, NSDictionary *__nullable info) {
+            NSLog(@"cacheAsset: %f", progress);
+            @try{
+                NSDictionary* dict = @{
+                                       @"progress": [NSNumber numberWithDouble:progress],
+                                       @"video" : self,
+                                       @"assetVideoRequestID" : @"_assetVideoRequestID"};
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:MWPHOTO_PROGRESS_NOTIFICATION object:dict];
+            }@catch(NSException *exc){
+                NSLog(@"NSException %@",exc.description);
+            }
+        };
         typeof(self) __weak weakSelf = self;
         _assetVideoRequestID = [[PHImageManager defaultManager] requestAVAssetForVideo:_asset options:options resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
             
@@ -131,13 +144,73 @@
             typeof(self) strongSelf = weakSelf;
             if (!strongSelf) return;
             strongSelf->_assetVideoRequestID = PHInvalidImageRequestID;
-            if ([asset isKindOfClass:[AVURLAsset class]]) {
-                completion(((AVURLAsset *)asset).URL);
+             if ([asset isKindOfClass:[AVURLAsset class]] ){
+                 NSLog(@"asset %f", CMTimeGetSeconds(asset.duration));
+                 if(CMTimeGetSeconds(asset.duration) > 0){
+                     completion(((AVURLAsset *)asset).URL,(AVURLAsset *)asset);
+                 }
             } else {
-                completion(nil);
+                if(([asset isKindOfClass:[AVComposition class]] && ((AVComposition *)asset).tracks.count == 2)){
+                    //slow motion videos. See Here: https://overflow.buffer.com/2016/02/29/slow-motion-video-ios/
+                    
+                    //Output URL of the slow motion file.
+                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+                    NSString *documentsDirectory = paths.firstObject;
+                    //cache it
+                    NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", [[_asset.localIdentifier componentsSeparatedByString:@"/"] objectAtIndex:0]]];
+                    NSLog(@"myPathDocs %@",myPathDocs);
+                    NSURL *url = [NSURL fileURLWithPath:myPathDocs];
+                    if([[NSFileManager defaultManager] fileExistsAtPath:myPathDocs]){
+                        completion(url,nil);
+                    }else{
+                        //Begin slow mo video export
+                        AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPresetHighestQuality];
+                        exporter.outputURL = url;
+                        exporter.outputFileType = AVFileTypeQuickTimeMovie;
+                        exporter.shouldOptimizeForNetworkUse = YES;
+                        
+                        [exporter exportAsynchronouslyWithCompletionHandler:^{
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                switch(exporter.status){
+                                    case AVAssetExportSessionStatusUnknown:
+                                        NSLog(@"AVAssetExportSessionStatusUnknown");
+                                        break;
+                                    case AVAssetExportSessionStatusWaiting:
+                                        NSLog(@"AVAssetExportSessionStatusWaiting");
+                                        break;
+                                    case AVAssetExportSessionStatusExporting:
+                                        NSLog(@"AVAssetExportSessionStatusExporting");
+                                        break;
+                                    case AVAssetExportSessionStatusCompleted:
+                                        NSLog(@"AVAssetExportSessionStatusCompleted");
+                                        break;
+                                    case AVAssetExportSessionStatusFailed:
+                                        NSLog(@"AVAssetExportSessionStatusFailed %@",exporter.error.localizedDescription);
+                                        break;
+                                    case AVAssetExportSessionStatusCancelled:
+                                        NSLog(@"AVAssetExportSessionStatusCancelled");
+                                        break;
+                                }
+                                if (exporter.status == AVAssetExportSessionStatusCompleted) {
+                                    NSURL *URL = exporter.outputURL;
+                                    completion(URL, nil);
+                                }else{
+                                    completion(nil, nil);
+                                }
+                            });
+                        }];
+                    }
+                    
+                    
+                }else{
+                    completion(nil, nil);
+                }
             }
             
         }];
+    }else if (_videoURL) {
+        completion(_videoURL, nil);
+        
     }
 }
 
@@ -215,14 +288,14 @@
     @try {
         SDWebImageManager *manager = [SDWebImageManager sharedManager];
         _webImageOperation = [manager loadImageWithURL:url options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-                        if (expectedSize > 0) {
-                            float progress = receivedSize / (float)expectedSize;
-                            NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                  [NSNumber numberWithFloat:progress], @"progress",
-                                                  self, @"photo", nil];
-                            [[NSNotificationCenter defaultCenter] postNotificationName:MWPHOTO_PROGRESS_NOTIFICATION object:dict];
-                        }
-
+            if (expectedSize > 0) {
+                float progress = receivedSize / (float)expectedSize;
+                NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [NSNumber numberWithFloat:progress], @"progress",
+                                      self, @"photo", nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:MWPHOTO_PROGRESS_NOTIFICATION object:dict];
+            }
+            
         } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
             if (error) {
                 MWLog(@"SDWebImage failed to download image: %@", error);
@@ -307,13 +380,13 @@
             [self imageLoadingComplete];
         });
     }];
-
+    
 }
 
 // Release if we can get it again from path or url
 - (void)unloadUnderlyingImage {
     _loadingInProgress = NO;
-	self.underlyingImage = nil;
+    self.underlyingImage = nil;
 }
 
 - (void)imageLoadingComplete {
