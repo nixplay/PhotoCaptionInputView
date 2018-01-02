@@ -13,22 +13,30 @@
 #import "MWPhoto.h"
 #import "MWPhotoBrowserPrivate.h"
 #import "UIImage+MWPhotoBrowser.h"
-
 // Private methods and properties
 @interface MWZoomingScrollView () {
     
     MWPhotoBrowser __weak *_photoBrowser;
-	MWTapDetectingView *_tapView; // for background taps
-	MWTapDetectingImageView *_photoImageView;
-	DACircularProgressView *_loadingIndicator;
+    MWTapDetectingView *_tapView; // for background taps
+    MWTapDetectingImageView *_photoImageView;
+    DACircularProgressView *_loadingIndicator;
     UIImageView *_loadingError;
-    
+    UITapGestureRecognizer * _tap;
 }
-
 @end
 
 @implementation MWZoomingScrollView
-
+@synthesize player = _player;
+@synthesize playerItem = _playerItem;
+@synthesize playerLayer = _playerLayer;
+@synthesize playbackTimeCheckerTimer = _playbackTimeCheckerTimer;
+@synthesize videoPlaybackPosition = _videoPlaybackPosition;
+@synthesize videoPlayer = _videoPlayer;
+@synthesize videoLayer = _videoLayer;
+@synthesize tempVideoPath = _tempVideoPath;
+@synthesize asset = _asset;
+@synthesize isPlaying = _isPlaying;
+@synthesize playButton = _playButton;
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super init])) {
         
@@ -36,56 +44,82 @@
         _index = NSUIntegerMax;
         _photoBrowser = browser;
         
-		// Tap view for background
-		_tapView = [[MWTapDetectingView alloc] initWithFrame:self.bounds];
-		_tapView.tapDelegate = self;
-		_tapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-		_tapView.backgroundColor = [UIColor blackColor];
-		[self addSubview:_tapView];
-		
-		// Image view
-		_photoImageView = [[MWTapDetectingImageView alloc] initWithFrame:CGRectZero];
-		_photoImageView.tapDelegate = self;
-		_photoImageView.contentMode = UIViewContentModeCenter;
-		_photoImageView.backgroundColor = [UIColor blackColor];
-		[self addSubview:_photoImageView];
-		
-		// Loading indicator
-		_loadingIndicator = [[DACircularProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
+        // Tap view for background
+        _tapView = [[MWTapDetectingView alloc] initWithFrame:self.bounds];
+        _tapView.tapDelegate = self;
+        _tapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _tapView.backgroundColor = [UIColor blackColor];
+        [self addSubview:_tapView];
+        
+        // Image view
+        _photoImageView = [[MWTapDetectingImageView alloc] initWithFrame:CGRectZero];
+        _photoImageView.tapDelegate = self;
+        _photoImageView.contentMode = UIViewContentModeCenter;
+        _photoImageView.backgroundColor = [UIColor blackColor];
+        [self addSubview:_photoImageView];
+        
+        // Loading indicator
+        _loadingIndicator = [[DACircularProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
         _loadingIndicator.userInteractionEnabled = NO;
         _loadingIndicator.thicknessRatio = 0.1;
         _loadingIndicator.roundedCorners = NO;
-		_loadingIndicator.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+        _loadingIndicator.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
         UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-		[self addSubview:_loadingIndicator];
-
+        [self addSubview:_loadingIndicator];
+        
         // Listen progress notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(setProgressFromNotification:)
                                                      name:MWPHOTO_PROGRESS_NOTIFICATION
                                                    object:nil];
         
-		// Setup
-		self.backgroundColor = [UIColor blackColor];
-		self.delegate = self;
-		self.showsHorizontalScrollIndicator = NO;
-		self.showsVerticalScrollIndicator = NO;
-		self.decelerationRate = UIScrollViewDecelerationRateFast;
-		self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        // Setup
+        self.backgroundColor = [UIColor blackColor];
+        self.delegate = self;
+        self.showsHorizontalScrollIndicator = NO;
+        self.showsVerticalScrollIndicator = NO;
+        self.decelerationRate = UIScrollViewDecelerationRateFast;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
     }
     return self;
 }
-
+-(void) didMoveToWindow {
+    [super didMoveToWindow]; // (does nothing by default)
+    if (self.window == nil) {
+        // YOUR CODE FOR WHEN UIVIEW IS REMOVED
+        if ([_photo respondsToSelector:@selector(cancelAnyLoading)]) {
+            [_photo cancelAnyLoading];
+        }
+        _isPlaying = NO;
+        [[NSNotificationCenter defaultCenter] removeObserver:self  name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
+        [_player seekToTime:CMTimeMake(0, 1)];
+        [_player pause];
+        [_player replaceCurrentItemWithPlayerItem:nil];
+        [_asset cancelLoading];
+        _asset = nil;
+        _player = nil;
+        _playerLayer = nil;
+        _videoLayer = nil;
+        _videoPlayer = nil;
+        
+        
+    }
+}
 - (void)dealloc {
     if ([_photo respondsToSelector:@selector(cancelAnyLoading)]) {
         [_photo cancelAnyLoading];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self  name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
 }
 
 - (void)prepareForReuse {
     [self hideImageFailure];
+    [_asset cancelLoading];
+    if ([_photo respondsToSelector:@selector(cancelAnyLoading)]) {
+        [_photo cancelAnyLoading];
+    }
     self.photo = nil;
     self.captionView = nil;
     self.selectedButton = nil;
@@ -113,6 +147,9 @@
         }
     }
     _photo = photo;
+    if(self.photo == nil){
+        return;
+    }
     UIImage *img = [_photoBrowser imageForPhoto:_photo];
     if (img) {
         [self displayImage];
@@ -120,47 +157,72 @@
         // Will be loading so show loading
         [self showLoadingIndicator];
     }
+    //    if(photo.isVideo){
+    //
+    //        typeof(self) __weak weakSelf = self;
+    //        dispatch_group_async(dispatch_group_create(), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    //            [self.photo getVideoURL:^(NSURL *url, AVURLAsset *__nullable avurlAsset) {
+    //
+    //                dispatch_async(dispatch_get_main_queue(), ^{
+    //                    // If the video is not playing anymore then bail
+    //
+    //                    typeof(self) strongSelf = weakSelf;
+    //                    if (!strongSelf) return;
+    //
+    //                    if (url) {
+    //                        ((MWPhoto*)strongSelf.photo).videoURL = url;
+    //                        [strongSelf setupVideoPreviewUrl:url avurlAsset:avurlAsset photoImageViewFrame:self.frame];
+    //
+    //                    } else {
+    //
+    //                    }
+    //                });
+    //            }];
+    //        });
+    //    }
 }
 
 // Get and display image
 - (void)displayImage {
-	if (_photo && _photoImageView.image == nil) {
-		
-		// Reset
-		self.maximumZoomScale = 1;
-		self.minimumZoomScale = 1;
-		self.zoomScale = 1;
-		self.contentSize = CGSizeMake(0, 0);
-		
-		// Get image from browser as it handles ordering of fetching
-		UIImage *img = [_photoBrowser imageForPhoto:_photo];
-		if (img) {
-			
-			// Hide indicator
-			[self hideLoadingIndicator];
-			
-			// Set image
-			_photoImageView.image = img;
-			_photoImageView.hidden = NO;
-			
-			// Setup photo frame
-			CGRect photoImageViewFrame;
-			photoImageViewFrame.origin = CGPointZero;
-			photoImageViewFrame.size = img.size;
-			_photoImageView.frame = photoImageViewFrame;
-			self.contentSize = photoImageViewFrame.size;
-
-			// Set zoom to minimum zoom
-			[self setMaxMinZoomScalesForCurrentBounds];
-			
-		} else  {
-
+    if (_photo && _photoImageView.image == nil) {
+        
+        // Reset
+        self.maximumZoomScale = 1;
+        self.minimumZoomScale = 1;
+        self.zoomScale = 1;
+        self.contentSize = CGSizeMake(0, 0);
+        
+        // Get image from browser as it handles ordering of fetching
+        UIImage *img = [_photoBrowser imageForPhoto:_photo];
+        if (img) {
+            
+            // Hide indicator
+            [self hideLoadingIndicator];
+            
+            // Set image
+            _photoImageView.image = img;
+            _photoImageView.hidden = NO;
+            
+            // Setup photo frame
+            CGRect photoImageViewFrame;
+            photoImageViewFrame.origin = CGPointZero;
+            photoImageViewFrame.size = img.size;
+            _photoImageView.frame = photoImageViewFrame;
+            self.contentSize = photoImageViewFrame.size;
+            [self displaySubView:photoImageViewFrame];
+            // Set zoom to minimum zoom
+            [self setMaxMinZoomScalesForCurrentBounds];
+            
+        } else  {
+            
             // Show image failure
             [self displayImageFailure];
-			
-		}
-		[self setNeedsLayout];
-	}
+            
+        }
+        [self setNeedsLayout];
+    }
+}
+-(void) displaySubView:(CGRect)photoImageViewFrame{
 }
 
 // Image failed so just show black!
@@ -198,10 +260,26 @@
 - (void)setProgressFromNotification:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSDictionary *dict = [notification object];
-        id <MWPhoto> photoWithProgress = [dict objectForKey:@"photo"];
-        if (photoWithProgress == self.photo) {
-            float progress = [[dict valueForKey:@"progress"] floatValue];
-            _loadingIndicator.progress = MAX(MIN(1, progress), 0);
+        if([dict objectForKey:@"photo"] != nil){
+            id <MWPhoto> photoWithProgress = [dict objectForKey:@"photo"];
+            if (photoWithProgress == self.photo) {
+                float progress = [[dict valueForKey:@"progress"] floatValue];
+                _loadingIndicator.progress = MAX(MIN(1, progress), 0);
+            }
+        }else  if([dict objectForKey:@"video"] != nil){
+            id <MWPhoto> photoWithProgress = [dict objectForKey:@"video"];
+            if (photoWithProgress == self.photo) {
+                float progress = [[dict valueForKey:@"progress"] floatValue];
+                if(progress < 1 ){
+                    _loadingIndicator.hidden = NO;
+                    _loadingIndicator.progress = MAX(MIN(1, progress), 0);
+                    _playButton.hidden = YES;
+                    
+                }else{
+                    _loadingIndicator.hidden = YES;
+                    _playButton.hidden = NO;
+                }
+            }
         }
     });
 }
@@ -211,6 +289,7 @@
 }
 
 - (void)showLoadingIndicator {
+    
     self.zoomScale = 0;
     self.minimumZoomScale = 0;
     self.maximumZoomScale = 0;
@@ -253,7 +332,7 @@
     
     // Reset position
     _photoImageView.frame = CGRectMake(0, 0, _photoImageView.frame.size.width, _photoImageView.frame.size.height);
-	
+    
     // Sizes
     CGSize boundsSize = self.bounds.size;
     CGSize imageSize = _photoImageView.image.size;
@@ -288,7 +367,7 @@
         // Centralise
         self.contentOffset = CGPointMake((imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
                                          (imageSize.height * self.zoomScale - boundsSize.height) / 2.0);
-
+        
     }
     
     // Disable scrolling initially until the first pinch to fix issues with swiping on an initally zoomed in photo
@@ -299,34 +378,34 @@
         self.maximumZoomScale = self.zoomScale;
         self.minimumZoomScale = self.zoomScale;
     }
-
+    
     // Layout
-	[self setNeedsLayout];
-
+    [self setNeedsLayout];
+    
 }
 
 #pragma mark - Layout
 
 - (void)layoutSubviews {
-	
-	// Update tap view frame
-	_tapView.frame = self.bounds;
-	
-	// Position indicators (centre does not seem to work!)
-	if (!_loadingIndicator.hidden)
+    
+    // Update tap view frame
+    _tapView.frame = self.bounds;
+    
+    // Position indicators (centre does not seem to work!)
+    if (!_loadingIndicator.hidden)
         _loadingIndicator.frame = CGRectMake(floorf((self.bounds.size.width - _loadingIndicator.frame.size.width) / 2.),
-                                         floorf((self.bounds.size.height - _loadingIndicator.frame.size.height) / 2),
-                                         _loadingIndicator.frame.size.width,
-                                         _loadingIndicator.frame.size.height);
-	if (_loadingError)
+                                             floorf((self.bounds.size.height - _loadingIndicator.frame.size.height) / 2),
+                                             _loadingIndicator.frame.size.width,
+                                             _loadingIndicator.frame.size.height);
+    if (_loadingError)
         _loadingError.frame = CGRectMake(floorf((self.bounds.size.width - _loadingError.frame.size.width) / 2.),
                                          floorf((self.bounds.size.height - _loadingError.frame.size.height) / 2),
                                          _loadingError.frame.size.width,
                                          _loadingError.frame.size.height);
-
-	// Super
-	[super layoutSubviews];
-	
+    
+    // Super
+    [super layoutSubviews];
+    
     // Center the image as it becomes smaller than the size of the screen
     CGSize boundsSize = self.bounds.size;
     CGRect frameToCenter = _photoImageView.frame;
@@ -334,40 +413,55 @@
     // Horizontally
     if (frameToCenter.size.width < boundsSize.width) {
         frameToCenter.origin.x = floorf((boundsSize.width - frameToCenter.size.width) / 2.0);
-	} else {
+    } else {
         frameToCenter.origin.x = 0;
-	}
+    }
     
     // Vertically
     if (frameToCenter.size.height < boundsSize.height) {
         frameToCenter.origin.y = floorf((boundsSize.height - frameToCenter.size.height) / 2.0);
-	} else {
+    } else {
         frameToCenter.origin.y = 0;
-	}
+    }
     
-	// Center
-	if (!CGRectEqualToRect(_photoImageView.frame, frameToCenter))
-		_photoImageView.frame = frameToCenter;
-	
+    // Center
+    if (!CGRectEqualToRect(_photoImageView.frame, frameToCenter))
+        _photoImageView.frame = frameToCenter;
+    
+    [self setFrameToCenter:frameToCenter];
+}
+
+
+-(void) setFrameToCenter:(CGRect)frame{
+    if(self.photo.isVideo){
+        if(self.videoPlayer != nil && self.videoLayer != nil && self.playerLayer != nil){
+            self.videoLayer.frame = frame;
+            if(self.playerLayer.superlayer != nil){
+                [self.playerLayer removeFromSuperlayer];
+            }
+            self.playerLayer.frame = CGRectMake(0, 0, CGRectGetWidth(frame), CGRectGetHeight(frame));
+            [self.videoLayer.layer addSublayer:self.playerLayer];
+        }
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-	return _photoImageView;
+    return _photoImageView;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-	[_photoBrowser cancelControlHiding];
+    [_photoBrowser cancelControlHiding];
 }
 
 - (void)scrollViewWillBeginZooming:(UIScrollView *)scrollView withView:(UIView *)view {
     self.scrollEnabled = YES; // reset
-	[_photoBrowser cancelControlHiding];
+    [_photoBrowser cancelControlHiding];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-	[_photoBrowser hideControlsAfterDelay];
+    [_photoBrowser hideControlsAfterDelay];
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
@@ -378,7 +472,10 @@
 #pragma mark - Tap Detection
 
 - (void)handleSingleTap:(CGPoint)touchPoint {
-	[_photoBrowser performSelector:@selector(toggleControls) withObject:nil afterDelay:0.2];
+    if(self.isPlaying){
+        [self onVideoTapped];
+    }
+    [_photoBrowser performSelector:@selector(toggleControls) withObject:nil afterDelay:0.2];
 }
 
 - (void)handleDoubleTap:(CGPoint)touchPoint {
@@ -387,33 +484,33 @@
     if ([self displayingVideo]) {
         return;
     }
-	
-	// Cancel any single tap handling
-	[NSObject cancelPreviousPerformRequestsWithTarget:_photoBrowser];
-	
-	// Zoom
-	if (self.zoomScale != self.minimumZoomScale && self.zoomScale != [self initialZoomScaleWithMinScale]) {
-		
-		// Zoom out
-		[self setZoomScale:self.minimumZoomScale animated:YES];
-		
-	} else {
-		
-		// Zoom in to twice the size
+    
+    // Cancel any single tap handling
+    [NSObject cancelPreviousPerformRequestsWithTarget:_photoBrowser];
+    
+    // Zoom
+    if (self.zoomScale != self.minimumZoomScale && self.zoomScale != [self initialZoomScaleWithMinScale]) {
+        
+        // Zoom out
+        [self setZoomScale:self.minimumZoomScale animated:YES];
+        
+    } else {
+        
+        // Zoom in to twice the size
         CGFloat newZoomScale = ((self.maximumZoomScale + self.minimumZoomScale) / 2);
         CGFloat xsize = self.bounds.size.width / newZoomScale;
         CGFloat ysize = self.bounds.size.height / newZoomScale;
         [self zoomToRect:CGRectMake(touchPoint.x - xsize/2, touchPoint.y - ysize/2, xsize, ysize) animated:YES];
-
-	}
-	
-	// Delay controls
-	[_photoBrowser hideControlsAfterDelay];
-	
+        
+    }
+    
+    // Delay controls
+    [_photoBrowser hideControlsAfterDelay];
+    
 }
 
 // Image View
-- (void)imageView:(UIImageView *)imageView singleTapDetected:(UITouch *)touch { 
+- (void)imageView:(UIImageView *)imageView singleTapDetected:(UITouch *)touch {
     [self handleSingleTap:[touch locationInView:imageView]];
 }
 - (void)imageView:(UIImageView *)imageView doubleTapDetected:(UITouch *)touch {
@@ -442,4 +539,169 @@
     [self handleDoubleTap:CGPointMake(touchX, touchY)];
 }
 
+#pragma mark - Video
+-(void) setAsset:(AVAsset *)asset{
+    _asset = asset;
+}
+-(void) setPlayButton:(UIButton*)button{
+    _playButton = button;
+    [_playButton addTarget:self action:@selector(onPlayButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+-(void) setupVideoPreviewUrl:(NSURL*)url avurlAsset:(AVURLAsset*)avurlAsset photoImageViewFrame:(CGRect)photoImageViewFrame{
+    if(self.photo.isVideo){
+        if(avurlAsset != nil){
+            _asset = avurlAsset;
+        }else{
+            _asset = [AVAsset assetWithURL:url];
+        }
+        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:_asset];
+        
+        _player = [AVPlayer playerWithPlayerItem:item];
+        _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
+        _playerLayer.contentsGravity = AVLayerVideoGravityResizeAspect;
+        _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+        
+        _videoLayer = [[UIView alloc] initWithFrame:CGRectZero];
+        _videoPlayer = [[UIView alloc] initWithFrame:CGRectZero];
+        [_playerLayer setFrame:CGRectZero];
+        [_videoPlayer setBackgroundColor:[UIColor clearColor]];
+        [self addSubview:_videoPlayer];
+        
+        [self insertSubview:_videoPlayer atIndex:[[self subviews] indexOfObject:_photoImageView]];
+        [_videoLayer.layer addSublayer:_playerLayer];
+        
+        _videoLayer.tag = 1;
+        
+        _videoPlaybackPosition = 0;
+        
+        [self seekVideoToPos:0];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(playerItemDidReachEnd:)
+                                                     name:AVPlayerItemDidPlayToEndTimeNotification
+                                                   object:item];
+        
+    }
+    
+}
+
+-(void) playerItemDidReachEnd:(NSNotification *)notification {
+    
+    NSLog(@"IT REACHED THE END");
+    [self.player pause];
+    [self stopPlaybackTimeChecker];
+    [self playButton].hidden = NO;
+    self.videoPlayer.hidden = YES;
+    _photoImageView.hidden = NO;
+    [self seekVideoToPos:0];
+    
+}
+- (void) tapOnVideoLayer:(UITapGestureRecognizer *)tap
+{
+    [self onVideoTapped];
+}
+
+-(void) onPlayButtonPressed:(id) sender{
+    [self onVideoTapped];
+}
+- (void) onVideoTapped{
+    
+    
+    if(self.photo.isVideo){
+        if (self.isPlaying) {
+            
+            [self.player pause];
+            [self stopPlaybackTimeChecker];
+            [self playButton].hidden = NO;
+            _photoImageView.hidden = NO;
+        }else {
+            typeof(self) __weak weakSelf = self;
+            if(self.videoPlayer == nil && self.videoLayer == nil && self.player == nil){
+                [self.photo getVideoURL:^(NSURL *url, AVURLAsset * _Nullable avurlAsset) {
+                    if(url){
+                        typeof(self) strongSelf = weakSelf;
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            
+                            [strongSelf setupVideoPreviewUrl:url avurlAsset:avurlAsset photoImageViewFrame:strongSelf.frame];
+                            strongSelf.videoPlayer.hidden = NO;
+                            if(strongSelf.videoLayer.superview == nil){
+                                [self.videoPlayer addSubview:strongSelf.videoLayer];
+                            }
+                            [strongSelf playButton].hidden = YES;
+                            
+                            [strongSelf.player play];
+                            [strongSelf startPlaybackTimeChecker];
+                            _photoImageView.hidden = YES;
+                        });
+                    }
+                }];
+                
+            }else{
+                self.videoPlayer.hidden = NO;
+                if(self.videoLayer.superview == nil){
+                    [self.videoPlayer addSubview:self.videoLayer];
+                }
+                [self playButton].hidden = YES;
+                
+                [self.player play];
+                [self startPlaybackTimeChecker];
+                _photoImageView.hidden = YES;
+            }
+        }
+        _isPlaying = !_isPlaying;
+        
+    }
+}
+- (void)startPlaybackTimeChecker
+{
+    [self stopPlaybackTimeChecker];
+    
+    _playbackTimeCheckerTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(onPlaybackTimeCheckerTimer) userInfo:nil repeats:YES];
+}
+
+- (void)stopPlaybackTimeChecker
+{
+    if (_playbackTimeCheckerTimer) {
+        [_playbackTimeCheckerTimer invalidate];
+        _playbackTimeCheckerTimer = nil;
+    }
+}
+
+
+#pragma mark - PlaybackTimeCheckerTimer
+
+- (void)onPlaybackTimeCheckerTimer
+{
+    CMTime curTime = [_player currentTime];
+    Float64 seconds = CMTimeGetSeconds(curTime);
+    if (seconds < 0){
+        seconds = 0; // this happens! dont know why.
+    }
+    _videoPlaybackPosition = seconds;
+    
+    
+    
+    if (_videoPlaybackPosition >= CMTimeGetSeconds([_asset duration])) {
+        [_playButton setHidden:NO];
+        [_player pause];
+        [self seekVideoToPos:0];
+    }
+}
+
+- (void)seekVideoToPos:(CGFloat)pos
+{
+    _videoPlaybackPosition = pos;
+    CMTime time = CMTimeMakeWithSeconds(_videoPlaybackPosition, _player.currentTime.timescale);
+    //NSLog(@"seekVideoToPos time:%.2f", CMT\imeGetSeconds(time));
+    [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+}
+
+- (void)resetPlayer
+{
+    if(self.player != nil){
+        [self.player pause];
+        [self.player seekToTime:CMTimeMakeWithSeconds(0, _player.currentTime.timescale) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+    }
+}
 @end
+
