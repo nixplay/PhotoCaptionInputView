@@ -23,7 +23,7 @@
 #define TEXTFIELD_BG_COLOR [UIColor whiteColor]
 #define TEXTFIELD_TEXT_COLOR [UIColor blackColor]
 #define MAX_CHARACTER 160
-#define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"ADD_CAPTION",nil) , MAX_CHARACTER]
+#define PLACEHOLDER_TEXT [NSString stringWithFormat:@"%@(0/%d)", NSLocalizedString(@"ADD_CAPTION" , nil ) , MAX_CHARACTER]
 #define LAYOUT_START_Y 10.5f
 #define BUNDLE_UIIMAGE(imageNames) [UIImage imageNamed:[NSString stringWithFormat:@"%@.bundle/%@", NSStringFromClass([self class]), imageNames]]
 #define BIN_UIIMAGE BUNDLE_UIIMAGE(@"images/bin.png")
