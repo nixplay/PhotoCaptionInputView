@@ -159,7 +159,7 @@
 }
 
 -(void) restoreRangeAndOffset{
-    if([[UIDevice currentDevice] orientation] == [[UIApplication sharedApplication] statusBarOrientation]){
+    if(((int)[[UIDevice currentDevice] orientation]) == ((int)[[UIApplication sharedApplication] statusBarOrientation])){
         MWPhotoExt *photoExt = self.photo;
         if(photoExt.startEndTime != nil){
             
