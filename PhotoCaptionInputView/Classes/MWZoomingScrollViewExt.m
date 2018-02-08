@@ -159,15 +159,17 @@
 }
 
 -(void) restoreRangeAndOffset{
-    MWPhotoExt *photoExt = self.photo;
-    if(photoExt.startEndTime != nil){
-        
-        CGFloat restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
-        CGFloat restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
-        CGPoint restoredTrimmerTimeOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
-        [self.trimmerView resetSubviews];
-        [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
-        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+    if([[UIDevice currentDevice] orientation] == [[UIApplication sharedApplication] statusBarOrientation]){
+        MWPhotoExt *photoExt = self.photo;
+        if(photoExt.startEndTime != nil){
+            
+            CGFloat restoredStartTime = [[photoExt.startEndTime valueForKey:@"startTime"] floatValue];
+            CGFloat restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
+            CGPoint restoredTrimmerTimeOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
+            [self.trimmerView resetSubviews];
+            [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
+            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+        }
     }
 }
 
