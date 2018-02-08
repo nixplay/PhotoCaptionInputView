@@ -377,7 +377,15 @@
 }
 
 -(void)addPhotoFromLibrary{
-	[self launchGMImagePicker];
+    if(self.camera){
+        [self launchCamera];
+    }else{
+        [self launchGMImagePicker];
+    }
+}
+- (void)launchCamera
+{
+    
 }
 - (void)launchGMImagePicker
 {
