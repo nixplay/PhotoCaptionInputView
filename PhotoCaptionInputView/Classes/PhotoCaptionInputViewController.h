@@ -34,6 +34,7 @@
 @property (nonatomic, assign) NSInteger maximumImagesCount;
 @property (nonatomic, assign) BOOL allow_video;
 @property (nonatomic, assign) BOOL camera;
+@property (nonatomic, assign) NSTimeInterval videoMaximumDuration;
 -(void) getPhotosCaptions;
 @end
 

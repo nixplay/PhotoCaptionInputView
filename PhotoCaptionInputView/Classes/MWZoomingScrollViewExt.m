@@ -15,6 +15,7 @@
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
 #define DEFAULT_VIDEO_LENGTH 15
 #define LOADING_DID_END_NOTIFICATION @"LOADING_DID_END_NOTIFICATION"
+#define HINTS_MESSAGE NSLocalizedString(@"Video limited to %@ seconds. Drag the blue bars to trim the video", nil)
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     
     CGRect _photoImageViewFrame;
@@ -99,11 +100,7 @@
                 
                 ;
                 CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
-                //                if(self.asset != nil){
-                //                    strongSelf.asset = self.asset;
-                //                }else{
-                //                    strongSelf.asset = [AVURLAsset assetWithURL:strongSelf.url];
-                //                }
+                
                 Float64 assetDuration = CMTimeGetSeconds( strongSelf.asset.duration );
                 if( assetDuration == 0 ){
                     NSLog(@"WARNING: Could not load av asset");
@@ -130,13 +127,14 @@
                     strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  | UIViewAutoresizingFlexibleWidth |
                     UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                 }
-                //                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                
                 UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
                 if(@available(iOS 11, *)){
                 }else{
-                    [timeRangeLabel setFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
+                    [timeRangeLabel setFrame:CGRectMake(0, 0, frame2.size.width, frame2.size.height)];
+                    
                 }
-                timeRangeLabel.textAlignment = NSTextAlignmentLeft;
+                timeRangeLabel.textAlignment = NSTextAlignmentCenter;
                 [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
                 [timeRangeLabel setFont:[UIFont systemFontOfSize:11]];
                 [timeRangeLabel adjustsFontSizeToFitWidth];
@@ -145,12 +143,9 @@
                 strongSelf.timeRangeLabel = timeRangeLabel;
                 [timecodeView addSubview:strongSelf.timeRangeLabel];
                 
-                //                    UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
-                UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-                if(@available(iOS 11, *)){
-                }else{
-                    [timeLengthLabel setFrame:CGRectMake(frame2.size.width*0.7+10, 0, frame2.size.width*0.3-20, frame2.size.height)];
-                }
+                UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame2.size.width*0.3-20, frame2.size.height)];
+
+                
                 timeLengthLabel.textAlignment = NSTextAlignmentCenter;
                 [timeLengthLabel setText:@"00:00:00"];
                 [timeLengthLabel setTextColor:[UIColor whiteColor]];
@@ -161,12 +156,18 @@
                 timeLengthLabel.layer.cornerRadius = 8;
                 timeLengthLabel.clipsToBounds = YES;
                 [strongSelf addSubview:timeLengthLabel];
-                [timecodeView addSubview:strongSelf.timeLengthLabel];
-                
-                
-                
-                
-                
+                if(@available(iOS 11, *)){
+                }else{
+                    [timeLengthLabel setNeedsLayout];
+                    
+                    
+                    CGRect frame = timeLengthLabel.frame;
+                    frame.origin.y = self.frame.origin.y+25;
+                    frame.origin.x = self.frame.size.width*0.5f - frame.size.width*0.5f;
+                    timeLengthLabel.frame = frame;
+                    timeLengthLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  | UIViewAutoresizingFlexibleWidth |
+                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
+                }
                 
                 strongSelf.timeLengthLabel = timeLengthLabel;
                 
@@ -357,7 +358,7 @@
             [self.trimmerView resetSubviews];
             [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH) ? floor(restoredEndTime) : restoredEndTime  contentOffset:restoredTrimmerTimeOffset];
             //            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-            [self.timeRangeLabel setText:[NSString stringWithFormat:@"Video limited to %@ seconds. Drag the blue bars to trim the video",@(DEFAULT_VIDEO_LENGTH)]];
+            [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
 //            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
         }
     }
@@ -441,6 +442,9 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
             //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+            if(_trimmerTimeOffset.x == 0 || _endTime == 0 || _startTime == CMTimeGetSeconds( self.asset.duration )){
+                [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
+            }
             [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
         });
         [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];

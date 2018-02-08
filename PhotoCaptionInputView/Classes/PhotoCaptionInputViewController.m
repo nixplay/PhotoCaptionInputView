@@ -7,6 +7,7 @@
 //
 
 #import "PhotoCaptionInputViewController.h"
+#import <MobileCoreServices/UTCoreTypes.h>
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import <MWPhotoBrowser/MWGridCell.h>
 #import <MWPhotoBrowser/UIImage+MWPhotoBrowser.h>
@@ -124,47 +125,51 @@
     
     
     
-	_parentView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.navigationController.view.frame.size.width, initHeight)];
-
+    _parentView = [[UIView alloc] initWithFrame:CGRectZero];
+    [_parentView setBackgroundColor:[UIColor blackColor]];
     [_parentView addSubview:self.addButton];
     
     [_parentView addSubview:self.collectionView];
-
+    //UIEdgeInsetsMake(CGFloat top, CGFloat left, CGFloat bottom, CGFloat right)
+    UIEdgeInsets subViewButtonPadding = UIEdgeInsetsMake(10,10,-10,-20);
     [_addButton mas_makeConstraints:^(MASConstraintMaker *make) {
         
-		make.top.equalTo(_addButton.superview.mas_top);
-		make.bottom.equalTo(_addButton.superview.mas_bottom);
-		make.right.equalTo(_addButton.superview.mas_right);
+        make.top.equalTo(_addButton.superview.mas_top).with.offset(subViewButtonPadding.top);
+        make.bottom.equalTo(_addButton.superview.mas_bottom).with.offset(subViewButtonPadding.bottom);
+        make.right.equalTo(_addButton.superview.mas_right).with.offset(subViewButtonPadding.right);
         
         make.height.mas_equalTo(initHeight);
         make.width.mas_equalTo(initHeight);
         
         
     }];
+    UIEdgeInsets collectionViewPadding = UIEdgeInsetsMake(10,20,-10,-20);
     [_collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
         
-		make.top.equalTo(_collectionView.superview.mas_top);
-		make.bottom.equalTo(_collectionView.superview.mas_bottom);
-		make.left.equalTo(_collectionView.superview.mas_left);
-		make.right.with.offset(-3-initHeight);
-
+        make.top.equalTo(_collectionView.superview.mas_top).with.offset(collectionViewPadding.top);
+        make.left.equalTo(_collectionView.superview.mas_left).with.offset(collectionViewPadding.left);
+        make.bottom.equalTo(_collectionView.superview.mas_bottom).with.offset(collectionViewPadding.bottom);
+        make.right.equalTo(_addButton.mas_left).with.offset(-3);
         make.height.mas_equalTo(initHeight);
         
     }];
     
     
     [self.view addSubview:_parentView];
-
+    UIEdgeInsets padding = UIEdgeInsetsMake(0,0,0,0);
     [_parentView mas_makeConstraints:^(MASConstraintMaker *make) {
-		make.bottom.equalTo(self.toolbar.mas_top).with.offset(-4);
+        //        make.bottom.equalTo(self.toolbar.mas_top).with.offset(-4);
+        
         if(@available(iOS 11, *)){
             
-			make.left.equalTo(_parentView.superview.mas_safeAreaLayoutGuideLeft).with.offset(10);
-			make.right.equalTo(_parentView.superview.mas_safeAreaLayoutGuideRight).with.offset(-10);
+            make.left.equalTo(_parentView.superview.mas_safeAreaLayoutGuideLeft).with.offset(padding.left);
+            make.right.equalTo(_parentView.superview.mas_safeAreaLayoutGuideRight).with.offset(padding.right);
         }else{
-			make.right.equalTo(_parentView.superview.mas_right).with.offset(-10);
-			make.left.equalTo(_parentView.superview.mas_left).with.offset(10);
+            make.right.equalTo(_parentView.superview.mas_right).with.offset(padding.right);
+            make.left.equalTo(_parentView.superview.mas_left).with.offset(padding.left);
         }
+        make.height.mas_equalTo(initHeight+(subViewButtonPadding.top*2));
+        make.bottom.equalTo(self.toolbar.mas_top);
     }];
     
     CGRect tfrect = CGRectMake(10, _parentView.frame.origin.y-31-10, self.navigationController.view.frame.size.width-20, 31);
@@ -445,7 +450,7 @@
     if([self.selfPhotos count] > 1){
         //        NSLog(@"removePhoto");
         //may have problem
-        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+//        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         //        if([preSelectedAssets containsObject:photo.photoData]){
         //            [preSelectedAssets removeObject:photo.photoData];
         //        }
@@ -802,11 +807,11 @@
     
 -(NSString*) photoBrowser:(MWPhotoBrowser *)photoBrowser titleForPhotoAtIndex:(NSUInteger)index{
     NSString* title = @"";
-    if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
-        title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
-    }else{
-        title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
-    }
+//    if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
+//        title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
+//    }else{
+//        title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
+//    }
     return title;
 }
     
@@ -865,7 +870,15 @@
     navigationBar.layer.borderWidth = 0;
     return YES;
 }
-    
+-(void) photoBrowser:(MWPhotoBrowser*)photoBrowser controlsHidden:(BOOL)hidden animated:(BOOL)animated{
+    if(animated){
+        if(hidden){
+            self.parentView.alpha = 0.0f;
+        }else{
+            self.parentView.alpha = 1.0f;
+        }
+    }
+}
 - (UIImage *)imageFromLayer:(CALayer *)layer
     {
         UIGraphicsBeginImageContext([layer frame].size);
