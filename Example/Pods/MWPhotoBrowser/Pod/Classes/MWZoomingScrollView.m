@@ -684,15 +684,15 @@
     if (_videoPlaybackPosition >= CMTimeGetSeconds([_asset duration])) {
         [_playButton setHidden:NO];
         [_player pause];
-        [self seekVideoToPos:0];
+        [_player seekToTime:CMTimeMake(0, 30)];
     }
 }
 
 - (void)seekVideoToPos:(CGFloat)pos
 {
     _videoPlaybackPosition = pos;
-    CMTime time = CMTimeMakeWithSeconds(_videoPlaybackPosition, _player.currentTime.timescale);
-    //NSLog(@"seekVideoToPos time:%.2f", CMT\imeGetSeconds(time));
+    CMTime time = CMTimeMakeWithSeconds(_videoPlaybackPosition, self.asset.duration.timescale);
+    NSLog(@"seekVideoToPos time:%.2f", CMTimeGetSeconds(time));
     [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
 }
 
@@ -700,7 +700,9 @@
 {
     if(self.player != nil){
         [self.player pause];
-        [self.player seekToTime:CMTimeMakeWithSeconds(0, _player.currentTime.timescale) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        CMTime time = CMTimeMakeWithSeconds(0, self.asset.duration.timescale);
+        NSLog(@"resetPlayer time:%.2f", CMTimeGetSeconds(time));
+        [self.player seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     }
 }
 @end

@@ -167,8 +167,9 @@
             CGFloat restoredEndTime = [[photoExt.startEndTime valueForKey:@"endTime"] floatValue];
             CGPoint restoredTrimmerTimeOffset = CGPointMake([[photoExt.startEndTime valueForKey:@"contentOffsetX"] floatValue], [[photoExt.startEndTime valueForKey:@"contentOffsetY"] floatValue]);
             [self.trimmerView resetSubviews];
-            [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
-            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+            [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH) ? floor(restoredEndTime) : restoredEndTime  contentOffset:restoredTrimmerTimeOffset];
+//            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
         }
     }
 }
@@ -218,10 +219,12 @@
                         NSLog(@"WARNING: Could not load av asset");
                         return;
                     }
-                    strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(0,0,CGRectGetWidth(strongSelf.frame)-10, 50) asset:strongSelf.asset delegate:strongSelf];
+                    strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(0,0,CGRectGetWidth(strongSelf.frame)-10, 50+20) asset:strongSelf.asset delegate:strongSelf];
                     if(@available(iOS 11, *)){
                     }else{
                         [strongSelf.trimmerView setFrame:frame];
+                        strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  | UIViewAutoresizingFlexibleWidth |
+                        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                     }
                     [[strongSelf.trimmerView layer] setCornerRadius:5];
                     
@@ -234,7 +237,7 @@
                     if(@available(iOS 11, *)){
                     }else{
                         [strongSelf.timecodeView setFrame:frame2];
-                        strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
+                        strongSelf.timecodeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin  | UIViewAutoresizingFlexibleWidth |
                         UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                     }
                     //                    UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame2.size.width*0.7-20, frame2.size.height)];
@@ -287,9 +290,10 @@
                     
                     // important: reset subviews
                     [strongSelf addSubview: strongSelf.trimmerView];
-                    [strongSelf addSubview: timecodeView];
+                    [strongSelf addSubview: strongSelf.timecodeView];
                     if(@available(iOS 11, *)){
                         [strongSelf.trimmerView mas_makeConstraints:^(MASConstraintMaker *make) {
+                            make.width.equalTo(strongSelf.trimmerView.superview.mas_width);
                             //                        make.centerX.equalTo(strongSelf.trimmerView.superview.mas_centerX);
                             if(@available(iOS 11, *)){
                                 make.top.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideTop).with.offset(padding.top);
@@ -337,8 +341,8 @@
                         strongSelf.startTime = restoredStartTime;
                         strongSelf.endTime = restoredEndTime;
                         strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
-                        [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:floor(restoredEndTime) contentOffset:restoredTrimmerTimeOffset];
-                        [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [strongSelf timeFormatted:strongSelf.startTime] , [strongSelf timeFormatted:strongSelf.endTime]]];
+                        [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH ) ? floor(restoredEndTime) : restoredEndTime contentOffset:restoredTrimmerTimeOffset];
+                        [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [strongSelf timeFormatted:strongSelf.startTime] , NSLocalizedString(@"TO", nil), [strongSelf timeFormatted:strongSelf.endTime]]];
                     }else{
                         [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(assetDuration) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  assetDuration) contentOffset:CGPointMake(0, 0)];
                     }
@@ -410,7 +414,8 @@
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
-        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+//        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
     });
     [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
     [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -421,7 +426,8 @@
 
 -(void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+         [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+//        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
 }
 
