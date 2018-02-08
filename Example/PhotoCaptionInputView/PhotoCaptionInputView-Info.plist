@@ -29,6 +29,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>App users camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>App uses microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Uses photo library</string>
 	<key>UILaunchStoryboardName</key>
