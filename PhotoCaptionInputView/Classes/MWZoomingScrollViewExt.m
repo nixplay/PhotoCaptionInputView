@@ -12,35 +12,38 @@
 #import <AVFoundation/AVFoundation.h>
 #import "MWPhotoExt.h"
 #import <Masonry/Masonry.h>
+@class MWPhotoBrowser;
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
 #define DEFAULT_VIDEO_LENGTH 15
 #define LOADING_DID_END_NOTIFICATION @"LOADING_DID_END_NOTIFICATION"
-#define HINTS_MESSAGE NSLocalizedString(@"Video limited to %@ seconds. Drag the blue bars to trim the video", nil)
+#define HINTS_MESSAGE NSLocalizedString(@"Limited to %@ seconds. Drag the blue bars to trim the video", nil)
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     
     CGRect _photoImageViewFrame;
     
     BOOL _isLoop;
+    
 }
-    @property (strong, nonatomic) ICGVideoTrimmerView *trimmerView;
-    @property (strong, nonatomic) UILabel *timeLengthLabel;
-    @property (strong, nonatomic) UILabel *timeRangeLabel;
-    @property (strong, nonatomic) UIView *timecodeView;
-    @property (assign, nonatomic) BOOL restartOnPlay;
-    @property (assign, nonatomic) BOOL needInitTrimmer;
-    @property (assign, nonatomic) CGFloat startTime;
-    @property (assign, nonatomic) CGFloat endTime;
-    //dotn use contentOffeset it will mess up UIScrollView of UIScrollView
-    @property (assign, nonatomic) CGPoint trimmerTimeOffset;
-    @property (assign, nonatomic) NSURL *url;
+@property (strong, nonatomic) ICGVideoTrimmerView *trimmerView;
+@property (strong, nonatomic) UILabel *timeLengthLabel;
+@property (strong, nonatomic) UILabel *timeRangeLabel;
+@property (strong, nonatomic) UIView *timecodeView;
+@property (assign, nonatomic) BOOL restartOnPlay;
+@property (assign, nonatomic) BOOL needInitTrimmer;
+@property (assign, nonatomic) CGFloat startTime;
+@property (assign, nonatomic) CGFloat endTime;
+//dotn use contentOffeset it will mess up UIScrollView of UIScrollView
+@property (assign, nonatomic) CGPoint trimmerTimeOffset;
+@property (assign, nonatomic) NSURL *url;
+@property (assign, nonatomic) MWPhotoBrowser* photobrowser;
     
 @end
 @implementation MWZoomingScrollViewExt
-    @synthesize startTime = _startTime;
-    @synthesize endTime = _endTime;
-    @synthesize trimmerTimeOffset = _trimmerTimeOffset;
-    @synthesize needInitTrimmer = _needInitTrimmer;
-    
+@synthesize startTime = _startTime;
+@synthesize endTime = _endTime;
+@synthesize trimmerTimeOffset = _trimmerTimeOffset;
+@synthesize needInitTrimmer = _needInitTrimmer;
+
     
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
@@ -53,6 +56,7 @@
                                                  selector:@selector(handleLoadingDidEndNotification:)
                                                      name:LOADING_DID_END_NOTIFICATION
                                                    object:nil];
+        self.photobrowser = browser;
     }
     return self;
 }
@@ -84,6 +88,7 @@
                 return;
             }
             ((MWPhoto*)strongSelf.photo).videoURL = strongSelf.url;
+            [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:(AVAsset*)strongSelf.asset photoImageViewFrame:strongSelf.frame];
             //            NSLog(@"description %@",strongSelf.description);
             if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
                 
@@ -115,7 +120,7 @@
                 }
                 [[strongSelf.trimmerView layer] setCornerRadius:5];
                 
-                CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height , frame.size.width, 20);
+                CGRect frame2 = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height+5 , frame.size.width, 20);
                 UIView *timecodeView = [[UIView alloc] initWithFrame:CGRectZero];
                 
                 [timecodeView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
@@ -187,14 +192,18 @@
                 [strongSelf addSubview: strongSelf.trimmerView];
                 [strongSelf addSubview: strongSelf.timecodeView];
                 if(@available(iOS 11, *)){
-                    UIEdgeInsets padding = UIEdgeInsetsMake(50, 10, 0, -10);
+                    
+                    //ref : https://stackoverflow.com/questions/33141343/autolayout-invalid-related-to-hidden-navigationbar-in-xib 
+                    float labelTopPadding = (strongSelf.photobrowser.navigationController.navigationBar.alpha==1) ? -25 : 10 ;
+                    float topPadding = (strongSelf.photobrowser.navigationController.navigationBar.alpha==1) ? 0 : 50 ;
+                    UIEdgeInsets padding = UIEdgeInsetsMake(topPadding, 10, 0, -10);
                     
                     [strongSelf.timeLengthLabel mas_makeConstraints:^(MASConstraintMaker *make) {
                         make.centerX.equalTo(strongSelf.mas_centerX);
                         if(@available(iOS 11, *)){
-                            make.top.equalTo(strongSelf.mas_safeAreaLayoutGuideTop).with.offset(44);
+                            make.top.equalTo(strongSelf.mas_safeAreaLayoutGuideTop).with.offset(labelTopPadding);
                         }else{
-                            make.top.equalTo(strongSelf.mas_top).with.offset(44);
+                            make.top.equalTo(strongSelf.mas_top).with.offset(labelTopPadding);
                         }
                         make.width.mas_equalTo(frame2.size.width*0.3);
                         make.height.mas_equalTo(frame2.size.height);
@@ -203,11 +212,11 @@
                     [strongSelf.trimmerView mas_makeConstraints:^(MASConstraintMaker *make) {
                         
                         if(@available(iOS 11, *)){
-                            make.top.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideTop).with.offset(padding.top+20);
+                            make.top.equalTo( strongSelf.timeLengthLabel.mas_safeAreaLayoutGuideTop).with.offset(padding.top);
                             make.right.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideRight).with.offset(padding.right);
                             make.left.equalTo( strongSelf.trimmerView.superview.mas_safeAreaLayoutGuideLeft).with.offset(padding.left);
                         }else{
-                            make.top.equalTo( strongSelf.timeLengthLabel.mas_top).with.offset(padding.top+20);
+                            make.top.equalTo( strongSelf.timeLengthLabel.mas_top).with.offset(padding.top);
                             make.right.equalTo( strongSelf.trimmerView.superview.mas_right).with.offset(padding.right);
                             make.left.equalTo( strongSelf.trimmerView.superview.mas_left).with.offset(padding.left);
                         }
@@ -236,7 +245,7 @@
                 //                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
                 //                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                 //                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
-                [strongSelf.trimmerView resetSubviews];
+//                [strongSelf.trimmerView resetSubviews];
                 if(restoredStartTime != -1 && restoredEndTime != -1){
                     strongSelf.startTime = restoredStartTime;
                     strongSelf.endTime = restoredEndTime;
@@ -392,26 +401,26 @@
 #pragma mark - PlaybackTimeCheckerTimer
     
 - (void)onPlaybackTimeCheckerTimer
-    {
-        CMTime curTime = [self.player currentTime];
-        Float64 seconds = CMTimeGetSeconds(curTime);
-        if (seconds < 0){
-            seconds = 0; // this happens! dont know why.
-        }
-        self.videoPlaybackPosition = seconds;
-        
-        [self.trimmerView seekToTime:seconds];
-        
-        if (self.videoPlaybackPosition >= _endTime) {
-            self.videoPlaybackPosition = _startTime;
-            [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
-            [self.trimmerView seekToTime:_startTime];
-            if(!_isLoop){
-                [self.playButton setHidden:NO];
-                [self.player pause];
-            }
+{
+    CMTime curTime = [self.player currentTime];
+    Float64 seconds = CMTimeGetSeconds(curTime);
+    if (seconds < 0){
+        seconds = 0; // this happens! dont know why.
+    }
+    self.videoPlaybackPosition = seconds;
+    
+    [self.trimmerView seekToTime:seconds];
+    
+    if (self.videoPlaybackPosition >= _endTime) {
+        self.videoPlaybackPosition = _startTime;
+        [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
+        [self.trimmerView seekToTime:_startTime];
+        if(!_isLoop){
+            [self.playButton setHidden:NO];
+            [self.player pause];
         }
     }
+}
 #pragma mark - ICGVideoTrimmerDelegate
     
 - (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime trimmerViewContentOffset:(CGPoint)trimmerViewContentOffset
@@ -424,12 +433,12 @@
         
         [self.trimmerView hideTracker:true];
         
-        if (startTime != _startTime) {
+        if (startTime > 0 || trimmerViewContentOffset.x > 0) {
             //then it moved the left position, we should rearrange the bar
             [self seekVideoToPos:startTime];
         }
         else{ // right has changed
-            [self seekVideoToPos:endTime];
+//            [self seekVideoToPos:endTime];
         }
         _startTime = startTime > 0 ? startTime : 0;
         _endTime = endTime;
