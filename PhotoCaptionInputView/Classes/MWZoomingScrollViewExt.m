@@ -16,7 +16,11 @@
 #define LIGHT_BLUE_COLOR [UIColor colorWithRed:(96.0f/255.0f)  green:(178.0f/255.0f)  blue:(232.0f/255.0f) alpha:1.0]
 #define DEFAULT_VIDEO_LENGTH 15
 #define LOADING_DID_END_NOTIFICATION @"LOADING_DID_END_NOTIFICATION"
-#define HINTS_MESSAGE NSLocalizedString(@"Limited to %@ seconds. Drag the blue bars to trim the video", nil)
+#define BUNDLE [self getBundle]
+#define HINTS_MESSAGE NSLocalizedStringFromTableInBundle(@"Limited to %@ seconds. Drag the blue bars to trim the video",  @"PhotoCaptionInputView", BUNDLE, @"Limited to %@ seconds. Drag the blue bars to trim the video")
+#define SELECTION NSLocalizedStringFromTableInBundle(@"Selection",  @"PhotoCaptionInputView", BUNDLE, @"Selection")
+#define TO NSLocalizedStringFromTableInBundle(@"to",  @"PhotoCaptionInputView", BUNDLE, @"to")
+
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
     NSTimer * _hintsVisibilityTimer;
     CGRect _photoImageViewFrame;
@@ -60,6 +64,17 @@
     }
     return self;
 }
+
+-(NSBundle*) getBundle{
+//    NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[MWZoomingScrollViewExt class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
+    NSBundle *bundle = [NSBundle bundleForClass:[MWZoomingScrollViewExt class]];
+//    NSLog(@"localizations : \" %@ \"",[bundle localizations]);
+//    NSLog(@"string : \" %@ \"",[bundle localizedStringForKey:@"Selection" value:@"not found" table:@"PhotoCaptionInputView"]);
+//
+    return  bundle;
+    
+}
+
 - (void)listeningRotating {
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -148,7 +163,7 @@
                     
                 }
                 timeRangeLabel.textAlignment = NSTextAlignmentCenter;
-                [timeRangeLabel setText:NSLocalizedString(@"MOVE_POINTERS_TO_TRIM_THE_VIDEO", nil)];
+                
                 [timeRangeLabel setFont:[UIFont systemFontOfSize:11]];
                 [timeRangeLabel adjustsFontSizeToFitWidth];
                 [timeRangeLabel setTextColor:[UIColor whiteColor]];
@@ -259,7 +274,7 @@
                     strongSelf.endTime = restoredEndTime;
                     strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
                     [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH ) ? floor(restoredEndTime) : restoredEndTime contentOffset:restoredTrimmerTimeOffset];
-                    [strongSelf setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [strongSelf timeFormatted:strongSelf.startTime] , NSLocalizedString(@"TO", nil), [strongSelf timeFormatted:strongSelf.endTime]]];
+                    [strongSelf setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [strongSelf timeFormatted:strongSelf.startTime] , TO, [strongSelf timeFormatted:strongSelf.endTime]]];
                 }else{
                     [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(assetDuration) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  assetDuration) contentOffset:CGPointMake(0, 0)];
                 }
@@ -375,7 +390,7 @@
             [self.trimmerView resetSubviews];
             [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH) ? floor(restoredEndTime) : restoredEndTime  contentOffset:restoredTrimmerTimeOffset];
             //            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
 
         }
     }
@@ -462,7 +477,7 @@
             if(_trimmerTimeOffset.x == 0 || _endTime == 0 || _startTime == CMTimeGetSeconds( self.asset.duration )){
                 [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
             }
-            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
         });
         [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
         [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -473,7 +488,7 @@
     
 -(void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+        [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
         //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
 }
