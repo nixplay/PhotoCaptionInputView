@@ -8,7 +8,7 @@
 
 #import <MWPhotoBrowser/MWPhotoBrowser.h>
 #import "MWZoomingScrollView.h"
-@interface MWZoomingScrollViewExt: MWZoomingScrollView<MWZoomingScrollView>
+@interface MWZoomingScrollViewExt: MWZoomingScrollView
 
 - (void) resetTrimmerSubview;
 

@@ -88,7 +88,7 @@
                 return;
             }
             ((MWPhoto*)strongSelf.photo).videoURL = strongSelf.url;
-            [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:(AVAsset*)strongSelf.asset photoImageViewFrame:strongSelf.frame];
+            [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
             //            NSLog(@"description %@",strongSelf.description);
             if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
                 
