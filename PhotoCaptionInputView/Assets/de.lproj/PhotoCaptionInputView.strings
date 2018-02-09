@@ -3,4 +3,4 @@
 "CANCEL" = "Abbrechen";
 "Selection" = "Auswahl";
 "to" = "bis";
-"Limited to %@ seconds. Drag the blue bars to trim the video" = "Begrenzt auf% @ Sekunden. Ziehe die blauen Balken, um das Video zu trimmen";
+"Limited to %@ seconds. Drag the blue bars to trim the video" = "Auf %@ Sek. begrenzt. Zum Schneiden des Videos blaue Striche verwenden.";
