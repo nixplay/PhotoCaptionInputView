@@ -400,7 +400,7 @@
         }else{
             picker.mediaTypes = @[(NSString *)kUTTypeImage];
         }
-        picker.allowsEditing = YES;
+        picker.allowsEditing = NO;
         
         picker.delegate = self;
         picker.modalPresentationStyle = UIModalPresentationPopover;
