@@ -1,3 +1,6 @@
 "SELECT_AN_ALBUM" = "Wählen Sie ein Album";
 "DONE" = "Donw";
 "CANCEL" = "Abbrechen";
+"Selection" = "Auswahl";
+"to" = "bis";
+"Limited to %@ seconds. Drag the blue bars to trim the video" = "Begrenzt auf% @ Sekunden. Ziehe die blauen Balken, um das Video zu trimmen";
