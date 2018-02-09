@@ -18,7 +18,7 @@
 #define LOADING_DID_END_NOTIFICATION @"LOADING_DID_END_NOTIFICATION"
 #define HINTS_MESSAGE NSLocalizedString(@"Limited to %@ seconds. Drag the blue bars to trim the video", nil)
 @interface MWZoomingScrollViewExt ()<ICGVideoTrimmerDelegate>{
-    
+    NSTimer * _hintsVisibilityTimer;
     CGRect _photoImageViewFrame;
     
     BOOL _isLoop;
@@ -73,12 +73,20 @@
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 //    [[NSNotificationCenter defaultCenter] removeObserver:self name:LOADING_DID_END_NOTIFICATION object:nil];
 }
+
+-(void) hideHints{
+    if (_hintsVisibilityTimer) {
+        [_hintsVisibilityTimer invalidate];
+        _hintsVisibilityTimer = nil;
+    }
+}
 #pragma mark - MWPhoto Loading Notification
     
 - (void)handleLoadingDidEndNotification:(NSNotification *)notification {
     MWZoomingScrollViewExt *strongSelf = notification.object;
     dispatch_async(dispatch_get_main_queue(), ^{
-        
+        [self hideHints];
+       _hintsVisibilityTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(hideHints) userInfo:nil repeats:NO];
         //        typeof(self) strongSelf = self;
         
         if (!strongSelf) return;
@@ -251,7 +259,7 @@
                     strongSelf.endTime = restoredEndTime;
                     strongSelf.trimmerTimeOffset = restoredTrimmerTimeOffset;
                     [strongSelf.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH ) ? floor(restoredEndTime) : restoredEndTime contentOffset:restoredTrimmerTimeOffset];
-                    [strongSelf.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [strongSelf timeFormatted:strongSelf.startTime] , NSLocalizedString(@"TO", nil), [strongSelf timeFormatted:strongSelf.endTime]]];
+                    [strongSelf setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [strongSelf timeFormatted:strongSelf.startTime] , NSLocalizedString(@"TO", nil), [strongSelf timeFormatted:strongSelf.endTime]]];
                 }else{
                     [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(assetDuration) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  assetDuration) contentOffset:CGPointMake(0, 0)];
                 }
@@ -367,8 +375,8 @@
             [self.trimmerView resetSubviews];
             [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH) ? floor(restoredEndTime) : restoredEndTime  contentOffset:restoredTrimmerTimeOffset];
             //            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-            [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
-//            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+
         }
     }
 }
@@ -454,7 +462,7 @@
             if(_trimmerTimeOffset.x == 0 || _endTime == 0 || _startTime == CMTimeGetSeconds( self.asset.duration )){
                 [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
             }
-            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
         });
         [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
         [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
@@ -465,19 +473,29 @@
     
 -(void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
+        [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", NSLocalizedString(@"SELECTION", nil), [self timeFormatted:self.startTime] , NSLocalizedString(@"TO", nil), [self timeFormatted:self.endTime]]];
         //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
 }
     
 -(NSString*) timeFormatted:(CGFloat) sec{
-    
+
     int totalSeconds = floorf(sec);
     int seconds = totalSeconds % 60;
     int minutes = (totalSeconds / 60) % 60;
     int hours = totalSeconds / 3600;
-    
+
     return [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds];
 }
-    @end
+
+-(void) setVideoRangeLabelWithSring:(NSString*) msg{
+    
+    if(_hintsVisibilityTimer){
+        [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
+    }else{
+        NSLog(@"setVideoRangeLabelWithSring %@",msg);
+        [self.timeRangeLabel setText:msg];
+    }
+}
+@end
 
