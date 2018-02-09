@@ -1147,8 +1147,9 @@
                     [strongSelf.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
                     [strongSelf.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
                     
-                    [strongSelf setCurrentPhotoIndex:self.selfPhotos.count-1];
+                    
                     dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf setCurrentPhotoIndex:self.selfPhotos.count-1];
                         [strongSelf reloadPhoto];
                         if(strongSelf.selfPhotos.count>1){
                             strongSelf.navigationItem.rightBarButtonItem.enabled = YES;
