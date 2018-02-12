@@ -136,6 +136,7 @@
                     return;
                 }
                 strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
+                strongSelf.trimmerView.minLength = 0;
                 if(@available(iOS 11, *)){
                 }else{
                     [strongSelf.trimmerView setFrame:frame];
@@ -408,14 +409,14 @@
         }
         weakSelf.asset = avAsset;
         weakSelf.url = url;
-        if(CMTimeGetSeconds(weakSelf.asset.duration ) > 3){
+//        if(CMTimeGetSeconds(weakSelf.asset.duration ) > 3){
             [[NSNotificationCenter defaultCenter] postNotificationName:LOADING_DID_END_NOTIFICATION object:weakSelf];
-        }else{
-            typeof(self) __strong strongSelf = weakSelf;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
-            });
-        }
+//        }else{
+//            typeof(self) __strong strongSelf = weakSelf;
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
+//            });
+//        }
         //advoid put too much proceee to main queue
         
     }];
