@@ -40,7 +40,7 @@
 @property (assign, nonatomic) CGPoint trimmerTimeOffset;
 @property (assign, nonatomic) NSURL *url;
 @property (assign, nonatomic) MWPhotoBrowser* photobrowser;
-    
+
 @end
 @implementation MWZoomingScrollViewExt
 @synthesize startTime = _startTime;
@@ -48,7 +48,7 @@
 @synthesize trimmerTimeOffset = _trimmerTimeOffset;
 @synthesize needInitTrimmer = _needInitTrimmer;
 
-    
+
 - (id)initWithPhotoBrowser:(MWPhotoBrowser *)browser {
     if ((self = [super initWithPhotoBrowser:browser])) {
         _startTime = -1;
@@ -66,11 +66,11 @@
 }
 
 -(NSBundle*) getBundle{
-//    NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[MWZoomingScrollViewExt class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
+    //    NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[MWZoomingScrollViewExt class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
     NSBundle *bundle = [NSBundle bundleForClass:[MWZoomingScrollViewExt class]];
-//    NSLog(@"localizations : \" %@ \"",[bundle localizations]);
-//    NSLog(@"string : \" %@ \"",[bundle localizedStringForKey:@"Selection" value:@"not found" table:@"PhotoCaptionInputView"]);
-//
+    //    NSLog(@"localizations : \" %@ \"",[bundle localizations]);
+    //    NSLog(@"string : \" %@ \"",[bundle localizedStringForKey:@"Selection" value:@"not found" table:@"PhotoCaptionInputView"]);
+    //
     return  bundle;
     
 }
@@ -82,11 +82,11 @@
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
 }
-    
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:LOADING_DID_END_NOTIFICATION object:nil];
+    //    [[NSNotificationCenter defaultCenter] removeObserver:self name:LOADING_DID_END_NOTIFICATION object:nil];
 }
 
 -(void) hideHints{
@@ -96,12 +96,13 @@
     }
 }
 #pragma mark - MWPhoto Loading Notification
-    
+
 - (void)handleLoadingDidEndNotification:(NSNotification *)notification {
     MWZoomingScrollViewExt *strongSelf = notification.object;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self hideHints];
-       _hintsVisibilityTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(hideHints) userInfo:nil repeats:NO];
+        _hintsVisibilityTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(hideHints) userInfo:nil repeats:NO];
         //        typeof(self) strongSelf = self;
         
         if (!strongSelf) return;
@@ -127,14 +128,14 @@
                 }
                 
                 ;
-                CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-10, 50);
+                CGRect frame = CGRectMake(5, [UIApplication sharedApplication].statusBarFrame.size.height+44, CGRectGetWidth(strongSelf.frame)-20, 50);
                 
                 Float64 assetDuration = CMTimeGetSeconds( strongSelf.asset.duration );
                 if( assetDuration == 0 ){
                     NSLog(@"WARNING: Could not load av asset");
                     return;
                 }
-                strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:CGRectMake(0,0,CGRectGetWidth(strongSelf.frame)-10, 50) asset:strongSelf.asset delegate:strongSelf];
+                strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
                 if(@available(iOS 11, *)){
                 }else{
                     [strongSelf.trimmerView setFrame:frame];
@@ -172,7 +173,7 @@
                 [timecodeView addSubview:strongSelf.timeRangeLabel];
                 
                 UILabel * timeLengthLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame2.size.width*0.3-20, frame2.size.height)];
-
+                
                 
                 timeLengthLabel.textAlignment = NSTextAlignmentCenter;
                 [timeLengthLabel setText:@"00:00:00"];
@@ -216,7 +217,7 @@
                 [strongSelf addSubview: strongSelf.timecodeView];
                 if(@available(iOS 11, *)){
                     
-                    //ref : https://stackoverflow.com/questions/33141343/autolayout-invalid-related-to-hidden-navigationbar-in-xib 
+                    //ref : https://stackoverflow.com/questions/33141343/autolayout-invalid-related-to-hidden-navigationbar-in-xib
                     float labelTopPadding = (strongSelf.photobrowser.navigationController.navigationBar.alpha==1) ? -25 : 10 ;
                     float topPadding = (strongSelf.photobrowser.navigationController.navigationBar.alpha==1) ? 0 : 50 ;
                     UIEdgeInsets padding = UIEdgeInsetsMake(topPadding, 10, 0, -10);
@@ -244,6 +245,7 @@
                             make.left.equalTo( strongSelf.trimmerView.superview.mas_left).with.offset(padding.left);
                         }
                         make.height.mas_equalTo(frame.size.height);
+                        make.width.mas_equalTo(frame.size.width);
                         
                     }];
                     [timecodeView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -268,7 +270,7 @@
                 //                    strongSelf.trimmerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
                 //                    UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
                 //                    NSLog(@"[strongSelf.trimmerView resetSubviews]");
-//                [strongSelf.trimmerView resetSubviews];
+                //                [strongSelf.trimmerView resetSubviews];
                 if(restoredStartTime != -1 && restoredEndTime != -1){
                     strongSelf.startTime = restoredStartTime;
                     strongSelf.endTime = restoredEndTime;
@@ -279,11 +281,12 @@
                     [strongSelf.trimmerView setVideoBoundsToStartTime:0 endTime: (floor(assetDuration) >= DEFAULT_VIDEO_LENGTH ? DEFAULT_VIDEO_LENGTH :  assetDuration) contentOffset:CGPointMake(0, 0)];
                 }
                 
+                
             }
         }
     });
 }
-    
+
 -(void) didMoveToWindow {
     [super didMoveToWindow]; // (does nothing by default)
     if (self.window == nil) {
@@ -336,7 +339,7 @@
     self.timecodeView = nil;
     [self playButton].hidden = NO;
 }
-    
+
 - (void)setPhoto:(id<MWPhoto>)photo {
     [super setPhoto:photo];
     if(self.photo == nil){
@@ -369,7 +372,7 @@
         
     }
 }
-    
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self restoreRangeAndOffset];
@@ -378,7 +381,7 @@
     
     //    [self restoreRangeAndOffset];
 }
-    
+
 -(void) restoreRangeAndOffset{
     if(((int)[[UIDevice currentDevice] orientation]) == ((int)[[UIApplication sharedApplication] statusBarOrientation])){
         MWPhotoExt *photoExt = self.photo;
@@ -391,11 +394,11 @@
             [self.trimmerView setVideoBoundsToStartTime: restoredStartTime endTime:(restoredEndTime > DEFAULT_VIDEO_LENGTH) ? floor(restoredEndTime) : restoredEndTime  contentOffset:restoredTrimmerTimeOffset];
             //            [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
             [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
-
+            
         }
     }
 }
-    
+
 - (void)resetTrimmerSubview{
     
     typeof(self) __weak weakSelf = self;
@@ -405,24 +408,30 @@
         }
         weakSelf.asset = avAsset;
         weakSelf.url = url;
-        [[NSNotificationCenter defaultCenter] postNotificationName:LOADING_DID_END_NOTIFICATION
-                                                            object:weakSelf];
+        if(CMTimeGetSeconds(weakSelf.asset.duration ) > 3){
+            [[NSNotificationCenter defaultCenter] postNotificationName:LOADING_DID_END_NOTIFICATION object:weakSelf];
+        }else{
+            typeof(self) __strong strongSelf = weakSelf;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
+            });
+        }
         //advoid put too much proceee to main queue
         
     }];
     
     
 }
-    
+
 - (void) onVideoTapped{
     [self.trimmerView hideTracker:self.isPlaying];
     [super onVideoTapped];
     
 }
-    
-    
+
+
 #pragma mark - PlaybackTimeCheckerTimer
-    
+
 - (void)onPlaybackTimeCheckerTimer
 {
     CMTime curTime = [self.player currentTime];
@@ -431,75 +440,77 @@
         seconds = 0; // this happens! dont know why.
     }
     self.videoPlaybackPosition = seconds;
-    
-    [self.trimmerView seekToTime:seconds];
-    
-    if (self.videoPlaybackPosition >= _endTime) {
-        self.videoPlaybackPosition = _startTime;
-        [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
-        [self.trimmerView seekToTime:_startTime];
-        if(!_isLoop){
-            [self.playButton setHidden:NO];
-            [self.player pause];
+    if(self.trimmerView){
+        [self.trimmerView seekToTime:seconds];
+        
+        if (self.videoPlaybackPosition >= _endTime) {
+            self.videoPlaybackPosition = _startTime;
+            [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
+            [self.trimmerView seekToTime:_startTime];
+            if(!_isLoop){
+                [self.playButton setHidden:NO];
+                [self.player pause];
+            }
         }
     }
 }
+
 #pragma mark - ICGVideoTrimmerDelegate
-    
+
 - (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime trimmerViewContentOffset:(CGPoint)trimmerViewContentOffset
-    {
-        _restartOnPlay = YES;
-        [self.playButton setHidden:NO];
-        [self.player pause];
-        self.isPlaying = NO;
-        [self stopPlaybackTimeChecker];
-        
-        [self.trimmerView hideTracker:true];
-        
-        if (startTime > 0 || trimmerViewContentOffset.x > 0) {
-            //then it moved the left position, we should rearrange the bar
-            [self seekVideoToPos:startTime];
-        }
-        else{ // right has changed
-//            [self seekVideoToPos:endTime];
-        }
-        _startTime = startTime > 0 ? startTime : 0;
-        _endTime = endTime;
-        _trimmerTimeOffset = CGPointMake(trimmerViewContentOffset.x, trimmerViewContentOffset.y);
-        MWPhotoExt *photoExt = self.photo;
-        
-        if(photoExt.startEndTime == nil){
-            photoExt.startEndTime = [NSMutableDictionary new];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
-            //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
-            if(_trimmerTimeOffset.x == 0 || _endTime == 0 || _startTime == CMTimeGetSeconds( self.asset.duration )){
-                [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
-            }
-            [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
-        });
-        [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
-        [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
-        [photoExt.startEndTime setValue:@(trimmerViewContentOffset.x) forKey:@"contentOffsetX"];
-        [photoExt.startEndTime setValue:@(trimmerViewContentOffset.y) forKey:@"contentOffsetY"];
-        
-    }
+{
+    _restartOnPlay = YES;
+    [self.playButton setHidden:NO];
+    [self.player pause];
+    self.isPlaying = NO;
+    [self stopPlaybackTimeChecker];
     
+    [self.trimmerView hideTracker:true];
+    
+    if (startTime > 0 || trimmerViewContentOffset.x > 0) {
+        //then it moved the left position, we should rearrange the bar
+        [self seekVideoToPos:startTime];
+    }
+    else{ // right has changed
+        //            [self seekVideoToPos:endTime];
+    }
+    _startTime = startTime > 0 ? startTime : 0;
+    _endTime = endTime;
+    _trimmerTimeOffset = CGPointMake(trimmerViewContentOffset.x, trimmerViewContentOffset.y);
+    MWPhotoExt *photoExt = self.photo;
+    
+    if(photoExt.startEndTime == nil){
+        photoExt.startEndTime = [NSMutableDictionary new];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timeLengthLabel setText:[self timeFormatted:endTime-startTime]];
+        //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
+        if(_trimmerTimeOffset.x == 0 || _endTime == 0 || _startTime == CMTimeGetSeconds( self.asset.duration )){
+            [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
+        }
+        [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
+    });
+    [photoExt.startEndTime setValue:@(startTime) forKey:@"startTime"];
+    [photoExt.startEndTime setValue:@(endTime) forKey:@"endTime"];
+    [photoExt.startEndTime setValue:@(trimmerViewContentOffset.x) forKey:@"contentOffsetX"];
+    [photoExt.startEndTime setValue:@(trimmerViewContentOffset.y) forKey:@"contentOffsetY"];
+    
+}
+
 -(void)trimmerViewDidEndEditing:(nonnull ICGVideoTrimmerView *)trimmerView{
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setVideoRangeLabelWithSring:[NSString stringWithFormat:@"%@: %@ %@ %@", SELECTION, [self timeFormatted:self.startTime] , TO, [self timeFormatted:self.endTime]]];
         //        [self.timeRangeLabel setText:[NSString stringWithFormat:@"%@ - %@", [self timeFormatted:self.startTime] , [self timeFormatted:self.endTime]]];
     });
 }
-    
--(NSString*) timeFormatted:(CGFloat) sec{
 
+-(NSString*) timeFormatted:(CGFloat) sec{
+    
     int totalSeconds = floorf(sec);
     int seconds = totalSeconds % 60;
     int minutes = (totalSeconds / 60) % 60;
     int hours = totalSeconds / 3600;
-
+    
     return [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds];
 }
 
