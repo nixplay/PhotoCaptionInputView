@@ -136,7 +136,7 @@
                     return;
                 }
                 strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
-                strongSelf.trimmerView.minLength = 0;
+                strongSelf.trimmerView.minLength = (assetDuration < 3 ) ? 0 : 3;
                 if(@available(iOS 11, *)){
                 }else{
                     [strongSelf.trimmerView setFrame:frame];
