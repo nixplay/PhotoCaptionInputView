@@ -137,6 +137,16 @@
                 }
                 strongSelf.trimmerView = [[ICGVideoTrimmerView alloc] initWithFrame:frame asset:strongSelf.asset delegate:strongSelf];
                 strongSelf.trimmerView.minLength = (assetDuration < 3 ) ? 0 : 3;
+                [strongSelf.trimmerView setDelegate:strongSelf];
+                // set properties for trimmer view
+                [strongSelf.trimmerView setThumbWidth:20];
+                [strongSelf.trimmerView setThemeColor:LIGHT_BLUE_COLOR];
+                [strongSelf.trimmerView setShowsRulerView:NO];
+                [strongSelf.trimmerView setMaxLength:assetDuration < DEFAULT_VIDEO_LENGTH ? assetDuration : DEFAULT_VIDEO_LENGTH];
+                
+                [strongSelf.trimmerView setRulerLabelInterval:10];
+                
+                [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
                 if(@available(iOS 11, *)){
                 }else{
                     [strongSelf.trimmerView setFrame:frame];
@@ -201,16 +211,7 @@
                 
                 strongSelf.timeLengthLabel = timeLengthLabel;
                 
-                [strongSelf.trimmerView setDelegate:strongSelf];
-                // set properties for trimmer view
-                [strongSelf.trimmerView setThumbWidth:20];
-                [strongSelf.trimmerView setThemeColor:LIGHT_BLUE_COLOR];
-                [strongSelf.trimmerView setShowsRulerView:NO];
-                [strongSelf.trimmerView setMaxLength:assetDuration < DEFAULT_VIDEO_LENGTH ? assetDuration : DEFAULT_VIDEO_LENGTH];
                 
-                [strongSelf.trimmerView setRulerLabelInterval:10];
-                
-                [strongSelf.trimmerView setTrackerColor:LIGHT_BLUE_COLOR];
                 
                 
                 // important: reset subviews
