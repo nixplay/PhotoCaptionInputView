@@ -429,9 +429,9 @@
                                           @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
                                           @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
     }
-    picker.title = NSLocalizedStringFromTable(@"Albums", @"PhotoCaptionInputViewController", nil)
-    picker.customDoneButtonTitle = NSLocalizedString(@"DONE",nil);
-    picker.customCancelButtonTitle = NSLocalizedString(@"CANCEL",nil);
+    picker.title = NSLocalizedStringFromTableInBundle(@"Albums",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Albums");
+    picker.customDoneButtonTitle = NSLocalizedStringFromTableInBundle(@"Donw",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Done");
+    picker.customCancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Cancel");
     
     picker.colsInPortrait = 3;
     picker.colsInLandscape = 5;
@@ -1053,13 +1053,13 @@
     return YES;
 }
 -(NSString*) controllerTitle{
-    return NSLocalizedStringFromTable(@"Albums", @"PhotoCaptionInputViewController", nil);
+    return NSLocalizedStringFromTableInBundle(@"Albums",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Albums");
 }
 -(NSString*) controllerCustomDoneButtonTitle{
-    return NSLocalizedString(@"DONE",nil);
+    return NSLocalizedStringFromTableInBundle(@"Done",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Done");
 }
 -(NSString*) controllerCustomCancelButtonTitle{
-    return NSLocalizedString(@"CANCEL",nil);
+    return NSLocalizedStringFromTableInBundle(@"Cancel",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Cancel");
 }
 #pragma mark -  Accessor
 -(NSArray*) preSelectedAssets{
