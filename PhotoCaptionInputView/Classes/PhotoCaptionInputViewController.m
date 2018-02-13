@@ -781,13 +781,10 @@
 
 -(void) resetTrimmerSubview{
     id page = [self pageDisplayedAtIndex:[self currentIndex]];
-    //    if(page != nil && [page isKindOfClass:[MWZoomingScrollView class]]){
-    //        MWZoomingScrollView *scrollView = (MWZoomingScrollView*)page;
     if([page respondsToSelector:@selector(resetTrimmerSubview)]){
         NSLog(@"resetTrimmerSubview");
         [page resetTrimmerSubview];
     }
-    //    }
 }
 
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
@@ -1049,6 +1046,7 @@
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
     //    NSLog(@"GMImagePicker: User pressed cancel button");
+    [self resetTrimmerSubview];
 }
 
 - (BOOL)shouldSelectAllAlbumCell{
