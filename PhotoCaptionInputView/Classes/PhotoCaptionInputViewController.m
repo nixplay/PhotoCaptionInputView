@@ -393,7 +393,7 @@
 {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    picker.videoMaximumDuration = self.videoMaximumDuration == 0 ? 15 : self.videoMaximumDuration;
+//    picker.videoMaximumDuration = self.videoMaximumDuration == 0 ? 15 : self.videoMaximumDuration;
     if(_allow_video){
         picker.mediaTypes = @[(NSString *)kUTTypeImage,(NSString *)kUTTypeMovie];
         picker.videoQuality = UIImagePickerControllerQualityTypeHigh;
