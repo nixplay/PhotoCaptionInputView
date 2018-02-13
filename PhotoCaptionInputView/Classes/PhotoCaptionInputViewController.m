@@ -39,19 +39,19 @@
     BOOL needResetLayout;
     
 }
-    @property (nonatomic, weak) NSArray* preSelectedAssets;
-    @end
+@property (nonatomic, weak) NSArray* preSelectedAssets;
+@end
 
 @implementation PhotoCaptionInputViewController
-    
-    @synthesize collectionView = _collectionView;
-    @synthesize addButton = _addButton;
-    @synthesize textView = _textView;
-    @synthesize selfDelegate = _selfDelegate;
-    @synthesize backButton = _backButton;
-    @synthesize trashButton = _trashButton;
+
+@synthesize collectionView = _collectionView;
+@synthesize addButton = _addButton;
+@synthesize textView = _textView;
+@synthesize selfDelegate = _selfDelegate;
+@synthesize backButton = _backButton;
+@synthesize trashButton = _trashButton;
 #pragma mark - Init
-    
+
 -(id)initWithPhotos:(NSArray* _Nonnull)photos thumbnails:(NSArray* _Nonnull)thumbnails  preselectedAssets:(NSArray*  _Nullable) _preselectedAssets delegate:(id<PhotoCaptionInputViewDelegate>)delegate{
     if ((self = [super init])) {
         [self initialisation];
@@ -265,12 +265,12 @@
     [[IQKeyboardManager sharedManager] setEnable:YES];
     
 }
-    
+
 -(void) viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
 }
-    
+
 - (UIImage *)imageFromSystemBarButton:(UIBarButtonSystemItem)systemItem {
     // Holding onto the oldItem (if any) to set it back later
     // could use left or right, doesn't matter
@@ -301,7 +301,7 @@
     
     return image;
 }
-    
+
 - (void)initialisation {
     keyboardIsShown = NO;
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -332,15 +332,15 @@
     
     // Do any additional setup after loading the view.
 }
-    
-    
+
+
 -(void)backAction{
     //    NSLog(@"backAction");
     if ([_selfDelegate respondsToSelector:@selector(dismissPhotoCaptionInputView:)]) {
         [_selfDelegate dismissPhotoCaptionInputView:self];
     }
 }
-    
+
 -(void) getPhotosCaptions{
     if ([_selfDelegate respondsToSelector:@selector(photoCaptionInputView:captions:photos:preSelectedAssets:)]) {
         NSMutableArray *captions = [NSMutableArray array];
@@ -381,7 +381,7 @@
         [_selfDelegate photoCaptionInputView:self captions:captions photos:photos preSelectedAssets: self.preSelectedAssets startEndTime:startEndTimes];
     }
 }
-    
+
 -(void)addPhotoFromLibrary{
     if(self.camera){
         [self launchCamera];
@@ -390,67 +390,67 @@
     }
 }
 - (void)launchCamera
-    {
-        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-        picker.videoMaximumDuration = self.videoMaximumDuration == 0 ? 15 : self.videoMaximumDuration;
-        if(_allow_video){
-            picker.mediaTypes = @[(NSString *)kUTTypeImage,(NSString *)kUTTypeMovie];
-            picker.videoQuality = UIImagePickerControllerQualityTypeHigh;
-        }else{
-            picker.mediaTypes = @[(NSString *)kUTTypeImage];
-        }
-        picker.allowsEditing = NO;
-        
-        picker.delegate = self;
-        picker.modalPresentationStyle = UIModalPresentationPopover;
-        
-        //    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
-        //    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
-        //    popPC.barButtonItem = self.addButton;
-        
-        //    [self showViewController:picker sender:self.addButton];
-        [self presentViewController:picker animated:YES completion:nil];
+{
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    picker.videoMaximumDuration = self.videoMaximumDuration == 0 ? 15 : self.videoMaximumDuration;
+    if(_allow_video){
+        picker.mediaTypes = @[(NSString *)kUTTypeImage,(NSString *)kUTTypeMovie];
+        picker.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    }else{
+        picker.mediaTypes = @[(NSString *)kUTTypeImage];
     }
-- (void)launchGMImagePicker
-    {
-        GMImagePickerController *picker = [[GMImagePickerController alloc] init:self.allow_video withAssets:self.preSelectedAssets delegate:self];
-        
-        if(self.allow_video){
-            picker.mediaTypes = @[@(PHAssetMediaTypeImage),
-                                  @(PHAssetMediaTypeVideo)];
-            picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumVideos),
-                                              @(PHAssetCollectionSubtypeSmartAlbumFavorites),
-                                              @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
-                                              @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
-        }else{
-            picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
-            picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumFavorites),
-                                              @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
-                                              @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
-        }
-        picker.title = NSLocalizedString(@"SELECT_AN_ALBUM",nil);
-        picker.customDoneButtonTitle = NSLocalizedString(@"DONE",nil);
-        picker.customCancelButtonTitle = NSLocalizedString(@"CANCEL",nil);
-        
-        picker.colsInPortrait = 3;
-        picker.colsInLandscape = 5;
-        picker.minimumInteritemSpacing = 2.0;
-        picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
-        picker.toolbarTextColor = LIGHT_BLUE_COLOR;
-        picker.toolbarTintColor = LIGHT_BLUE_COLOR;
-        picker.showCameraButton = YES;
-        picker.autoSelectCameraImages = YES;
-        
-        [self.navigationController presentViewController:picker animated:YES completion:nil];
-        
-    }
+    picker.allowsEditing = NO;
     
+    picker.delegate = self;
+    picker.modalPresentationStyle = UIModalPresentationPopover;
+    
+    //    UIPopoverPresentationController *popPC = picker.popoverPresentationController;
+    //    popPC.permittedArrowDirections = UIPopoverArrowDirectionAny;
+    //    popPC.barButtonItem = self.addButton;
+    
+    //    [self showViewController:picker sender:self.addButton];
+    [self presentViewController:picker animated:YES completion:nil];
+}
+- (void)launchGMImagePicker
+{
+    GMImagePickerController *picker = [[GMImagePickerController alloc] init:self.allow_video withAssets:self.preSelectedAssets delegate:self];
+    
+    if(self.allow_video){
+        picker.mediaTypes = @[@(PHAssetMediaTypeImage),
+                              @(PHAssetMediaTypeVideo)];
+        picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumVideos),
+                                          @(PHAssetCollectionSubtypeSmartAlbumFavorites),
+                                          @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
+                                          @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
+    }else{
+        picker.mediaTypes = @[@(PHAssetMediaTypeImage)];
+        picker.customSmartCollections = @[@(PHAssetCollectionSubtypeSmartAlbumFavorites),
+                                          @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
+                                          @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
+    }
+    picker.title = NSLocalizedString(@"SELECT_AN_ALBUM",nil);
+    picker.customDoneButtonTitle = NSLocalizedString(@"DONE",nil);
+    picker.customCancelButtonTitle = NSLocalizedString(@"CANCEL",nil);
+    
+    picker.colsInPortrait = 3;
+    picker.colsInLandscape = 5;
+    picker.minimumInteritemSpacing = 2.0;
+    picker.navigationBarTintColor = LIGHT_BLUE_COLOR;
+    picker.toolbarTextColor = LIGHT_BLUE_COLOR;
+    picker.toolbarTintColor = LIGHT_BLUE_COLOR;
+    picker.showCameraButton = YES;
+    picker.autoSelectCameraImages = YES;
+    
+    [self.navigationController presentViewController:picker animated:YES completion:nil];
+    
+}
+
 -(void)removePhoto{
     if([self.selfPhotos count] > 1){
         //        NSLog(@"removePhoto");
         //may have problem
-//        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
+        //        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
         //        if([preSelectedAssets containsObject:photo.photoData]){
         //            [preSelectedAssets removeObject:photo.photoData];
         //        }
@@ -478,52 +478,52 @@
     }
     
 }
-    
+
 -(void)reloadPhoto{
     //    NSLog(@"removePhoto");
     [self.collectionView reloadData];
     [self reloadData];
     self.navigationItem.rightBarButtonItem = _trashButton;
 }
-    
-    
+
+
 -(void) viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-    
+
 #pragma mark UITextViewDelegate
-    
+
 -(void) onKeyboardDidShow :(NSNotification*)notification
-    {
-        if(!keyboardIsShown){
-            //        NSDictionary* keyboardInfo = [notification userInfo];
-            //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-            //        _keyboardRect= [keyboardFrameBegin CGRectValue];
-            //        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
-            //
-            //        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
-            //        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
-            keyboardIsShown = YES;
-            NSString * caption = [ [self.selfPhotos objectAtIndex:self.currentIndex] caption];
-            ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
-        }
-        
+{
+    if(!keyboardIsShown){
+        //        NSDictionary* keyboardInfo = [notification userInfo];
+        //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        //        _keyboardRect= [keyboardFrameBegin CGRectValue];
+        //        BOOL isNotOffset = (self.navigationController.view.frame.origin.y == 0);
+        //
+        //        [self.navigationController.view setFrame:CGRectMake(0, 0, self.view.frame.size.width , self.view.frame.size.height)];
+        //        [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect animation:isNotOffset];
+        keyboardIsShown = YES;
+        NSString * caption = [ [self.selfPhotos objectAtIndex:self.currentIndex] caption];
+        ((IQTextView*)_textView).toolbarPlaceholder = ([caption length]) == 0 ? PLACEHOLDER_TEXT : [NSString stringWithFormat:@"%lu/%d",(unsigned long)_textView.text.length, MAX_CHARACTER];
     }
     
+}
+
 -(void) onKeyboardWillHide :(NSNotification*)notification
-    {
-        if(keyboardIsShown){
-            //        NSDictionary* keyboardInfo = [notification userInfo];
-            //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
-            //        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
-            //        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
-            [_textView setFrame:[self newFrameFromTextView:_textView]];
-            
-            keyboardIsShown = NO;
-        }
+{
+    if(keyboardIsShown){
+        //        NSDictionary* keyboardInfo = [notification userInfo];
+        //        NSValue* keyboardFrameBegin = [keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey];
+        //        CGRect keyboardFrameBeginRect = [keyboardFrameBegin CGRectValue];
+        //        [self animatetextView:_textView up:NO keyboardFrameBeginRect:keyboardFrameBeginRect animation:YES];
+        [_textView setFrame:[self newFrameFromTextView:_textView]];
         
+        keyboardIsShown = NO;
     }
     
+}
+
 -(void)textViewDidChange:(UITextView *)textView{
     MWPhotoExt *photo = [self.selfPhotos objectAtIndex:self.currentIndex];
     
@@ -539,21 +539,21 @@
     return YES;
 }
 -(void)textViewDidBeginEditing:(UITextView *)textView
-    {
-        //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
-        textView.backgroundColor = TEXTFIELD_BG_COLOR;
-        textView.textColor = TEXTFIELD_TEXT_COLOR;
-    }
-    
+{
+    //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:keyboardRect];
+    textView.backgroundColor = TEXTFIELD_BG_COLOR;
+    textView.textColor = TEXTFIELD_TEXT_COLOR;
+}
+
 - (void)textViewDidEndEditing:(UITextView *)textView
-    {
-        //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
-        //    [self animatetextView:textView up:NO :];
-        textView.backgroundColor = TEXTFIELD_BG_COLOR;
-        textView.textColor = TEXTFIELD_TEXT_COLOR;
-        [textView setFrame:[self newFrameFromTextView:textView]];
-        
-    }
+{
+    //    [self animatetextView:_textView up:YES keyboardFrameBeginRect:_keyboardRect];
+    //    [self animatetextView:textView up:NO :];
+    textView.backgroundColor = TEXTFIELD_BG_COLOR;
+    textView.textColor = TEXTFIELD_TEXT_COLOR;
+    [textView setFrame:[self newFrameFromTextView:textView]];
+    
+}
 - (BOOL)textViewShouldReturn:(UITextView *)textView{
     //    NSLog(@"textViewShouldReturn:");
     if (textView.tag == 1) {
@@ -571,8 +571,8 @@
     }
     return YES;
 }
-    
-    
+
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // Prevent crashing undo bug – see note below.
     IQTextView* iqTextView = (IQTextView*)textView;
@@ -591,34 +591,34 @@
     NSUInteger newLength = [textView.text length] + [text length] - range.length;
     return newLength <= MAX_CHARACTER;
 }
-    
-    
+
+
 -(void)animatetextView:(UITextView*)textView up:(BOOL)up keyboardFrameBeginRect:(CGRect)keyboardFrameBeginRect animation:(BOOL) animation
-    {
-        
-        const int movementDistance = -(keyboardFrameBeginRect.size.height ); // tweak as needed
-        const float movementDuration = animation ? 0.3f : 0; // tweak as needed
-        
-        int movement = (up ? movementDistance : -movementDistance);
-        
-        [UIView beginAnimations: @"animatetextView" context: nil];
-        [UIView setAnimationBeginsFromCurrentState: YES];
-        [UIView setAnimationDuration: movementDuration];
-        self.navigationController.view.frame = CGRectOffset(self.navigationController.view.frame, 0, movement);
-        [UIView commitAnimations];
-    }
+{
     
+    const int movementDistance = -(keyboardFrameBeginRect.size.height ); // tweak as needed
+    const float movementDuration = animation ? 0.3f : 0; // tweak as needed
+    
+    int movement = (up ? movementDistance : -movementDistance);
+    
+    [UIView beginAnimations: @"animatetextView" context: nil];
+    [UIView setAnimationBeginsFromCurrentState: YES];
+    [UIView setAnimationDuration: movementDuration];
+    self.navigationController.view.frame = CGRectOffset(self.navigationController.view.frame, 0, movement);
+    [UIView commitAnimations];
+}
+
 #pragma mark UICollectionViewDelegate
-    //
-    //-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    //    return [self.photos count];
-    //}
-    
+//
+//-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+//    return [self.photos count];
+//}
+
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     
     return [self.selfThumbs count];
 }
-    
+
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     MWGridCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"GridCell" forIndexPath:indexPath];
     if (!cell) {
@@ -651,61 +651,61 @@
     
 }
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-    {
-        dispatch_async (dispatch_get_main_queue (), ^{
-            [self setCurrentPhotoIndex:indexPath.item];
+{
+    dispatch_async (dispatch_get_main_queue (), ^{
+        [self setCurrentPhotoIndex:indexPath.item];
+        
+        //        [self.collectionView layoutIfNeeded];
+        
+        [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
+        
+        if(self.prevSelectItem != NULL){
             
-            //        [self.collectionView layoutIfNeeded];
+            [self.prevSelectItem setHighlighted: NO];
+            self.prevSelectItem.layer.borderWidth = 0.0;
+            self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
+        }
+        
+        MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+        if(cell != NULL){
+            
+            cell.layer.borderWidth = 2.0;
+            cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
+            self.prevSelectItem = cell;
+            
+        }
+        
+        [self resetTrimmerSubview];
+        MWPhotoExt *photo = [self.selfPhotos objectAtIndex:indexPath.item];
+        if(!photo.isVideo){
+            NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
             
             [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
             
-            if(self.prevSelectItem != NULL){
-                
-                [self.prevSelectItem setHighlighted: NO];
-                self.prevSelectItem.layer.borderWidth = 0.0;
-                self.prevSelectItem.layer.borderColor = [[UIColor clearColor] CGColor];
-            }
-            
-            MWGridCell *cell = (MWGridCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
-            if(cell != NULL){
-                
-                cell.layer.borderWidth = 2.0;
-                cell.layer.borderColor = LIGHT_BLUE_CGCOLOR;
-                self.prevSelectItem = cell;
-                
-            }
-            
-            [self resetTrimmerSubview];
-            MWPhotoExt *photo = [self.selfPhotos objectAtIndex:indexPath.item];
-            if(!photo.isVideo){
-                NSString * caption = [ [self.selfPhotos objectAtIndex:indexPath.item] caption];
-                
-                [self.collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:YES];
-                
-                [_textView setText:caption];
-                [_textView setFrame:[self newFrameFromTextView:_textView]];
-                [_textView setHidden:NO];
-            }else{
-                [_textView setHidden:YES];
-            }
-            
-        });
-    }
-    
+            [_textView setText:caption];
+            [_textView setFrame:[self newFrameFromTextView:_textView]];
+            [_textView setHidden:NO];
+        }else{
+            [_textView setHidden:YES];
+        }
+        
+    });
+}
+
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat initHeight = collectionView.frame.size.height;
     return CGSizeMake(initHeight, initHeight);
     
 }
-    
+
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section {
     return 3;
 }
-    
+
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     return 3;
 }
-    
+
 -(CGRect) newFrameFromTextView:(UITextView*)textView{
     
     float rows = (textView.contentSize.height - textView.textContainerInset.top - textView.textContainerInset.bottom) / textView.font.lineHeight;
@@ -717,7 +717,7 @@
         return CGRectMake( 10, _parentView.frame.origin.y-10-newHeight, self.view.frame.size.width-20 , newHeight);
     }
 }
-    
+
 - (UIImage *)imageForPhoto:(id<MWPhoto>)photo {
     if (photo) {
         // Get image or obtain in background
@@ -729,10 +729,10 @@
     }
     return nil;
 }
-    
-    
+
+
 #pragma mark MWPhotoBrowserDelegate
-    
+
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index{
     if(self.collectionView != NULL){
         if(self.prevSelectItem != NULL){
@@ -774,11 +774,11 @@
         
     }
 }
-    
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     [self resetTrimmerSubview];
 }
-    
+
 -(void) resetTrimmerSubview{
     id page = [self pageDisplayedAtIndex:[self currentIndex]];
     //    if(page != nil && [page isKindOfClass:[MWZoomingScrollView class]]){
@@ -789,32 +789,32 @@
     }
     //    }
 }
-    
+
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
     return [self.selfPhotos count];
 }
-    
+
 - (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index {
     return [self.selfPhotos objectAtIndex:index];
 }
-    
+
 - (MWCaptionView *)photoBrowser:(MWPhotoBrowser *)photoBrowser captionViewForPhotoAtIndex:(NSUInteger)index{
     //    MWPhoto *photo = [self.photos objectAtIndex:index];
     //    MWCaptionView *captionView = [[MWCaptionView alloc] initWithPhoto:photo];
     //    return captionView;
     return nil;
 }
-    
+
 -(NSString*) photoBrowser:(MWPhotoBrowser *)photoBrowser titleForPhotoAtIndex:(NSUInteger)index{
     NSString* title = @"";
-//    if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
-//        title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
-//    }else{
-//        title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
-//    }
+    //    if ([_selfDelegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
+    //        title = [_selfDelegate photoCaptionInputView:self titleForPhotoAtIndex:index];
+    //    }else{
+    //        title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(photoBrowser.currentIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long) [self.selfPhotos count]];
+    //    }
     return title;
 }
-    
+
 - (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser{
     
     
@@ -840,7 +840,7 @@
     }
     
 }
-    
+
 - (NSMutableArray*)photoBrowser:(MWPhotoBrowser *)photoBrowser buildToolbarItems:(UIToolbar*)toolBar{
     
     NSMutableArray *items = nil;
@@ -851,7 +851,7 @@
     }
     return items;
 }
-    
+
 - (BOOL)photoBrowser:(MWPhotoBrowser *)photoBrowser setNavBarAppearance:(UINavigationBar *)navigationBar{
     
     [photoBrowser.navigationController setNavigationBarHidden:NO animated:NO];
@@ -880,26 +880,26 @@
     }
 }
 - (UIImage *)imageFromLayer:(CALayer *)layer
-    {
-        UIGraphicsBeginImageContext([layer frame].size);
-        
-        [layer renderInContext:UIGraphicsGetCurrentContext()];
-        UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
-        
-        UIGraphicsEndImageContext();
-        
-        return outputImage;
-    }
+{
+    UIGraphicsBeginImageContext([layer frame].size);
     
+    [layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
     
+    UIGraphicsEndImageContext();
+    
+    return outputImage;
+}
+
+
 - (void)didReceiveMemoryWarning {
     self.collectionView = nil;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-    
-    
-    
+
+
+
 #pragma mark - Video
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
     //    [self setVideoLoadingIndicatorVisible:NO atPageIndex:index];
@@ -911,7 +911,7 @@
     //    }
     
 }
-    
+
 - (void)setVideoLoadingIndicatorVisible:(BOOL)visible atPageIndex:(NSUInteger)pageIndex {
     //    if (_currentVideoLoadingIndicator && !visible) {
     //        [_currentVideoLoadingIndicator removeFromSuperview];
@@ -926,86 +926,86 @@
     //        [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = YES;
     //    }
 }
-    /*
-     #pragma mark - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-     // Get the new view controller using [segue destinationViewController].
-     // Pass the selected object to the new view controller.
-     }
-     */
-    
-    
-    
-    
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+
+
+
 #pragma mark - GMImagePickerControllerDelegate
-    
-    
-    
+
+
+
 - (NSPredicate *)predicateOfAssetType:(PHAssetMediaType)type
-    {
-        return [NSPredicate predicateWithBlock:^BOOL(PHAsset *asset, NSDictionary *bindings) {
-            return (asset.mediaType == type);
-        }];
-    }
-    
+{
+    return [NSPredicate predicateWithBlock:^BOOL(PHAsset *asset, NSDictionary *bindings) {
+        return (asset.mediaType == type);
+    }];
+}
+
 - (void)assetsPickerController:(GMImagePickerController *)picker didFinishPickingAssets:(NSArray *)assetArray
-    {
-        UIScreen *screen = [UIScreen mainScreen];
-        CGFloat scale = screen.scale;
-        // Sizing is very rough... more thought required in a real implementation
-        CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
-        CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
-        CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+{
+    UIScreen *screen = [UIScreen mainScreen];
+    CGFloat scale = screen.scale;
+    // Sizing is very rough... more thought required in a real implementation
+    CGFloat imageSize = MAX(screen.bounds.size.width, screen.bounds.size.height) * 1.5;
+    CGSize imageTargetSize = CGSizeMake(imageSize * scale, imageSize * scale);
+    CGSize thumbTargetSize = CGSizeMake(imageSize / 3.0 * scale, imageSize / 3.0 * scale);
+    
+    
+    [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    //    [preSelectedAssets removeAllObjects];
+    
+    //    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
+    //No sure if remo all data from list and add it back
+    NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
+    NSMutableArray *removeAssets = [NSMutableArray new];
+    NSIndexSet *toBeRemoved = [self.selfPhotos indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
+        // The block is called for each object in the array.
+        //remove item if not exist
+        BOOL stillExist = NO;
         
-        
-        [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        //    [preSelectedAssets removeAllObjects];
-        
-        //    NSArray* backPhotos = [NSArray arrayWithArray:self.selfPhotos];
-        //No sure if remo all data from list and add it back
-        NSMutableArray *assets = [NSMutableArray arrayWithArray:assetArray];
-        NSMutableArray *removeAssets = [NSMutableArray new];
-        NSIndexSet *toBeRemoved = [self.selfPhotos indexesOfObjectsPassingTest:^BOOL(MWPhotoExt* obj, NSUInteger idx, BOOL *stop) {
-            // The block is called for each object in the array.
-            //remove item if not exist
-            BOOL stillExist = NO;
-            
-            for(PHAsset * asset in assets){
-                if([[obj photoData ] isEqualToString:asset.localIdentifier]){
-                    [removeAssets addObject:asset];
-                    stillExist = YES;
-                }
+        for(PHAsset * asset in assets){
+            if([[obj photoData ] isEqualToString:asset.localIdentifier]){
+                [removeAssets addObject:asset];
+                stillExist = YES;
             }
-            return !stillExist;
-        }];
-        [assets removeObjectsInArray:removeAssets];
-        [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
-        [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
-        
-        
-        
-        
-        //TODO not yet handle deselect action
-        [assets enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
-            [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
-            [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
-        }];
-        [self setCurrentPhotoIndex:self.selfPhotos.count-1];
-        [self reloadPhoto];
-        if(self.selfPhotos.count>1){
-            self.navigationItem.rightBarButtonItem.enabled = YES;
         }
-        if([self.selfPhotos count] >= self.maximumImagesCount){
-            self.addButton.enabled = NO;
-        }
-        needResetLayout = YES;
-        [self resetTrimmerSubview];
-        
-        
-        
+        return !stillExist;
+    }];
+    [assets removeObjectsInArray:removeAssets];
+    [self.selfPhotos removeObjectsAtIndexes:toBeRemoved];
+    [self.selfThumbs removeObjectsAtIndexes:toBeRemoved];
+    
+    
+    
+    
+    //TODO not yet handle deselect action
+    [assets enumerateObjectsUsingBlock:^(PHAsset*  _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self.selfPhotos addObject:[MWPhotoExt photoWithAsset:asset targetSize:imageTargetSize]];
+        [self.selfThumbs addObject:[MWPhotoExt photoWithAsset:asset targetSize:thumbTargetSize]];
+    }];
+    [self setCurrentPhotoIndex:self.selfPhotos.count-1];
+    [self reloadPhoto];
+    if(self.selfPhotos.count>1){
+        self.navigationItem.rightBarButtonItem.enabled = YES;
     }
+    if([self.selfPhotos count] >= self.maximumImagesCount){
+        self.addButton.enabled = NO;
+    }
+    needResetLayout = YES;
+    [self resetTrimmerSubview];
+    
+    
+    
+}
 -(BOOL)assetsPickerController:(GMImagePickerController *)picker shouldSelectAsset:(PHAsset *)asset{
     NSPredicate *videoPredicate = [self predicateOfAssetType:PHAssetMediaTypeVideo];
     NSInteger nVideos = [picker.selectedAssets filteredArrayUsingPredicate:videoPredicate].count;
@@ -1045,12 +1045,12 @@
         return YES;
     }
 }
-    //Optional implementation:
+//Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
-    {
-        //    NSLog(@"GMImagePicker: User pressed cancel button");
-    }
-    
+{
+    //    NSLog(@"GMImagePicker: User pressed cancel button");
+}
+
 - (BOOL)shouldSelectAllAlbumCell{
     return YES;
 }
@@ -1071,9 +1071,9 @@
     }
     return nil;
 }
-    
-    //lock orientation
-    
+
+//lock orientation
+
 - (void)viewLayoutMarginsDidChange{
     [super viewLayoutMarginsDidChange];
     [_textView setFrame:[self newFrameFromTextView:_textView]];
@@ -1081,23 +1081,23 @@
 -(BOOL)shouldAutorotate {
     return YES;
 }
-    
+
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait|UIInterfaceOrientationMaskLandscapeLeft|UIInterfaceOrientationMaskLandscapeRight;
 }
-    
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
     return YES;
 }
-    
+
 - (BOOL)prefersStatusBarHidden {
     return NO;
 }
-    
+
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleDefault;
 }
-    
+
 -(NSBundle*) getBundle{
     return [NSBundle bundleForClass:[self superclass]];
 }
@@ -1105,9 +1105,9 @@
     MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
     return scrollView;
 }
-    
+
 #pragma mark - Camera Delegate
-    
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
 {
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
@@ -1149,8 +1149,7 @@
                     
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [strongSelf setCurrentPhotoIndex:self.selfPhotos.count-1];
-                        [strongSelf reloadPhoto];
+                        
                         if(strongSelf.selfPhotos.count>1){
                             strongSelf.navigationItem.rightBarButtonItem.enabled = YES;
                         }
@@ -1159,6 +1158,8 @@
                         }
                         needResetLayout = YES;
                         [hud hideAnimated:YES];
+                        [strongSelf setCurrentPhotoIndex:self.selfPhotos.count-1];
+                        [strongSelf reloadPhoto];
                     });
                     
                 }
@@ -1201,7 +1202,7 @@
     }
     
 }
-    
+
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
