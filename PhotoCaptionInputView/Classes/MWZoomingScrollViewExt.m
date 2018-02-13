@@ -305,6 +305,7 @@
         self.playerLayer = nil;
         self.videoLayer = nil;
         self.videoPlayer = nil;
+        [self.trimmerView removeFromSuperview];
         self.trimmerView = nil;
         
         [self.timeLengthLabel removeFromSuperview];
@@ -331,6 +332,7 @@
     self.playerLayer = nil;
     self.videoLayer = nil;
     self.videoPlayer = nil;
+    [self.trimmerView removeFromSuperview];
     self.trimmerView = nil;
     [self.timeLengthLabel removeFromSuperview];
     [self.timeRangeLabel removeFromSuperview];
@@ -409,6 +411,7 @@
         }
         weakSelf.asset = avAsset;
         weakSelf.url = url;
+        if(!weakSelf.trimmerView){
 //        if(CMTimeGetSeconds(weakSelf.asset.duration ) > 3){
             [[NSNotificationCenter defaultCenter] postNotificationName:LOADING_DID_END_NOTIFICATION object:weakSelf];
 //        }else{
@@ -417,6 +420,7 @@
 //                [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
 //            });
 //        }
+        }
         //advoid put too much proceee to main queue
         
     }];
