@@ -429,7 +429,7 @@
                                           @(PHAssetCollectionSubtypeSmartAlbumRecentlyAdded),
                                           @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
     }
-    picker.title = NSLocalizedString(@"SELECT_AN_ALBUM",nil);
+    picker.title = NSLocalizedStringFromTable(@"Albums", @"PhotoCaptionInputViewController", nil)
     picker.customDoneButtonTitle = NSLocalizedString(@"DONE",nil);
     picker.customCancelButtonTitle = NSLocalizedString(@"CANCEL",nil);
     
@@ -1053,7 +1053,7 @@
     return YES;
 }
 -(NSString*) controllerTitle{
-    return NSLocalizedString(@"SELECT_AN_ALBUM",nil);
+    return NSLocalizedStringFromTable(@"Albums", @"PhotoCaptionInputViewController", nil);
 }
 -(NSString*) controllerCustomDoneButtonTitle{
     return NSLocalizedString(@"DONE",nil);
