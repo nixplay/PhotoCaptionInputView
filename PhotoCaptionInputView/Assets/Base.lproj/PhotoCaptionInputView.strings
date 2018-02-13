@@ -1,8 +1,7 @@
 "SELECT_AN_ALBUM" = "Select an Album";
 "Albums" = "Albums";
-"DONE" = "Done";
-"CANCEL" = "Cancel";
+"Done" = "Done";
+"Cancel" = "Cancel";
 "Selection" = "Selection";
 "to" = "to";
 "Limited to %@ seconds. Drag the blue bars to trim the video" = "Limited to %@ seconds. Drag the blue bars to trim the video";
-
