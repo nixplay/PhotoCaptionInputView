@@ -112,7 +112,7 @@
                 return;
             }
             ((MWPhoto*)strongSelf.photo).videoURL = strongSelf.url;
-            [strongSelf setupVideoPreviewUrl:strongSelf.url avurlAsset:((AVURLAsset*)strongSelf.asset) photoImageViewFrame:strongSelf.frame];
+            [strongSelf setupVideoPreviewAsset:strongSelf.asset photoImageViewFrame:strongSelf.frame];
             //            NSLog(@"description %@",strongSelf.description);
             if(strongSelf.startTime == -1 && strongSelf.endTime == -1 && strongSelf.trimmerView == nil && strongSelf.trimmerView == nil ){
                 
@@ -405,9 +405,9 @@
 - (void)resetTrimmerSubview{
     
     typeof(self) __weak weakSelf = self;
-    self.playButton.hidden = YES;
-    [self.photo getVideoURL:^(NSURL *url, AVURLAsset *avAsset) {
-        if(url == nil){
+
+    [self.photo getVideoURL:^(NSURL *url, AVAsset *avAsset) {
+        if(url == nil && avAsset == nil){
             return;
         }
         weakSelf.asset = avAsset;
@@ -466,7 +466,9 @@
 - (void)trimmerView:(ICGVideoTrimmerView *)trimmerView didChangeLeftPosition:(CGFloat)startTime rightPosition:(CGFloat)endTime trimmerViewContentOffset:(CGPoint)trimmerViewContentOffset
     {
         _restartOnPlay = YES;
-        self.playButton.hidden = NO;
+        if(self.isPlaying){
+            self.playButton.hidden = NO;
+        }
         [self.player pause];
         self.isPlaying = NO;
         [self stopPlaybackTimeChecker];
