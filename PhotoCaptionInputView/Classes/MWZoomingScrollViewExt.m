@@ -442,24 +442,9 @@
 #pragma mark - PlaybackTimeCheckerTimer
 -(void) playerItemDidReachEnd:(NSNotification *)notification{
     
-//    [super playerItemDidReachEnd:notification];
-//    CMTime curTime = [self.player currentTime];
-//    Float64 seconds = CMTimeGetSeconds(curTime);
-//    if (seconds < 0){
-//        seconds = 0; // this happens! dont know why.
-//    }
-    if(self.trimmerView){
-        self.videoPlaybackPosition = _startTime;
-        
-        [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
-        [self.trimmerView seekToTime:_startTime];
-        if(!_isLoop){
-            [super playerItemDidReachEnd:notification];
-        }else{
-            [self.player play];
-        }
-        
-    }
+    [super playerItemDidReachEnd:notification];
+    self.isPlaying = NO;
+
 }
 - (void)onPlaybackTimeCheckerTimer
 {
