@@ -293,6 +293,7 @@
     [super didMoveToWindow]; // (does nothing by default)
     if (self.window == nil) {
         // YOUR CODE FOR WHEN UIVIEW IS REMOVED
+        [self stopPlaybackTimeChecker];
         self.isPlaying = NO;
         [self.player seekToTime:CMTimeMake(0, 1)];
         [self.player pause];
@@ -319,6 +320,7 @@
 }
 - (void)prepareForReuse {
     [super prepareForReuse];
+    [self stopPlaybackTimeChecker];
     self.isPlaying = NO;
     
     [self.player seekToTime:CMTimeMake(0, 1)];
@@ -440,20 +442,21 @@
 #pragma mark - PlaybackTimeCheckerTimer
 -(void) playerItemDidReachEnd:(NSNotification *)notification{
     
-    [super playerItemDidReachEnd:notification];
-    CMTime curTime = [self.player currentTime];
-    Float64 seconds = CMTimeGetSeconds(curTime);
-    if (seconds < 0){
-        seconds = 0; // this happens! dont know why.
-    }
+//    [super playerItemDidReachEnd:notification];
+//    CMTime curTime = [self.player currentTime];
+//    Float64 seconds = CMTimeGetSeconds(curTime);
+//    if (seconds < 0){
+//        seconds = 0; // this happens! dont know why.
+//    }
     if(self.trimmerView){
-        [self.trimmerView seekToTime:seconds];
         self.videoPlaybackPosition = _startTime;
+        
         [self seekVideoToPos: _startTime < 0 ? 0 : _startTime ];
         [self.trimmerView seekToTime:_startTime];
         if(!_isLoop){
-            self.playButton.hidden = NO;
-            [self.player pause];
+            [super playerItemDidReachEnd:notification];
+        }else{
+            [self.player play];
         }
         
     }
