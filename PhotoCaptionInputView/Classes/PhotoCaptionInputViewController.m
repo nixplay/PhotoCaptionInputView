@@ -430,7 +430,7 @@
                                           @(PHAssetCollectionSubtypeSmartAlbumPanoramas)];
     }
     picker.title = NSLocalizedStringFromTableInBundle(@"Albums",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Albums");
-    picker.customDoneButtonTitle = NSLocalizedStringFromTableInBundle(@"Donw",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Done");
+    picker.customDoneButtonTitle = NSLocalizedStringFromTableInBundle(@"Done",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Done");
     picker.customCancelButtonTitle = NSLocalizedStringFromTableInBundle(@"Cancel",  @"PhotoCaptionInputView", [NSBundle bundleForClass:PhotoCaptionInputViewController.class], @"Cancel");
     
     picker.colsInPortrait = 3;
