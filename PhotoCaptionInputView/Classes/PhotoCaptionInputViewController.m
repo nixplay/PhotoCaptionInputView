@@ -233,7 +233,7 @@
     //    [_textView setScrollEnabled:NO];
     
     
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"toolbarBackWhite"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(backAction)];
@@ -243,7 +243,7 @@
     _backButton = backButton;
     
     
-    UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"bin"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]]
+    UIBarButtonItem *trashButton = [[UIBarButtonItem alloc] initWithImage:[[UIImage imageForResourcePath:[NSString stringWithFormat:format, @"bin"] ofType:@"png" inBundle:[NSBundle bundleForClass:[self class]]] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]
                                                                     style:UIBarButtonItemStylePlain
                                                                    target:self
                                                                    action:@selector(removePhoto)];
