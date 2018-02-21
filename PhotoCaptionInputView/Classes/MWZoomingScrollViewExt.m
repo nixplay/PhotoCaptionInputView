@@ -225,7 +225,7 @@
                     UIEdgeInsets padding = UIEdgeInsetsMake(topPadding, 10, 0, -10);
                     
                     [strongSelf.timeLengthLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-                        make.centerX.equalTo(strongSelf.mas_centerX);
+                        make.centerX.equalTo(strongSelf.timecodeView.mas_centerX);
                         if(@available(iOS 11, *)){
                             make.top.equalTo(strongSelf.mas_safeAreaLayoutGuideTop).with.offset(labelTopPadding);
                         }else{
