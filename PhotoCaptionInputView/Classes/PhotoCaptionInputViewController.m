@@ -1096,9 +1096,6 @@
     return UIStatusBarStyleDefault;
 }
 
--(NSBundle*) getBundle{
-    return [NSBundle bundleForClass:[self class]];
-}
 -(MWZoomingScrollView *) InitMWZoomingScrollView {
     MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
     return scrollView;
