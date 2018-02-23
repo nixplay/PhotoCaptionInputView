@@ -5,4 +5,4 @@
 "Selection" = "Auswahl";
 "to" = "bis";
 "Limited to %@ seconds. Drag the blue bars to trim the video" = "Auf %@ Sek. begrenzt. Zum Schneiden des Videos blaue Striche verwenden.";
-"Syncing" = "Syncing" ;
+"Syncing" = "Downloading from iCloud" ;

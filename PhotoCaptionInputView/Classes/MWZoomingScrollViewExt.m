@@ -543,7 +543,7 @@
 - (NSString*) labelText{
     NSBundle* bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[MWZoomingScrollViewExt class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
     
-    return NSLocalizedStringFromTableInBundle(@"Syncing", @"PhotoCaptionInputView", bundle, @"Syncing");
+    return NSLocalizedStringFromTableInBundle(@"Syncing", @"PhotoCaptionInputView", bundle, @"Downloading from iCloud");
 }
 @end
 
