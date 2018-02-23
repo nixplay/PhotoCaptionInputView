@@ -1097,7 +1097,7 @@
 }
 
 -(NSBundle*) getBundle{
-    return [NSBundle bundleForClass:[self superclass]];
+    return [NSBundle bundleForClass:[self class]];
 }
 -(MWZoomingScrollView *) InitMWZoomingScrollView {
     MWZoomingScrollViewExt *scrollView= [[MWZoomingScrollViewExt alloc] initWithPhotoBrowser:self];
