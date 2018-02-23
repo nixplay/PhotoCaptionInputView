@@ -1202,6 +1202,9 @@
 {
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
+-(NSBundle*) getBundle{
+    return [NSBundle bundleForClass:[self superclass]];
+}
 
 //-(void)image:(UIImage *)image finishedSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
 //{
