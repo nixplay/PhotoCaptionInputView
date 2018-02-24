@@ -383,6 +383,10 @@
     [super layoutSubviews];
     [self restoreRangeAndOffset];
 }
+-(void) setPlayButton:(UIButton*)button{
+    [super setPlayButton:button];
+    self.playButton.hidden = YES;
+}
 - (void)onDeviceOrientationChange {
     
     //    [self restoreRangeAndOffset];
