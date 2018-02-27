@@ -4,5 +4,5 @@
 "Cancel" = "Cancel";
 "Selection" = "Selection";
 "to" = "to";
-"Limited to %@ seconds. Drag the blue bars to trim the video" = "Limited to %@ seconds. Drag the blue bars to trim the video";
+"Limited to %@ seconds. Drag the blue bars to trim the video" = "Maximum %@ seconds. Drag the blue bars to trim";
 "Syncing" = "Downloading from iCloud" ;

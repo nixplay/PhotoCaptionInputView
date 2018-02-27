@@ -66,13 +66,9 @@
 }
 
 -(NSBundle*) getBundle{
-//    NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[MWZoomingScrollViewExt class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
-    NSBundle *bundle = [NSBundle bundleForClass:[MWZoomingScrollViewExt class]];
-//    NSLog(@"localizations : \" %@ \"",[bundle localizations]);
-//    NSLog(@"string : \" %@ \"",[bundle localizedStringForKey:@"Selection" value:@"not found" table:@"PhotoCaptionInputView"]);
-//
-    return  bundle;
-    
+    NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[self class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
+    NSLog(@" %@",[bundle localizations]);
+    return bundle;
 }
 
 - (void)listeningRotating {
