@@ -1126,7 +1126,7 @@
             
             if (success) {
                 
-                NSLog(@"localIdentifier %@", placeholder.localIdentifier);
+                //NSLog(@"localIdentifier %@", placeholder.localIdentifier);
                 
                 dispatch_semaphore_signal(sema);
                 UIScreen *screen = [UIScreen mainScreen];
@@ -1161,7 +1161,7 @@
                 
             }
             else {
-                NSLog(@"%@", error);
+                //NSLog(@"%@", error);
                 dispatch_semaphore_signal(sema);
             }
         };

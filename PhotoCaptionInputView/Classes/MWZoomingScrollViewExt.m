@@ -534,7 +534,7 @@
     if(_hintsVisibilityTimer){
         [self.timeRangeLabel setText:[NSString stringWithFormat:HINTS_MESSAGE,@(DEFAULT_VIDEO_LENGTH)]];
     }else{
-        NSLog(@"setVideoRangeLabelWithSring %@",msg);
+        //NSLog(@"setVideoRangeLabelWithSring %@",msg);
         [self.timeRangeLabel setText:msg];
     }
 }
