@@ -67,7 +67,6 @@
 
 -(NSBundle*) getBundle{
     NSBundle * bundle = [NSBundle bundleWithURL:[[NSBundle bundleForClass:[self class]] URLForResource:@"PhotoCaptionInputView" withExtension:@"bundle"]];
-    NSLog(@" %@",[bundle localizations]);
     return bundle;
 }
 
