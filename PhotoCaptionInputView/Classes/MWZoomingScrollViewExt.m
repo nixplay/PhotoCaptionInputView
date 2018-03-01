@@ -164,6 +164,7 @@
                 }
                 
                 UILabel * timeRangeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+                [timeRangeLabel setFont:[UIFont systemFontOfSize:10]];
                 if(@available(iOS 11, *)){
                 }else{
                     [timeRangeLabel setFrame:CGRectMake(0, 0, frame2.size.width, frame2.size.height)];
