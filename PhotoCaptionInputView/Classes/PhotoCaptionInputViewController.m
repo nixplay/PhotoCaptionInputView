@@ -440,7 +440,7 @@
     picker.toolbarTextColor = LIGHT_BLUE_COLOR;
     picker.toolbarTintColor = LIGHT_BLUE_COLOR;
     picker.showCameraButton = YES;
-    picker.autoSelectCameraImages = YES;
+    picker.autoSelectCameraImages = NO;
     
     [self.navigationController presentViewController:picker animated:YES completion:nil];
     
